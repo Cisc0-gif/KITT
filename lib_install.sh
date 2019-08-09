@@ -44,6 +44,7 @@ pip install bs4
 pip install requests
 pip install psutil
 pip install httplib
+pip3 install shodan
 pip3 install datetime
 pip3 install pytz
 pip3 install colorama

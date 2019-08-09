@@ -114,3 +114,8 @@
 * formatted LOG.txt as CHANGELOG.md
 * push all files to origin master
 * commits 0-9 were added
+
+### v1.0 8/9/19
+* removed git signatures from OWASP-ZSC, 7zipcrack, hashcat, theHarvester
+* add shodan pip install to lib_install.sh
+* reinitialized repo to fix git signatures
