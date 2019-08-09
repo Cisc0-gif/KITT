@@ -55,6 +55,7 @@ def home():
   print('*[21] OWASP-ZSC - payload encoder                              *')
   print('*[22] Investig@te - forensics tools                            *')
   print('*[23] Spooftooph - bluetooth device spoofer                    *')
+  print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(os.getcwd() + ': ')
@@ -699,6 +700,12 @@ def home():
       wait()
     except:
       print('Error running bluespoof.sh!')
+  elif in_put == '24':
+    try:
+      os.system('python3 shodan_search.py')
+      wait()
+    except:
+      print('Error running shodan_search.py!')
   elif in_put == 'R':
     os.chdir(root)
     os.system('more README.md')

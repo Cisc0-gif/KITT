@@ -119,3 +119,4 @@
 * removed git signatures from OWASP-ZSC, 7zipcrack, hashcat, theHarvester
 * add shodan pip install to lib_install.sh
 * reinitialized repo to fix git signatures
+* added shodan_search.py to menu
