@@ -60,7 +60,7 @@ def home():
   print(Style.RESET_ALL + '================================================================')
   in_put = input(os.getcwd() + ': ')
   nums = ['X', 'R', 'L']
-  for i in range(1,24):
+  for i in range(1,25):
     nums.append(str(i))
   if in_put not in nums:
     print('not an option dumbass')

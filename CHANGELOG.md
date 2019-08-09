@@ -120,3 +120,4 @@
 * add shodan pip install to lib_install.sh
 * reinitialized repo to fix git signatures
 * added shodan_search.py to menu
+* fixed option list error
