@@ -1,0 +1,9 @@
+PING godhatesfags.com (104.18.83.61) 56(84) bytes of data.
+64 bytes from 104.18.83.61: icmp_seq=1 ttl=56 time=24.6 ms
+64 bytes from 104.18.83.61: icmp_seq=2 ttl=56 time=19.8 ms
+64 bytes from 104.18.83.61: icmp_seq=3 ttl=56 time=21.8 ms
+64 bytes from 104.18.83.61: icmp_seq=4 ttl=56 time=28.2 ms
+
+--- godhatesfags.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 7ms
+rtt min/avg/max/mdev = 19.787/23.597/28.165/3.144 ms

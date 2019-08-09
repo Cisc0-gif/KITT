@@ -1,0 +1,11 @@
+-------------------------------------------
+      	     Joomla Scan                  
+   Usage: python joomlascan.py <target>    
+    Version 0.5beta - Database Entries 1197
+         created by Andrea Draghetti       
+-------------------------------------------
+Robots file found: 	 	 > https://www.godhatesfags.com/robots.txt
+No Error Log found
+
+Start scan...with 10 concurrent threads!
+End Scanner

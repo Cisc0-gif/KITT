@@ -1,0 +1,60 @@
+"Target Host","Date (UTC)","MSF Module","LocalHost","Listening Port","Successful Logs","Failure Logs","All Logs"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/dns/dns_fuzzer","4444","default","","[-] 104.200.129.98:53     - 104.200.129.98:53 - DNS - The remote server is not responding to DNS requests.","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-dns-dns_fuzzer for ERB directives.
+[*] Added workspace: 192.168.1.144
+[*] Workspace: 192.168.1.144
+[-] 104.200.129.98:53     - 104.200.129.98:53 - DNS - The remote server is not responding to DNS requests.
+[*] 104.200.129.98:53     - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/ftp/client_ftp","4444","default","","[-] Auxiliary failed: NoMethodError undefined method `match' for {:check_empty=>false}:Hash
+[-] Call stack:
+[-]   /usr/share/metasploit-framework/lib/msf/core/opt_base.rb:118:in `valid?'
+[-]   /usr/share/metasploit-framework/lib/msf/core/opt_string.rb:34:in `valid?'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:200:in `block in validate'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:199:in `each_pair'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:199:in `validate'","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-ftp-client_ftp for ERB directives.
+[*] Workspace '192.168.1.144' already existed, switching to it.
+[*] Workspace: 192.168.1.144
+[*] Running module against 104.200.129.98
+[-] Auxiliary failed: NoMethodError undefined method `match' for {:check_empty=>false}:Hash
+[-] Call stack:
+[-]   /usr/share/metasploit-framework/lib/msf/core/opt_base.rb:118:in `valid?'
+[-]   /usr/share/metasploit-framework/lib/msf/core/opt_string.rb:34:in `valid?'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:200:in `block in validate'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:199:in `each_pair'
+[-]   /usr/share/metasploit-framework/lib/msf/core/option_container.rb:199:in `validate'"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/ftp/ftp_pre_post","4444","default","","[-] 104.200.129.98:21 - Error: Rex::ConnectionRefused The connection was refused by the remote host (104.200.129.98:21). [""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:298:in `rescue in create_by_type'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:263:in `create_by_type'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:33:in `create'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket.rb:49:in `create_param'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/tcp.rb:37:in `create_param'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/tcp.rb:28:in `create'"", ""/usr/share/metasploit-framework/lib/msf/core/exploit/tcp.rb:106:in `connect'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:91:in `block in process_phase'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:78:in `each'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:78:in `process_phase'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:161:in `run_host'"", ""/usr/share/metasploit-framework/lib/msf/core/auxiliary/scanner.rb:111:in `block (2 levels) in run'"", ""/usr/share/metasploit-framework/lib/msf/core/thread_manager.rb:106:in `block in spawn'""]","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-ftp-ftp_pre_post for ERB directives.
+[*] Workspace '192.168.1.144' already existed, switching to it.
+[*] Workspace: 192.168.1.144
+[*] 104.200.129.98:21 - Connecting to host 104.200.129.98 on port 21
+[*] 104.200.129.98:21 - [Phase 1] Fuzzing without command - 2019-07-09 15:13:15 -0700
+[*] 104.200.129.98:21 -  Character : Cyclic (1/1)
+[*] 104.200.129.98:21 - Exception 1 of 2
+[*] 104.200.129.98:21 - Crash string : Cyclic x 10
+[*] 104.200.129.98:21 - Exception triggered, need 1 more exception(s) before interrupting process
+[*] 104.200.129.98:21 - Exception 2 of 2
+[*] 104.200.129.98:21 - Crash string : Cyclic x 10
+[*] 104.200.129.98:21 - System does not respond - exiting now
+[-] 104.200.129.98:21 - Error: Rex::ConnectionRefused The connection was refused by the remote host (104.200.129.98:21). [""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:298:in `rescue in create_by_type'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:263:in `create_by_type'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/comm/local.rb:33:in `create'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket.rb:49:in `create_param'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/tcp.rb:37:in `create_param'"", ""/usr/share/metasploit-framework/vendor/bundle/ruby/2.5.0/gems/rex-socket-0.1.17/lib/rex/socket/tcp.rb:28:in `create'"", ""/usr/share/metasploit-framework/lib/msf/core/exploit/tcp.rb:106:in `connect'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:91:in `block in process_phase'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:78:in `each'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:78:in `process_phase'"", ""/usr/share/metasploit-framework/modules/auxiliary/fuzzers/ftp/ftp_pre_post.rb:161:in `run_host'"", ""/usr/share/metasploit-framework/lib/msf/core/auxiliary/scanner.rb:111:in `block (2 levels) in run'"", ""/usr/share/metasploit-framework/lib/msf/core/thread_manager.rb:106:in `block in spawn'""]
+[*] 104.200.129.98:21 - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/http/http_form_field","4444","default","","[-] The connection was refused by the remote host (104.200.129.98:80).
+[-] No response","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-http-http_form_field for ERB directives.
+[*] Workspace '192.168.1.144' already existed, switching to it.
+[*] Workspace: 192.168.1.144
+[*] Running module against 104.200.129.98
+[*] Grabbing webpage / from 104.200.129.98
+[-] The connection was refused by the remote host (104.200.129.98:80).
+[-] No response
+[*] Auxiliary module execution completed"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/http/http_get_uri_long","4444","default","","","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-http-http_get_uri_long for ERB directives.
+[*] Workspace '192.168.1.144' already existed, switching to it.
+[*] Workspace: 192.168.1.144
+[*] Running module against 104.200.129.98
+[*] 104.200.129.98:80 - Could not connect to the service: The connection was refused by the remote host (104.200.129.98:80).
+[*] Auxiliary module execution completed"
+"104.200.129.98","2019-07-09_15h10m13s","auxiliary/fuzzers/http/http_get_uri_strings","4444","default","","","[*] Processing /root/AutoSploit/autosploit_out/2019-07-09_15h10m13s/104.200.129.98/auxiliary-fuzzers-http-http_get_uri_strings for ERB directives.
+[*] Workspace '192.168.1.144' already existed, switching to it.
+[*] Workspace: 192.168.1.144
+[*] Running module against 104.200.129.98
+[*] 104.200.129.98:80 - Could not connect to the service: The connection was refused by the remote host (104.200.129.98:80).
+[*] Auxiliary module execution completed"

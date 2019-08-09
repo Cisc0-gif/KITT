@@ -1,0 +1,470 @@
+Starting Nmap 7.70 ( https://nmap.org ) at 2019-07-03 00:34 PDT
+Stats: 0:01:33 elapsed; 0 hosts completed (1 up), 1 undergoing Script Scan
+NSE Timing: About 99.45% done; ETC: 00:36 (0:00:00 remaining)
+Nmap scan report for godhatesfags.com (104.18.83.61)
+Host is up (0.023s latency).
+Other addresses for godhatesfags.com (not scanned): 104.18.82.61
+Not shown: 996 filtered ports
+PORT     STATE SERVICE       VERSION
+80/tcp   open  http          cloudflare
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dc2080cd346-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   GetRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dbfebf613f3-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   HTTPOptions: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dc07a079953-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   RTSPRequest: 
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   X11Probe: 
+|     HTTP/1.1 400 Bad Request
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     CF-RAY: -
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|_    </html>
+| http-robots.txt: 9 disallowed entries 
+| /cgi-bin/ /mobile/ /scripts/ /js/ /css/ /flash/ /php/ 
+|_/*.css /*.php
+|_http-server-header: cloudflare
+|_http-title: Westboro Baptist Church Home Page
+443/tcp  open  ssl/https     cloudflare
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:51 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de97fd42112-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   GetRequest: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:50 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de72f1213f9-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   HTTPOptions: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:50 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de83ec09923-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   RTSPRequest: 
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   tor-versions: 
+|     HTTP/1.1 400 Bad Request
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:51 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     CF-RAY: -
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|_    </html>
+| http-robots.txt: 9 disallowed entries 
+| /cgi-bin/ /mobile/ /scripts/ /js/ /css/ /flash/ /php/ 
+|_/*.css /*.php
+|_http-server-header: cloudflare
+|_http-title: Westboro Baptist Church Home Page
+| ssl-cert: Subject: commonName=ssl384960.cloudflaressl.com
+| Subject Alternative Name: DNS:ssl384960.cloudflaressl.com, DNS:*.godhatesfags.com, DNS:godhatesfags.com
+| Not valid before: 2019-03-07T00:00:00
+|_Not valid after:  2019-09-13T23:59:59
+|_ssl-date: 2019-07-03T07:35:08+00:00; 0s from scanner time.
+| tls-alpn: 
+|   h2
+|_  http/1.1
+| tls-nextprotoneg: 
+|   h2
+|_  http/1.1
+8080/tcp open  http-proxy    cloudflare
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dc1ec3ad386-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   GetRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dbfec2453d6-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   HTTPOptions: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     Server: cloudflare
+|     CF-RAY: 4f072dc0ef4a98c3-LAX
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   RTSPRequest: 
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   Socks5: 
+|     HTTP/1.1 400 Bad Request
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:44 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     CF-RAY: -
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|_    </html>
+|_http-server-header: cloudflare
+8443/tcp open  ssl/https-alt cloudflare
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:51 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de9bbf920be-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   GetRequest: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:50 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de72932785a-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   HTTPOptions: 
+|     HTTP/1.1 403 Forbidden
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:50 GMT
+|     Content-Type: text/html
+|     Content-Length: 167
+|     Connection: close
+|     CF-RAY: 4f072de888649851-LAX
+|     <html>
+|     <head><title>403 Forbidden</title></head>
+|     <body bgcolor="white">
+|     <center><h1>403 Forbidden</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   RPCCheck: 
+|     HTTP/1.1 400 Bad Request
+|     Server: cloudflare
+|     Date: Wed, 03 Jul 2019 07:34:56 GMT
+|     Content-Type: text/html
+|     Content-Length: 171
+|     Connection: close
+|     CF-RAY: -
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|     </html>
+|   RTSPRequest: 
+|     <html>
+|     <head><title>400 Bad Request</title></head>
+|     <body bgcolor="white">
+|     <center><h1>400 Bad Request</h1></center>
+|     <hr><center>cloudflare</center>
+|     </body>
+|_    </html>
+|_http-server-header: cloudflare
+|_http-title: 400 The plain HTTP request was sent to HTTPS port
+| ssl-cert: Subject: commonName=ssl384960.cloudflaressl.com
+| Subject Alternative Name: DNS:ssl384960.cloudflaressl.com, DNS:*.godhatesfags.com, DNS:godhatesfags.com
+| Not valid before: 2019-03-07T00:00:00
+|_Not valid after:  2019-09-13T23:59:59
+|_ssl-date: 2019-07-03T07:35:14+00:00; 0s from scanner time.
+| tls-alpn: 
+|   h2
+|_  http/1.1
+| tls-nextprotoneg: 
+|   h2
+|_  http/1.1
+4 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port80-TCP:V=7.70%I=7%D=7/3%Time=5D1C5A94%P=arm-unknown-linux-gnueabihf
+SF:%r(GetRequest,15F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nDate:\x20Wed,\
+SF:x2003\x20Jul\x202019\x2007:34:44\x20GMT\r\nContent-Type:\x20text/html\r
+SF:\nContent-Length:\x20171\r\nConnection:\x20close\r\nServer:\x20cloudfla
+SF:re\r\nCF-RAY:\x204f072dbfebf613f3-LAX\r\n\r\n<html>\r\n<head><title>400
+SF:\x20Bad\x20Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<ce
+SF:nter><h1>400\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflare<
+SF:/center>\r\n</body>\r\n</html>\r\n")%r(HTTPOptions,15F,"HTTP/1\.1\x2040
+SF:0\x20Bad\x20Request\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:44\x
+SF:20GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nConnec
+SF:tion:\x20close\r\nServer:\x20cloudflare\r\nCF-RAY:\x204f072dc07a079953-
+SF:LAX\r\n\r\n<html>\r\n<head><title>400\x20Bad\x20Request</title></head>\
+SF:r\n<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x20Request</h1
+SF:></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n
+SF:")%r(RTSPRequest,AB,"<html>\r\n<head><title>400\x20Bad\x20Request</titl
+SF:e></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x20R
+SF:equest</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n<
+SF:/html>\r\n")%r(X11Probe,14C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nServ
+SF:er:\x20cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:44\x20
+SF:GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nConnecti
+SF:on:\x20close\r\nCF-RAY:\x20-\r\n\r\n<html>\r\n<head><title>400\x20Bad\x
+SF:20Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>
+SF:400\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflare</center>\
+SF:r\n</body>\r\n</html>\r\n")%r(FourOhFourRequest,15F,"HTTP/1\.1\x20400\x
+SF:20Bad\x20Request\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:44\x20G
+SF:MT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nConnectio
+SF:n:\x20close\r\nServer:\x20cloudflare\r\nCF-RAY:\x204f072dc2080cd346-LAX
+SF:\r\n\r\n<html>\r\n<head><title>400\x20Bad\x20Request</title></head>\r\n
+SF:<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x20Request</h1></
+SF:center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port443-TCP:V=7.70%T=SSL%I=7%D=7/3%Time=5D1C5A9A%P=arm-unknown-linux-gn
+SF:ueabihf%r(GetRequest,159,"HTTP/1\.1\x20403\x20Forbidden\r\nServer:\x20c
+SF:loudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:50\x20GMT\r\nC
+SF:ontent-Type:\x20text/html\r\nContent-Length:\x20167\r\nConnection:\x20c
+SF:lose\r\nCF-RAY:\x204f072de72f1213f9-LAX\r\n\r\n<html>\r\n<head><title>4
+SF:03\x20Forbidden</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<cente
+SF:r><h1>403\x20Forbidden</h1></center>\r\n<hr><center>cloudflare</center>
+SF:\r\n</body>\r\n</html>\r\n")%r(HTTPOptions,159,"HTTP/1\.1\x20403\x20For
+SF:bidden\r\nServer:\x20cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x
+SF:2007:34:50\x20GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x201
+SF:67\r\nConnection:\x20close\r\nCF-RAY:\x204f072de83ec09923-LAX\r\n\r\n<h
+SF:tml>\r\n<head><title>403\x20Forbidden</title></head>\r\n<body\x20bgcolo
+SF:r=\"white\">\r\n<center><h1>403\x20Forbidden</h1></center>\r\n<hr><cent
+SF:er>cloudflare</center>\r\n</body>\r\n</html>\r\n")%r(FourOhFourRequest,
+SF:159,"HTTP/1\.1\x20403\x20Forbidden\r\nServer:\x20cloudflare\r\nDate:\x2
+SF:0Wed,\x2003\x20Jul\x202019\x2007:34:51\x20GMT\r\nContent-Type:\x20text/
+SF:html\r\nContent-Length:\x20167\r\nConnection:\x20close\r\nCF-RAY:\x204f
+SF:072de97fd42112-LAX\r\n\r\n<html>\r\n<head><title>403\x20Forbidden</titl
+SF:e></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>403\x20Forbidde
+SF:n</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html
+SF:>\r\n")%r(tor-versions,14C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nServe
+SF:r:\x20cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:51\x20G
+SF:MT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nConnectio
+SF:n:\x20close\r\nCF-RAY:\x20-\r\n\r\n<html>\r\n<head><title>400\x20Bad\x2
+SF:0Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>4
+SF:00\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflare</center>\r
+SF:\n</body>\r\n</html>\r\n")%r(RTSPRequest,AB,"<html>\r\n<head><title>400
+SF:\x20Bad\x20Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<ce
+SF:nter><h1>400\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflare<
+SF:/center>\r\n</body>\r\n</html>\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8080-TCP:V=7.70%I=7%D=7/3%Time=5D1C5A94%P=arm-unknown-linux-gnueabi
+SF:hf%r(GetRequest,15F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nDate:\x20Wed
+SF:,\x2003\x20Jul\x202019\x2007:34:44\x20GMT\r\nContent-Type:\x20text/html
+SF:\r\nContent-Length:\x20171\r\nConnection:\x20close\r\nServer:\x20cloudf
+SF:lare\r\nCF-RAY:\x204f072dbfec2453d6-LAX\r\n\r\n<html>\r\n<head><title>4
+SF:00\x20Bad\x20Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<
+SF:center><h1>400\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflar
+SF:e</center>\r\n</body>\r\n</html>\r\n")%r(HTTPOptions,15F,"HTTP/1\.1\x20
+SF:400\x20Bad\x20Request\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:44
+SF:\x20GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nConn
+SF:ection:\x20close\r\nServer:\x20cloudflare\r\nCF-RAY:\x204f072dc0ef4a98c
+SF:3-LAX\r\n\r\n<html>\r\n<head><title>400\x20Bad\x20Request</title></head
+SF:>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x20Request</
+SF:h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r
+SF:\n")%r(RTSPRequest,AB,"<html>\r\n<head><title>400\x20Bad\x20Request</ti
+SF:tle></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x2
+SF:0Request</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\
+SF:n</html>\r\n")%r(FourOhFourRequest,15F,"HTTP/1\.1\x20400\x20Bad\x20Requ
+SF:est\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:44\x20GMT\r\nContent
+SF:-Type:\x20text/html\r\nContent-Length:\x20171\r\nConnection:\x20close\r
+SF:\nServer:\x20cloudflare\r\nCF-RAY:\x204f072dc1ec3ad386-LAX\r\n\r\n<html
+SF:>\r\n<head><title>400\x20Bad\x20Request</title></head>\r\n<body\x20bgco
+SF:lor=\"white\">\r\n<center><h1>400\x20Bad\x20Request</h1></center>\r\n<h
+SF:r><center>cloudflare</center>\r\n</body>\r\n</html>\r\n")%r(Socks5,14C,
+SF:"HTTP/1\.1\x20400\x20Bad\x20Request\r\nServer:\x20cloudflare\r\nDate:\x
+SF:20Wed,\x2003\x20Jul\x202019\x2007:34:44\x20GMT\r\nContent-Type:\x20text
+SF:/html\r\nContent-Length:\x20171\r\nConnection:\x20close\r\nCF-RAY:\x20-
+SF:\r\n\r\n<html>\r\n<head><title>400\x20Bad\x20Request</title></head>\r\n
+SF:<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Bad\x20Request</h1></
+SF:center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8443-TCP:V=7.70%T=SSL%I=7%D=7/3%Time=5D1C5A9A%P=arm-unknown-linux-g
+SF:nueabihf%r(GetRequest,159,"HTTP/1\.1\x20403\x20Forbidden\r\nServer:\x20
+SF:cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:50\x20GMT\r\n
+SF:Content-Type:\x20text/html\r\nContent-Length:\x20167\r\nConnection:\x20
+SF:close\r\nCF-RAY:\x204f072de72932785a-LAX\r\n\r\n<html>\r\n<head><title>
+SF:403\x20Forbidden</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<cent
+SF:er><h1>403\x20Forbidden</h1></center>\r\n<hr><center>cloudflare</center
+SF:>\r\n</body>\r\n</html>\r\n")%r(HTTPOptions,159,"HTTP/1\.1\x20403\x20Fo
+SF:rbidden\r\nServer:\x20cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\
+SF:x2007:34:50\x20GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20
+SF:167\r\nConnection:\x20close\r\nCF-RAY:\x204f072de888649851-LAX\r\n\r\n<
+SF:html>\r\n<head><title>403\x20Forbidden</title></head>\r\n<body\x20bgcol
+SF:or=\"white\">\r\n<center><h1>403\x20Forbidden</h1></center>\r\n<hr><cen
+SF:ter>cloudflare</center>\r\n</body>\r\n</html>\r\n")%r(FourOhFourRequest
+SF:,159,"HTTP/1\.1\x20403\x20Forbidden\r\nServer:\x20cloudflare\r\nDate:\x
+SF:20Wed,\x2003\x20Jul\x202019\x2007:34:51\x20GMT\r\nContent-Type:\x20text
+SF:/html\r\nContent-Length:\x20167\r\nConnection:\x20close\r\nCF-RAY:\x204
+SF:f072de9bbf920be-LAX\r\n\r\n<html>\r\n<head><title>403\x20Forbidden</tit
+SF:le></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>403\x20Forbidd
+SF:en</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</htm
+SF:l>\r\n")%r(RTSPRequest,AB,"<html>\r\n<head><title>400\x20Bad\x20Request
+SF:</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<center><h1>400\x20Ba
+SF:d\x20Request</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body
+SF:>\r\n</html>\r\n")%r(RPCCheck,14C,"HTTP/1\.1\x20400\x20Bad\x20Request\r
+SF:\nServer:\x20cloudflare\r\nDate:\x20Wed,\x2003\x20Jul\x202019\x2007:34:
+SF:56\x20GMT\r\nContent-Type:\x20text/html\r\nContent-Length:\x20171\r\nCo
+SF:nnection:\x20close\r\nCF-RAY:\x20-\r\n\r\n<html>\r\n<head><title>400\x2
+SF:0Bad\x20Request</title></head>\r\n<body\x20bgcolor=\"white\">\r\n<cente
+SF:r><h1>400\x20Bad\x20Request</h1></center>\r\n<hr><center>cloudflare</ce
+SF:nter>\r\n</body>\r\n</html>\r\n");
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|specialized|media device|WAP
+Running (JUST GUESSING): Linux 3.X|4.X|2.6.X (94%), Hikvision embedded (85%)
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:2.6.10 cpe:/h:hikvision:ds-7600 cpe:/o:linux:linux_kernel:3.0 cpe:/o:linux:linux_kernel:3.10
+Aggressive OS guesses: Linux 3.12 - 4.10 (94%), Linux 3.16 (87%), Linux 3.18 (87%), HIKVISION DS-7600 Linux Embedded NVR (Linux 2.6.10) (85%), Linux 3.0 (85%), DD-WRT v24-sp2 (Linux 3.10) (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 9 hops
+
+TRACEROUTE (using port 80/tcp)
+HOP RTT      ADDRESS
+1   4.50 ms  192.168.1.254
+2   22.45 ms 76-218-92-1.lightspeed.irvnca.sbcglobal.net (76.218.92.1)
+3   21.49 ms 75.29.48.33
+4   22.94 ms 12.122.129.190
+5   24.20 ms ggr2.la2ca.ip.att.net (12.122.128.97)
+6   ...
+7   32.77 ms if-ae-30-2.tcore1.eql-los-angeles.as6453.net (206.82.129.18)
+8   22.21 ms 206.82.129.227
+9   19.88 ms 104.18.83.61
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 121.09 seconds

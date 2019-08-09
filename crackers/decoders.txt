@@ -1,0 +1,25 @@
+Vigenere Cipher - http://rumkin.com/tools/cipher/vigenere.php
+
+Atbash Cipher - http://rumkin.com/tools/cipher/atbash.php
+
+Online Hash Cracker - https://md5hashing.net/hash/
+
+Online Hash Cracker - https://crackstation.net/
+
+RSA Calculator - http://extranet.cryptomathic.com/rsacalc/index
+
+Methods of Cracking RSA - https://www.sjoerdlangkemper.nl/2019/06/19/attacking-rsa/
+
+Bin-Hex-Dec Converter https://www.binaryhexconverter.com/
+
+Railfence Cipher - http://rumkin.com/tools/cipher/railfence.php
+
+Bit Shift Calculator - https://bit-calculator.com/bit-shift-calculator
+
+Bit/Binary Calculator - https://www.miniwebtool.com/bitwise-calculator/?data_type=2&number1=0000000011001000&number2=0000000011101111&operator=OR
+
+JS Char Code Converter - http://jdstiles.com/java/cct.html
+
+UUEncode Decocer - https://www.dcode.fr/uu-encoding
+
+SHA-1 Converter and Reverser - https://sha1.gromweb.com/

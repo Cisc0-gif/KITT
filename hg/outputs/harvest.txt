@@ -1,0 +1,97 @@
+
+Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+
+
+[93m*******************************************************************
+*  _   _                                            _             *
+* | |_| |__   ___    /\  /\__ _ _ ____   _____  ___| |_ ___ _ __  *
+* | __|  _ \ / _ \  / /_/ / _` | '__\ \ / / _ \/ __| __/ _ \ '__| *
+* | |_| | | |  __/ / __  / (_| | |   \ V /  __/\__ \ ||  __/ |    *
+*  \__|_| |_|\___| \/ /_/ \__,_|_|    \_/ \___||___/\__\___|_|    *
+*                                                                 *
+* theHarvester 3.1.0.dev1                                          *
+* Coded by Christian Martorella                                   *
+* Edge-Security Research                                          *
+* cmartorella@edge-security.com                                   *
+*                                                                 *
+******************************************************************* 
+
+ [0m
+[94m[*] Target: lootcrate.com 
+ [0m
+[94m[*] Searching Google. [0m
+
+
+[-] Searching with Google Dorks: 
+	Searching through 10 results
+	Searching through 20 results
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Searching through 30 results
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+	Google is blocking your IP due to too many automated requests, wait or change your IP
+
+[*] No IPs found.
+
+[*] No emails found.
+
+[*] Hosts found: 3
+---------------------
+help.lootcrate.com:104.16.55.111
+vault.lootcrate.com:23.227.38.32
+www.lootcrate.com:35.190.5.75
+
+
+[*] Scanning ports (active).
+
+[*] Scanning 104.16.55.111
+	[*] Detected open ports: 80,443,8080
+	 Searching takeovers for help.lootcrate.com
+[*] Scanning 23.227.38.32
+	[*] Detected open ports: 80,443,8080
+	 Searching takeovers for vault.lootcrate.com
+[*] Scanning 35.190.5.75
+	[*] Detected open ports: 80,443,8080
+	 Searching takeovers for www.lootcrate.com
+[94m[*] Searching Shodan. [0m
+	Searching for 104.16.55.111
+	Searching for 23.227.38.32
+	Searching for 35.190.5.75
++-----------------+----------------------+-----------------+-----------------+--------------------+
+|   IP address    |       Hostname       |       Org       | Services:Ports  |    Technologies    |
++#################+######################+#################+#################+####################+
+|  104.16.55.111  |                      |   Cloudflare    |    None:443,    |  jQuery, Ruby on   |
+|                 |                      |                 |     None:80     |    Rails, Ruby     |
++-----------------+----------------------+-----------------+-----------------+--------------------+
+|                 |                      |                 |    None:80,     |  jQuery, Shopify,  |
+|  23.227.38.32   |                      |     Shopify     |    None:443,    |  Google Analytics  |
+|                 |                      |                 |    None:2083    |                    |
++-----------------+----------------------+-----------------+-----------------+--------------------+
+|                 |                      |                 |    None:25,     |                    |
+|                 |                      |                 |   nginx:443,    |                    |
+|                 |                      |                 |    nginx:80,    |                    |
+|                 |                      |                 |   None:8080,    |                    |
+|                 |                      |                 |   None:3389,    |    Ruby, React,    |
+|                 | 75.5.190.35.bc.googl |                 |    None:195,    |  Google Font API,  |
+|   35.190.5.75   |   eusercontent.com   |  Google Cloud   |   None:5901,    |     Google Tag     |
+|                 |                      |                 |   None:5222,    |  Manager, Ruby on  |
+|                 |                      |                 |   None:5900,    |       Rails        |
+|                 |                      |                 |   None:9200,    |                    |
+|                 |                      |                 |   None:5672,    |                    |
+|                 |                      |                 |    None:587,    |                    |
+|                 |                      |                 |    None:1883    |                    |
++-----------------+----------------------+-----------------+-----------------+--------------------+
+
+[*] Reporting started.
+[*] Reporting finished.
+[*] Saving files.
+[*] Files saved.
+
+
+
