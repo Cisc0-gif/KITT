@@ -34,10 +34,7 @@ static void main_log_clear_line (MAYBE_UNUSED const size_t prev_len, MAYBE_UNUSE
 
   fputc ('\r', fp);
 
-  for (size_t i = 0; i < prev_len; i++)
-  {
-    fputc (' ', fp);
-  }
+  for (size_t i = 0; i < prev_len; i++) fputc (' ', fp);
 
   fputc ('\r', fp);
 
@@ -60,10 +57,7 @@ static void main_log (hashcat_ctx_t *hashcat_ctx, FILE *fp, const int loglevel)
 
   const size_t prev_len = event_ctx->prev_len;
 
-  if (prev_len)
-  {
-    main_log_clear_line (prev_len, fp);
-  }
+  if (prev_len) main_log_clear_line (prev_len, fp);
 
   if (msg_newline == true)
   {
@@ -100,16 +94,16 @@ static void main_log (hashcat_ctx_t *hashcat_ctx, FILE *fp, const int loglevel)
   #else
   switch (loglevel)
   {
-    case LOGLEVEL_INFO:                                      break;
-    case LOGLEVEL_WARNING: hc_fwrite ("\033[33m", 5, 1, fp); break;
-    case LOGLEVEL_ERROR:   hc_fwrite ("\033[31m", 5, 1, fp); break;
-    case LOGLEVEL_ADVICE:  hc_fwrite ("\033[33m", 5, 1, fp); break;
+    case LOGLEVEL_INFO:                                   break;
+    case LOGLEVEL_WARNING: fwrite ("\033[33m", 5, 1, fp); break;
+    case LOGLEVEL_ERROR:   fwrite ("\033[31m", 5, 1, fp); break;
+    case LOGLEVEL_ADVICE:  fwrite ("\033[33m", 5, 1, fp); break;
   }
   #endif
 
   // finally, print
 
-  hc_fwrite (msg_buf, msg_len, 1, fp);
+  fwrite (msg_buf, msg_len, 1, fp);
 
   // color stuff post
 
@@ -124,10 +118,10 @@ static void main_log (hashcat_ctx_t *hashcat_ctx, FILE *fp, const int loglevel)
   #else
   switch (loglevel)
   {
-    case LOGLEVEL_INFO:                                     break;
-    case LOGLEVEL_WARNING: hc_fwrite ("\033[0m", 4, 1, fp); break;
-    case LOGLEVEL_ERROR:   hc_fwrite ("\033[0m", 4, 1, fp); break;
-    case LOGLEVEL_ADVICE:  hc_fwrite ("\033[0m", 4, 1, fp); break;
+    case LOGLEVEL_INFO:                                  break;
+    case LOGLEVEL_WARNING: fwrite ("\033[0m", 4, 1, fp); break;
+    case LOGLEVEL_ERROR:   fwrite ("\033[0m", 4, 1, fp); break;
+    case LOGLEVEL_ADVICE:  fwrite ("\033[0m", 4, 1, fp); break;
   }
   #endif
 
@@ -135,13 +129,13 @@ static void main_log (hashcat_ctx_t *hashcat_ctx, FILE *fp, const int loglevel)
 
   if (msg_newline == true)
   {
-    hc_fwrite (EOL, strlen (EOL), 1, fp);
+    fwrite (EOL, strlen (EOL), 1, fp);
 
     // on error, add another newline
 
     if (loglevel == LOGLEVEL_ERROR)
     {
-      hc_fwrite (EOL, strlen (EOL), 1, fp);
+      fwrite (EOL, strlen (EOL), 1, fp);
     }
   }
 
@@ -333,15 +327,15 @@ static void main_cracker_hash_cracked (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, 
   user_options_t        *user_options       = hashcat_ctx->user_options;
   user_options_extra_t  *user_options_extra = hashcat_ctx->user_options_extra;
 
-  if (outfile_ctx->fp != NULL) return; // cracked hash was not written to an outfile
+  if (outfile_ctx->fp.pfp != NULL) return; // cracked hash was not written to an outfile
 
   if ((user_options_extra->wordlist_mode == WL_MODE_FILE) || (user_options_extra->wordlist_mode == WL_MODE_MASK))
   {
     if (outfile_ctx->filename == NULL) if (user_options->quiet == false) clear_prompt (hashcat_ctx);
   }
 
-  hc_fwrite (buf, len,          1, stdout);
-  hc_fwrite (EOL, strlen (EOL), 1, stdout);
+  fwrite (buf, len,          1, stdout);
+  fwrite (EOL, strlen (EOL), 1, stdout);
 
   if ((user_options_extra->wordlist_mode == WL_MODE_FILE) || (user_options_extra->wordlist_mode == WL_MODE_MASK))
   {
@@ -384,20 +378,20 @@ static void main_potfile_hash_show (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAY
 {
   outfile_ctx_t *outfile_ctx = hashcat_ctx->outfile_ctx;
 
-  if (outfile_ctx->fp != NULL) return; // cracked hash was not written to an outfile
+  if (outfile_ctx->fp.pfp != NULL) return; // cracked hash was not written to an outfile
 
-  hc_fwrite (buf, len,          1, stdout);
-  hc_fwrite (EOL, strlen (EOL), 1, stdout);
+  fwrite (buf, len,          1, stdout);
+  fwrite (EOL, strlen (EOL), 1, stdout);
 }
 
 static void main_potfile_hash_left (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
 {
   outfile_ctx_t *outfile_ctx = hashcat_ctx->outfile_ctx;
 
-  if (outfile_ctx->fp != NULL) return; // cracked hash was not written to an outfile
+  if (outfile_ctx->fp.pfp != NULL) return; // cracked hash was not written to an outfile
 
-  hc_fwrite (buf, len,          1, stdout);
-  hc_fwrite (EOL, strlen (EOL), 1, stdout);
+  fwrite (buf, len,          1, stdout);
+  fwrite (EOL, strlen (EOL), 1, stdout);
 }
 
 static void main_potfile_num_cracked (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
@@ -482,7 +476,7 @@ static void main_outerloop_mainscreen (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, 
 
     for (u32 i = 0; i < 32; i++)
     {
-      const u32 opti_bit = 1u << i;
+      const u32 opti_bit = 1U << i;
 
       if (hashconfig->opti_type & opti_bit) event_log_info (hashcat_ctx, "* %s", stroptitype (opti_bit));
     }
@@ -1066,10 +1060,12 @@ int main (int argc, char **argv)
 
   hashcat_ctx_t *hashcat_ctx = (hashcat_ctx_t *) hcmalloc (sizeof (hashcat_ctx_t));
 
-  const int rc_hashcat_init = hashcat_init (hashcat_ctx, event);
+  if (hashcat_init (hashcat_ctx, event) == -1)
+  {
+    hcfree (hashcat_ctx);
 
-  if (rc_hashcat_init == -1) return -1;
-
+    return -1;
+  }
   // install and shared folder need to be set to recognize "make install" use
 
   const char *install_folder = NULL;
@@ -1085,19 +1081,28 @@ int main (int argc, char **argv)
 
   // initialize the user options with some defaults (you can override them later)
 
-  const int rc_options_init = user_options_init (hashcat_ctx);
+  if (user_options_init (hashcat_ctx) == -1)
+  {
+    hcfree (hashcat_ctx);
 
-  if (rc_options_init == -1) return -1;
+    return -1;
+  }
 
   // parse commandline parameters and check them
 
-  const int rc_options_getopt = user_options_getopt (hashcat_ctx, argc, argv);
+  if (user_options_getopt (hashcat_ctx, argc, argv) == -1)
+  {
+    hcfree (hashcat_ctx);
 
-  if (rc_options_getopt == -1) return -1;
+    return -1;
+  }
 
-  const int rc_options_sanity = user_options_sanity (hashcat_ctx);
+  if (user_options_sanity (hashcat_ctx) == -1)
+  {
+    hcfree (hashcat_ctx);
 
-  if (rc_options_sanity == -1) return -1;
+    return -1;
+  }
 
   // some early exits
 
@@ -1108,6 +1113,8 @@ int main (int argc, char **argv)
   {
     const int rc = brain_server (user_options->brain_host, user_options->brain_port, user_options->brain_password, user_options->brain_session_whitelist);
 
+    hcfree (hashcat_ctx);
+
     return rc;
   }
   #endif
@@ -1116,6 +1123,8 @@ int main (int argc, char **argv)
   {
     printf ("%s\n", VERSION_TAG);
 
+    hcfree (hashcat_ctx);
+
     return 0;
   }
 
@@ -1123,11 +1132,9 @@ int main (int argc, char **argv)
 
   welcome_screen (hashcat_ctx, VERSION_TAG);
 
-  const int rc_session_init = hashcat_session_init (hashcat_ctx, install_folder, shared_folder, argc, argv, COMPTIME);
-
   int rc_final = -1;
 
-  if (rc_session_init == 0)
+  if (hashcat_session_init (hashcat_ctx, install_folder, shared_folder, argc, argv, COMPTIME) == 0)
   {
     if (user_options->usage == true)
     {
@@ -1173,7 +1180,7 @@ int main (int argc, char **argv)
 
   hashcat_destroy (hashcat_ctx);
 
-  free (hashcat_ctx);
+  hcfree (hashcat_ctx);
 
   return rc_final;
 }

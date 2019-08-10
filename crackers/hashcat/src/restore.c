@@ -54,9 +54,9 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
 
   char *eff_restore_file = restore_ctx->eff_restore_file;
 
-  FILE *fp = fopen (eff_restore_file, "rb");
+  HCFILE fp;
 
-  if (fp == NULL)
+  if (hc_fopen (&fp, eff_restore_file, "rb") == false)
   {
     event_log_error (hashcat_ctx, "Restore file '%s': %s", eff_restore_file, strerror (errno));
 
@@ -65,11 +65,11 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
 
   restore_data_t *rd = restore_ctx->rd;
 
-  if (fread (rd, sizeof (restore_data_t), 1, fp) != 1)
+  if (hc_fread (rd, sizeof (restore_data_t), 1, &fp) != 1)
   {
     event_log_error (hashcat_ctx, "Cannot read %s", eff_restore_file);
 
-    fclose (fp);
+    hc_fclose (&fp);
 
     return -1;
   }
@@ -80,7 +80,7 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
   {
     event_log_error (hashcat_ctx, "Unusually low number of arguments (argc) within restore file %s", eff_restore_file);
 
-    fclose (fp);
+    hc_fclose (&fp);
 
     return -1;
   }
@@ -89,7 +89,7 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
   {
     event_log_error (hashcat_ctx, "Unusually high number of arguments (argc) within restore file %s", eff_restore_file);
 
-    fclose (fp);
+    hc_fclose (&fp);
 
     return -1;
   }
@@ -100,11 +100,13 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
 
   for (u32 i = 0; i < rd->argc; i++)
   {
-    if (fgets (buf, HCBUFSIZ_LARGE - 1, fp) == NULL)
+    if (hc_fgets (buf, HCBUFSIZ_LARGE - 1, &fp) == NULL)
     {
       event_log_error (hashcat_ctx, "Cannot read %s", eff_restore_file);
 
-      fclose (fp);
+      hc_fclose (&fp);
+
+      hcfree (buf);
 
       return -1;
     }
@@ -118,7 +120,7 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
 
   hcfree (buf);
 
-  fclose (fp);
+  hc_fclose (&fp);
 
   if (hc_path_exist (rd->cwd) == false)
   {
@@ -178,9 +180,7 @@ static int read_restore (hashcat_ctx_t *hashcat_ctx)
 
     pidfile_ctx_destroy (hashcat_ctx);
 
-    const int rc_pidfile_init = pidfile_ctx_init (hashcat_ctx);
-
-    if (rc_pidfile_init == -1) return -1;
+    if (pidfile_ctx_init (hashcat_ctx) == -1) return -1;
   }
 
   return 0;
@@ -203,38 +203,38 @@ static int write_restore (hashcat_ctx_t *hashcat_ctx)
 
   char *new_restore_file = restore_ctx->new_restore_file;
 
-  FILE *fp = fopen (new_restore_file, "wb");
+  HCFILE fp;
 
-  if (fp == NULL)
+  if (hc_fopen (&fp, new_restore_file, "wb") == false)
   {
     event_log_error (hashcat_ctx, "%s: %s", new_restore_file, strerror (errno));
 
     return -1;
   }
 
-  if (setvbuf (fp, NULL, _IONBF, 0))
+  if (setvbuf (fp.pfp, NULL, _IONBF, 0))
   {
     event_log_error (hashcat_ctx, "setvbuf file '%s': %s", new_restore_file, strerror (errno));
 
-    fclose (fp);
+    hc_fclose (&fp);
 
     return -1;
   }
 
-  hc_fwrite (rd, sizeof (restore_data_t), 1, fp);
+  hc_fwrite (rd, sizeof (restore_data_t), 1, &fp);
 
   for (u32 i = 0; i < rd->argc; i++)
   {
-    fprintf (fp, "%s", rd->argv[i]);
+    hc_fprintf (&fp, "%s", rd->argv[i]);
 
-    fputc ('\n', fp);
+    hc_fputc ('\n', &fp);
   }
 
-  fflush (fp);
+  hc_fflush (&fp);
 
-  fsync (fileno (fp));
+  fsync (hc_fileno (&fp));
 
-  fclose (fp);
+  hc_fclose (&fp);
 
   rd->masks_pos = 0;
   rd->dicts_pos = 0;
@@ -252,9 +252,7 @@ int cycle_restore (hashcat_ctx_t *hashcat_ctx)
   const char *eff_restore_file = restore_ctx->eff_restore_file;
   const char *new_restore_file = restore_ctx->new_restore_file;
 
-  const int rc_write_restore = write_restore (hashcat_ctx);
-
-  if (rc_write_restore == -1) return -1;
+  if (write_restore (hashcat_ctx) == -1) return -1;
 
   if (hc_path_exist (eff_restore_file) == true)
   {
@@ -330,17 +328,15 @@ int restore_ctx_init (hashcat_ctx_t *hashcat_ctx, int argc, char **argv)
   restore_ctx->argc = argc;
   restore_ctx->argv = argv;
 
-  const int rc_init_restore = init_restore (hashcat_ctx);
-
-  if (rc_init_restore == -1) return -1;
+  if (init_restore (hashcat_ctx) == -1) return -1;
 
   restore_ctx->enabled = true;
 
+  restore_ctx->restore_execute = false;
+
   if (user_options->restore == true)
   {
-    const int rc_read_restore = read_restore (hashcat_ctx);
-
-    if (rc_read_restore == -1) return -1;
+    if (read_restore (hashcat_ctx) == -1) return -1;
 
     restore_data_t *rd = restore_ctx->rd;
 
@@ -353,9 +349,9 @@ int restore_ctx_init (hashcat_ctx_t *hashcat_ctx, int argc, char **argv)
 
     user_options_init (hashcat_ctx);
 
-    const int rc_options_getopt = user_options_getopt (hashcat_ctx, rd->argc, rd->argv);
+    if (user_options_getopt (hashcat_ctx, rd->argc, rd->argv) == -1) return -1;
 
-    if (rc_options_getopt == -1) return -1;
+    restore_ctx->restore_execute = true;
   }
 
   return 0;
@@ -369,7 +365,6 @@ void restore_ctx_destroy (hashcat_ctx_t *hashcat_ctx)
 
   hcfree (restore_ctx->eff_restore_file);
   hcfree (restore_ctx->new_restore_file);
-
   hcfree (restore_ctx->rd);
 
   memset (restore_ctx, 0, sizeof (restore_ctx_t));

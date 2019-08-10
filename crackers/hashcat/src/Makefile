@@ -179,6 +179,9 @@ endif
 ## because ZLIB
 ifeq ($(USE_SYSTEM_ZLIB),0)
 CFLAGS_ZLIB             += -Wno-implicit-fallthrough
+CFLAGS_ZLIB             += -Wno-implicit-function-declaration
+CFLAGS_ZLIB             += -Wno-unused-parameter
+CFLAGS_ZLIB             += -DIOAPI_NO_64
 endif
 
 ifeq ($(DEBUG),0)
@@ -318,7 +321,7 @@ WIN_OBJS                += $(foreach OBJ,$(OBJS_LZMA),obj/$(OBJ).WIN.o)
 endif
 
 ifeq ($(USE_SYSTEM_ZLIB),0)
-OBJS_ZLIB               := adler32 crc32 zutil inftrees inffast inflate
+OBJS_ZLIB               := adler32 crc32 deflate inflate inffast inftrees trees gzread gzwrite gzclose zutil gzlib contrib/minizip/unzip contrib/minizip/ioapi
 
 NATIVE_OBJS             += $(foreach OBJ,$(OBJS_ZLIB),obj/$(OBJ).NATIVE.o)
 LINUX_OBJS              += $(foreach OBJ,$(OBJS_ZLIB),obj/$(OBJ).LINUX.o)
@@ -344,8 +347,10 @@ default: $(HASHCAT_FRONTEND) modules
 clean:
 	$(RM) -f $(HASHCAT_FRONTEND)
 	$(RM) -f $(HASHCAT_LIBRARY)
+	$(RM) -rf modules/*.dSYM
 	$(RM) -f modules/*.dll
 	$(RM) -f modules/*.so
+	$(RM) -f obj/*/*/*.o
 	$(RM) -f obj/*.o
 	$(RM) -f obj/*.a
 	$(RM) -f *.bin *.exe

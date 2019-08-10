@@ -184,9 +184,9 @@ int save_hash (hashcat_ctx_t *hashcat_ctx)
 
   char separator = hashconfig->separator;
 
-  FILE *fp = fopen (new_hashfile, "wb");
+  HCFILE fp;
 
-  if (fp == NULL)
+  if (hc_fopen (&fp, new_hashfile, "wb") == false)
   {
     event_log_error (hashcat_ctx, "%s: %s", new_hashfile, strerror (errno));
 
@@ -196,9 +196,9 @@ int save_hash (hashcat_ctx_t *hashcat_ctx)
     return -1;
   }
 
-  if (lock_file (fp) == -1)
+  if (hc_lockfile (&fp) == -1)
   {
-    fclose (fp);
+    hc_fclose (&fp);
 
     event_log_error (hashcat_ctx, "%s: %s", new_hashfile, strerror (errno));
 
@@ -228,7 +228,7 @@ int save_hash (hashcat_ctx_t *hashcat_ctx)
 
         const int binary_len = module_ctx->module_hash_binary_save (hashes, salt_pos, digest_pos, &binary_buf);
 
-        hc_fwrite (binary_buf, binary_len, 1, fp);
+        hc_fwrite (binary_buf, binary_len, 1, &fp);
 
         hcfree (binary_buf);
       }
@@ -240,25 +240,25 @@ int save_hash (hashcat_ctx_t *hashcat_ctx)
 
           u32 i;
 
-          for (i = 0; i < user->user_len; i++) fputc (user->user_name[i], fp);
+          for (i = 0; i < user->user_len; i++) hc_fputc (user->user_name[i], &fp);
 
-          fputc (separator, fp);
+          hc_fputc (separator, &fp);
         }
 
         const int out_len = hash_encode (hashcat_ctx->hashconfig, hashcat_ctx->hashes, hashcat_ctx->module_ctx, (char *) out_buf, HCBUFSIZ_LARGE, salt_pos, digest_pos);
 
         out_buf[out_len] = 0;
 
-        fprintf (fp, "%s" EOL, out_buf);
+        hc_fprintf (&fp, "%s" EOL, out_buf);
       }
     }
   }
 
   hcfree (out_buf);
 
-  fflush (fp);
+  hc_fflush (&fp);
 
-  fclose (fp);
+  hc_fclose (&fp);
 
   unlink (old_hashfile);
 
@@ -330,18 +330,22 @@ void check_hash (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
   // plain
 
-  u32 plain_buf[64] = { 0 };
+  u8 plain_buf[256+1];
 
-  u8 *plain_ptr = (u8 *) plain_buf;
+  memset (plain_buf, 0, sizeof (plain_buf));
+
+  u8 *plain_ptr = plain_buf;
   int plain_len = 0;
 
-  build_plain (hashcat_ctx, device_param, plain, plain_buf, &plain_len);
+  build_plain (hashcat_ctx, device_param, plain, (u32 *)plain_buf, &plain_len);
 
   if (module_ctx->module_build_plain_postprocess != MODULE_DEFAULT)
   {
-    u32 temp_buf[64] = { 0 };
+    u8 temp_buf[256+1] = { 0 };
 
-    const int temp_len = module_ctx->module_build_plain_postprocess (hashcat_ctx->hashconfig, hashcat_ctx->hashes, tmps, plain_buf, sizeof (plain_buf), plain_len, temp_buf, sizeof (temp_buf));
+    memset (temp_buf, 0, sizeof (temp_buf));
+
+    const int temp_len = module_ctx->module_build_plain_postprocess (hashcat_ctx->hashconfig, hashcat_ctx->hashes, tmps, (u32 *)plain_buf, sizeof (plain_buf), plain_len, (u32 *)temp_buf, sizeof (temp_buf));
 
     if (temp_len < (int) sizeof (plain_buf))
     {
@@ -379,9 +383,9 @@ void check_hash (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
   const int tmp_len = outfile_write (hashcat_ctx, (char *) out_buf, out_len, plain_ptr, plain_len, crackpos, NULL, 0, (char *) tmp_buf);
 
-  outfile_write_close (hashcat_ctx);
-
   EVENT_DATA (EVENT_CRACKER_HASH_CRACKED, tmp_buf, tmp_len);
+
+  outfile_write_close (hashcat_ctx);
 
   // potfile
   // we can have either used-defined hooks or reuse the same format as input format
@@ -431,14 +435,14 @@ void check_hash (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
   // if enabled, update also the loopback file
 
-  if (loopback_ctx->fp != NULL)
+  if (loopback_ctx->fp.pfp != NULL)
   {
     loopback_write_append (hashcat_ctx, plain_ptr, plain_len);
   }
 
   // if enabled, update also the (rule) debug file
 
-  if (debugfile_ctx->fp != NULL)
+  if (debugfile_ctx->fp.pfp != NULL)
   {
     // the next check implies that:
     // - (user_options->attack_mode == ATTACK_MODE_STRAIGHT)
@@ -674,9 +678,9 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
     }
     else if (hashlist_mode == HL_MODE_FILE_PLAIN)
     {
-      FILE *fp = NULL;
+      HCFILE fp;
 
-      if ((fp = fopen (hashfile, "rb")) == NULL)
+      if (hc_fopen (&fp, hashfile, "rb") == false)
       {
         event_log_error (hashcat_ctx, "%s: %s", hashfile, strerror (errno));
 
@@ -685,33 +689,31 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
 
       EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_PRE, hashfile, strlen (hashfile));
 
-      hashes_avail = count_lines (fp);
+      hashes_avail = count_lines (&fp);
 
       EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_POST, hashfile, strlen (hashfile));
 
-      rewind (fp);
+      hc_rewind (&fp);
 
       if (hashes_avail == 0)
       {
         event_log_error (hashcat_ctx, "hashfile is empty or corrupt.");
 
-        fclose (fp);
+        hc_fclose (&fp);
 
         return -1;
       }
 
-      hashlist_format = hlfmt_detect (hashcat_ctx, fp, 100); // 100 = max numbers to "scan". could be hashes_avail, too
+      hashlist_format = hlfmt_detect (hashcat_ctx, &fp, 100); // 100 = max numbers to "scan". could be hashes_avail, too
+
+      hc_fclose (&fp);
 
       if ((user_options->remove == true) && (hashlist_format != HLFMT_HASHCAT))
       {
         event_log_error (hashcat_ctx, "Use of --remove is not supported in native hashfile-format mode.");
 
-        fclose (fp);
-
         return -1;
       }
-
-      fclose (fp);
     }
     else if (hashlist_mode == HL_MODE_FILE_BINARY)
     {
@@ -771,7 +773,7 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
 
   if ((user_options->username == true) || (hashconfig->opts_type & OPTS_TYPE_HASH_COPY) || (hashconfig->opts_type & OPTS_TYPE_HASH_SPLIT))
   {
-    u32 hash_pos;
+    u64 hash_pos;
 
     for (hash_pos = 0; hash_pos < hashes_avail; hash_pos++)
     {
@@ -818,7 +820,7 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
     salts_buf = (salt_t *) hccalloc (1, sizeof (salt_t));
   }
 
-  for (u32 hash_pos = 0; hash_pos < hashes_avail; hash_pos++)
+  for (u64 hash_pos = 0; hash_pos < hashes_avail; hash_pos++)
   {
     hashes_buf[hash_pos].digest = ((char *) digests_buf) + (hash_pos * hashconfig->dgst_size);
 
@@ -996,9 +998,9 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
     }
     else if (hashlist_mode == HL_MODE_FILE_PLAIN)
     {
-      FILE *fp;
+      HCFILE fp;
 
-      if ((fp = fopen (hashfile, "rb")) == NULL)
+      if (hc_fopen (&fp, hashfile, "rb") == false)
       {
         event_log_error (hashcat_ctx, "%s: %s", hashfile, strerror (errno));
 
@@ -1012,11 +1014,11 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
       time_t prev = 0;
       time_t now  = 0;
 
-      while (!feof (fp))
+      while (!hc_feof (&fp))
       {
         line_num++;
 
-        const size_t line_len = fgetl (fp, line_buf);
+        const size_t line_len = fgetl (&fp, line_buf, HCBUFSIZ_LARGE);
 
         if (line_len == 0) continue;
 
@@ -1237,7 +1239,7 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
 
       hcfree (line_buf);
 
-      fclose (fp);
+      hc_fclose (&fp);
     }
     else if (hashlist_mode == HL_MODE_FILE_BINARY)
     {
@@ -1792,7 +1794,9 @@ int hashes_init_selftest (hashcat_ctx_t *hashcat_ctx)
 
       hc_asprintf (&tmpfile_bin, "%s/selftest.hash", folder_config->session_dir);
 
-      FILE *fp = fopen (tmpfile_bin, "wb");
+      HCFILE fp;
+
+      hc_fopen (&fp, tmpfile_bin, "wb");
 
       const size_t st_hash_len = strlen (hashconfig->st_hash);
 
@@ -1800,10 +1804,10 @@ int hashes_init_selftest (hashcat_ctx_t *hashcat_ctx)
       {
         const u8 c = hex_to_u8 ((const u8 *) hashconfig->st_hash + i);
 
-        fputc (c, fp);
+        hc_fputc (c, &fp);
       }
 
-      fclose (fp);
+      hc_fclose (&fp);
 
       parser_status = module_ctx->module_hash_decode (hashconfig, hash.digest, hash.salt, hash.esalt, hash.hook_salt, hash.hash_info, tmpfile_bin, strlen (tmpfile_bin));
 

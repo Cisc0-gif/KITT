@@ -78,7 +78,7 @@ static const u32 crc32tab[256] =
 
 u32 cpu_crc32_buffer (const u8 *buf, const size_t length)
 {
-  u32 crc = ~0u;
+  u32 crc = ~0U;
 
   for (size_t pos = 0; pos < length; pos++)
   {
@@ -90,17 +90,19 @@ u32 cpu_crc32_buffer (const u8 *buf, const size_t length)
 
 int cpu_crc32 (const char *filename, u8 keytab[64])
 {
-  u32 crc = ~0u;
+  u32 crc = ~0U;
 
-  FILE *fd = fopen (filename, "rb");
+  HCFILE fp;
+
+  hc_fopen (&fp, filename, "rb");
 
   #define MAX_KEY_SIZE (1024 * 1024)
 
   u8 *buf = (u8 *) hcmalloc (MAX_KEY_SIZE + 1);
 
-  size_t nread = hc_fread (buf, sizeof (u8), MAX_KEY_SIZE, fd);
+  size_t nread = hc_fread (buf, sizeof (u8), MAX_KEY_SIZE, &fp);
 
-  fclose (fd);
+  hc_fclose (&fp);
 
   size_t kpos = 0;
 

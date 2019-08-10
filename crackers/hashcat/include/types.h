@@ -18,6 +18,18 @@
 #include <unistd.h>
 #include <math.h>
 
+// workaround to get the rid of "redefinition of typedef 'Byte'" build warning
+#if !defined (__APPLE__)
+#include "zlib.h"
+#endif
+
+#if !defined(__MACTYPES__)
+#define __MACTYPES__
+#include "ext_lzma.h"
+#undef __MACTYPES__
+#endif
+// end of workaround
+
 #if defined (_WIN)
 #define WINICONV_CONST
 #endif
@@ -160,15 +172,15 @@ typedef enum amplifier_count
 
 typedef enum vendor_id
 {
-  VENDOR_ID_AMD           = (1 << 0),
-  VENDOR_ID_APPLE         = (1 << 1),
-  VENDOR_ID_INTEL_BEIGNET = (1 << 2),
-  VENDOR_ID_INTEL_SDK     = (1 << 3),
-  VENDOR_ID_MESA          = (1 << 4),
-  VENDOR_ID_NV            = (1 << 5),
-  VENDOR_ID_POCL          = (1 << 6),
-  VENDOR_ID_AMD_USE_INTEL = (1 << 7),
-  VENDOR_ID_GENERIC       = (1 << 31)
+  VENDOR_ID_AMD           = (1U << 0),
+  VENDOR_ID_APPLE         = (1U << 1),
+  VENDOR_ID_INTEL_BEIGNET = (1U << 2),
+  VENDOR_ID_INTEL_SDK     = (1U << 3),
+  VENDOR_ID_MESA          = (1U << 4),
+  VENDOR_ID_NV            = (1U << 5),
+  VENDOR_ID_POCL          = (1U << 6),
+  VENDOR_ID_AMD_USE_INTEL = (1U << 7),
+  VENDOR_ID_GENERIC       = (1U << 31)
 
 } vendor_id_t;
 
@@ -988,6 +1000,23 @@ typedef struct link_speed
 
 } link_speed_t;
 
+// file handling
+
+typedef struct hc_fp
+{
+  int         fd;
+
+  FILE       *pfp; // plain fp
+  gzFile      gfp; //  gzip fp
+  unzFile     ufp; //   zip fp
+
+  bool        is_gzip;
+  bool        is_zip;
+
+  char       *mode;
+  const char *path;
+} HCFILE;
+
 #include "ext_nvrtc.h"
 #include "ext_cuda.h"
 #include "ext_OpenCL.h"
@@ -1147,12 +1176,12 @@ typedef struct hc_device_param
   u32          *brain_link_out_buf;
   #endif
 
-  char   *scratch_buf;
+  char     *scratch_buf;
 
-  FILE   *combs_fp;
-  pw_t   *combs_buf;
+  HCFILE    combs_fp;
+  pw_t     *combs_buf;
 
-  void   *hooks_buf;
+  void     *hooks_buf;
 
   pw_idx_t *pws_idx;
   u32      *pws_comp;
@@ -1541,11 +1570,12 @@ typedef aes_context_t aes_ctx;
 
 typedef struct debugfile_ctx
 {
-  bool enabled;
+  HCFILE  fp;
 
-  FILE *fp;
-  char *filename;
-  u32   mode;
+  bool    enabled;
+
+  char   *filename;
+  u32     mode;
 
 } debugfile_ctx_t;
 
@@ -1586,11 +1616,12 @@ typedef struct dictstat_ctx
 
 typedef struct loopback_ctx
 {
-  bool enabled;
-  bool unused;
+  HCFILE  fp;
 
-  FILE *fp;
-  char *filename;
+  bool    enabled;
+  bool    unused;
+
+  char   *filename;
 
 } loopback_ctx_t;
 
@@ -1603,12 +1634,12 @@ typedef struct mf
 
 typedef struct outfile_ctx
 {
-  char *filename;
+  HCFILE  fp;
 
-  FILE *fp;
+  u32     outfile_format;
+  bool    outfile_autohex;
 
-  u32   outfile_format;
-  bool  outfile_autohex;
+  char   *filename;
 
 } outfile_ctx_t;
 
@@ -1623,9 +1654,10 @@ typedef struct pot
 
 typedef struct potfile_ctx
 {
+  HCFILE   fp;
+
   bool     enabled;
 
-  FILE    *fp;
   char    *filename;
 
   u8      *out_buf; // allocates [HCBUFSIZ_LARGE];
@@ -1684,6 +1716,8 @@ typedef struct restore_ctx
 {
   bool    enabled;
 
+  bool    restore_execute;
+
   int     argc;
   char  **argv;
 
@@ -1707,10 +1741,10 @@ typedef struct pidfile_ctx
 
 typedef struct out
 {
-  FILE *fp;
+  HCFILE fp;
 
-  char  buf[HCBUFSIZ_SMALL];
-  int   len;
+  char   buf[HCBUFSIZ_SMALL];
+  int    len;
 
 } out_t;
 
@@ -2017,7 +2051,7 @@ typedef struct mask_ctx
 
   u64    bfs_cnt;
 
-  cs_t  *css_buf;
+  cs_t   css_buf[256];
   u32    css_cnt;
 
   hcstat_table_t *root_table_buf;

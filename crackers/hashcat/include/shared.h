@@ -15,6 +15,9 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "zlib.h"
+#include "filehandling.h"
+
 #if defined (_WIN)
 #include <winsock2.h> // needed for select()
 #else
@@ -60,9 +63,6 @@ bool hc_string_is_digit (const char *s);
 
 void hc_string_trim_trailing (char *s);
 void hc_string_trim_leading (char *s);
-
-size_t hc_fread (void *ptr, size_t size, size_t nmemb, FILE *stream);
-size_t hc_fwrite (const void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 bool hc_same_files (char *file1, char *file2);
 
