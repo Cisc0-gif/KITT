@@ -14,5 +14,5 @@ echo "[+]Done!"
 echo "[*]Appending KITT directory to .bashrc"
 echo "export PATH=$PATH:/opt/KITT" >> /root/.bashrc
 echo "[+]Done!"
-echo 'Execute "KITTexe" to run KITT'
+echo 'Execute "KITTexe.sh" to run KITT'
 

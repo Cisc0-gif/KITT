@@ -121,3 +121,14 @@
 * reinitialized repo to fix git signatures
 * added shodan_search.py to menu
 * fixed option list error
+
+### v1.0 8/10/19
+* revamped entire KITT.py UI
+* added unmade hashcat
+* removed some useless features
+* added autoremove to init of KITT.py and closing statement of lib_install.sh
+* reformatted dorks.txt and decoders.txt to markdown and removed osint_sites.txt
+* debugged recursion() errors
+* removed accidental hydra.restore file
+* fixed syntax error in KITT_INSTALLER.sh
+* renamed sketch.ino to filename.ino in convert.sh

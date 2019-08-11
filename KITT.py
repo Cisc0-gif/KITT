@@ -20,6 +20,7 @@ if sys.platform != 'linux':
 
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
+os.system('sudo apt autoremove')
 root = os.getcwd()
 
 def wait():
@@ -58,12 +59,12 @@ def home():
   print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
-  in_put = input(os.getcwd() + ': ')
+  in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L']
   for i in range(1,25):
     nums.append(str(i))
   if in_put not in nums:
-    print('not an option dumbass')
+    print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
     wait()
     home()
   elif in_put == '1':
@@ -75,62 +76,43 @@ def home():
       os.chdir('rooters')
       wait()
       os.system('ls')
-      print('Select a dev rooter for use: ')
+      print(Fore.CYAN + '[*]Select a dev rooter for use: ' + Style.RESET_ALL)
       dev_rooter = input('')
       os.system('cp ' + dev_rooter + ' ~')
-      print('dev_rooter ha$ /bin/ cOpied to r00t!')
+      print(Fore.GREEN + '[+]dev_rooter ha$ /bin/ cOpied to r00t!' + Style.RESET_ALL)
     except:
-      print('dev_rooter not found!')
+      print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '3':
     os.chdir('rootkittens')
     try:
       os.system('ls')
-      dev_rooter = input('Select a rootkit for use: ')
+      dev_rooter = input(Fore.CYAN + '[*]Select a rootkit for use: ' + Style.RESET_ALL)
       os.system('cp -R ' + dev_rooter + ' ~')
-      print('r--tkit has /bin/ cOpied to r00t!')
+      print(Fore.GREEN + '[+]r--tkit has /bin/ cOpied to r00t!' + Style.RESET_ALL)
     except:
-      print('rootkit not found!')
+      print(Fore.RED + '[*]rootkit not found!' + Style.RESET_ALL)
       print(os.getcwd())
     wait()
   elif in_put == '4':
     os.chdir('crackers')
     print('[1] hashcat')
     print('[2] append_num')
-    print('[3] weB_l0g!n_CR@CKER')
+    print('[3] hydr@')
     print('[4] burpsuite')
     print('[5] dec0ders')
     print('[6] crunch')
     print('[7] 7zCracker')
     print('[8] cewl')
-    print('[9] B0T_decrypt - :WARNING: Due to extensive wordlist, anon-net may crash under this!')
-    print('[10] go home')
-    crack = input("So what'll it be?: ")
+    print('[9] R0T_decrypt - :WARNING: Due to extensive wordlist, KITT may crash under this!')
+    print('[10] go home' + Style.RESET_ALL)
+    crack = input(Fore.CYAN + "[*]So what'll it be?: " + Style.RESET_ALL)
     if crack == '1':
       os.chdir('hashcat')
-      print("run hashcat at your will or type 'q' to exit (can use append_num.py here too")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Hashcat syntax = hashcat -a # -m # hash/hashlist.txt wordlist.txt bruteforce mask ?#?#?#?#?#" + Style.RESET_ALL)
       def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-    elif crack == '2':
-      os.chdir('hashcat')
-      os.system('python3.7 append_num.py')
-      wait()
-    elif crack == '3':
-      os.system('sudo ./weblogin_crack.sh')
-      wait()
-    elif crack == '4':
-      print("Unfortunately we don't support burpsuite...")
-      time.sleep(1)
-      print("Nah i'm just fuckin with you")
-      print("use burpsuite at your will or type 'q' to exit")
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
+        in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
         if in_put == 'q':
           wait()
           home()
@@ -138,15 +120,36 @@ def home():
           os.system(in_put)
         recursion()
       recursion()
+    elif crack == '2':
+      os.chdir('hashcat')
+      os.system('python3 append_num.py')
+      wait()
+    elif crack == '3':
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Hydra syntax = hydra -l/-L uname/uname.lst -p/-P pass/pass.lst url type" + Style.RESET_ALL)
+      def recursion():
+        in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
+        if in_put == 'q':
+          wait()
+          home()
+        else:
+          os.system(in_put)
+        recursion()
+      recursion()
+    elif crack == '4':
+      print(Fore.CYAN + "[*]Running Burpsuite..." + Style.RESET_ALL)
+      os.system("burpsuite")
+      wait()
     elif crack == '5':
       with open('decoders.txt', 'r') as f:
         contents = f.read()
       print(contents)
       wait()
     elif crack == '6':
-      print("use crunch at your will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Crunch syntax = crunch min-max -t @,%^(chars to insert) -f charset.lst -i (inverts output) -q readfile.lst -o output.lst" + Style.RESET_ALL)
       def recursion():
-        in_put = input(os.getcwd() + ': ')
+        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
         if in_put == 'q':
           wait()
           home()
@@ -156,9 +159,10 @@ def home():
       recursion()
     elif crack == '7':
       os.chdir('7zip-crack')
-      print("To use 7zCracker type ./7zipcrack file.7z wordlist or type 'q' to quit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("7zipcrack syntax = ./7zipcrack file.7z wordlist.lst" + Style.RESET_ALL)
       def recursion():
-        in_put = input(os.getcwd() + ': ')
+        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
         if in_put == 'q':
           wait()
           home()
@@ -167,9 +171,10 @@ def home():
         recursion()
       recursion()
     elif crack == '8':
-      print("use cewl at your will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Cewl syntax = cewl -d #(site depth) -m #(min len) -o (offsite) -ua ###(user agent) --with-numbers --meta_file file.txt --email_file file.txt -w output.txt" + Style.RESET_ALL)
       def recursion():
-        in_put = input(os.getcwd() + ': ')
+        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
         if in_put == 'q':
           wait()
           home()
@@ -178,8 +183,9 @@ def home():
         recursion()
       recursion()
     elif crack == '9':
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
       def recursion():
-        message = input("Enter cipher text here or type 'q' to quit: ").lower().split(' ')
+        message = input("[*]ROT Cipher Text: " + Style.RESET_ALL).lower().split(' ')
         if message == 'q':
           wait()
           home()
@@ -203,7 +209,7 @@ def home():
             wordlist = f.read().splitlines()
             for i in l:
               if i in wordlist:
-                print('Decrypted Ciphertext: "' + i + '"')
+                print(Fore.CYAN + '[*]Decrypted Ciphertext: "' + i + '"' + Style.RESET_ALL)
           wait()
           recursion()
 
@@ -212,21 +218,21 @@ def home():
       wait()
   elif in_put == '5':
     os.chdir('hg')
-    print('Welcome to 2/3 of you life...')
+    print(Fore.RED + 'Welcome to 2/3 of you life...')
     print('[1] JoomlaScan')
     print('[2] theHarvester')
     print('[3] FOCA - Windows')
-    print('[4] 0sint_sites')
-    print('[5] malteg0')
-    print('[6] g00gle dorks')
-    print('[7] r#con-ng')
-    print('[8] fbi_master')
-    print('[9] Aut0Sp!oit')
-    print('[10] go home')
-    hg = input(os.getcwd() + ': ')
+    print('[4] google email index')
+    print('[5] g00gle dorks')
+    print('[6] r#con-ng')
+    print('[7] fbi_master')
+    print('[8] Aut0Sp!oit')
+    print('[9] go home' + Style.RESET_ALL)
+    hg = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
     if hg == '1':
       os.chdir('JoomlaScan')
-      print('python2 joomlascan.py --help for help')
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print('[*]JoomlaScan syntax = python joomlascan.py -u url -t #(threads)' + Style.RESET_ALL)
       def recursion():
         in_put = input(os.getcwd() + ': ')
         if in_put == 'q':
@@ -238,7 +244,8 @@ def home():
       recursion()
     elif hg == '2':
       os.chdir('theHarvester')
-      print('python3.7 theHarvester.py --help for help')
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]theHarvester syntax = python3 theHarvester.py -d domain -b source(google,twitter) -l #(limit) -s (start)" + Style.RESET_ALL)
       def recursion():
         in_put = input(os.getcwd() + ': ')
         if in_put == 'q':
@@ -251,47 +258,48 @@ def home():
     elif hg == '3':
       try:
         os.system('cp -R FOCA ~')
-        print('FOCA copied to r00t!')
+        print(Fore.CYAN + '[+]FOCA copied to r00t!' + Style.RESET_ALL)
       except:
-        print('FOCA not found!')
+        print(Fore.RED + '[*]FOCA not found!' + Style.RESET_ALL)
       wait()
     elif hg =='4':
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print('[*]goog-mail.py syntax = python goog-mail.py -d domain' + Style.RESET_ALL)
+      def recursion():
+        in_put = input(os.getcwd() + ': ')
+        if in_put == 'q':
+          wait()
+          home()
+        else:
+          os.system(in_put)
+        recursion()
+      recursion()
+    elif hg == '5':
       try:
-        with open('osint_sites.txt', 'r') as f:
+        with open('dorks.md', 'r') as f:
           contents = f.read()
         print(contents)
       except:
-        print('osint_sites.txt not found!')
-      wait()
-    elif hg == '5':
-      os.system('maltegoce')
+        print(Fore.RED + '[*]dorks not found!' + Style.RESET_ALL)
       wait()
     elif hg == '6':
-      try:
-        with open('dorks.txt', 'r') as f:
-          contents = f.read()
-        print(contents)
-      except:
-        print('dorks not found!')
+      os.system('recon-ng')
       wait()
     elif hg == '7':
-      os.system('recon-ng')
+      try:
+        os.chdir('fbi-master')
+        os.system('python fbi.py')
+      except:
+        print(Fore.RED + '[*]Error in running fbi-master!' + Style.RESET_ALL)
       wait()
     elif hg == '8':
       try:
-        os.chdir('fbi-master')
-        os.system('python2.7 fbi.py')
+        os.chdir('AutoSploit')
+        os.system('python autosploit.py')
       except:
-        print('Error in running fbi-master!')
+        print(Fore.RED + '[*]Error running AutoSploit!' + Style.RESET_ALL)
       wait()
     elif hg == '9':
-      try:
-        os.chdir('AutoSploit')
-        os.system('python2 autosploit.py')
-      except:
-        print('Error running AutoSploit!')
-      wait()
-    elif hg == '10':
       wait()
   elif in_put == '6':
     os.chdir('keyloggers')
@@ -303,23 +311,23 @@ def home():
     if keylog == '1':
       try:
         os.system('cp -R Winupdate ~')
-        print('keylogger copied to r00t!')
+        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
       except:
-        print('keylogger not found!')
+        print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '2':
       try:
         os.system('cp -R KidLogger-setupwin26-11-2017 ~')
-        print('keylogger copied to r00t!')
+        print(Fore.GREEN '[+]keylogger copied to r00t!' + Style.RESET_ALL)
       except:
-        print('keylogger not found!')
+        print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '3':
       try:
         os.system('cp -R staffcounter_install ~')
-        print('keylogger copied to r00t!')
+        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
       except:
-        print('keylogger not found!')
+        print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '4':
       wait()
@@ -338,28 +346,29 @@ def home():
     if exploit == '1':
       try:
         os.system('cp -R LM_exploit_WIN.sh ~')
-        print('exploit copied to r00t!')
+        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
       except:
-        print('exploit not found!')
+        print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '2':
       try:
         os.system('cp -R unplug.sh ~')
-        print('exploit copied to r00t!')
+        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
       except:
-        print('exploit not found!')
+        print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '3':
       try:
         os.system('cp -R Cisco_E4200_vuln.py ~')
-        print('exploit copied to r00t!')
+        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
       except:
-        print('exploit not found!')
+        print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '4':
       wait()
   elif in_put == '9':
-    print("Use ssh to your will or type 'q' to exit")
+    print(Fore.CYAN + "[*]Enter 'q' to exit")
+    print("[*]SSH syntax = ssh -i RSA_KEY uname@ip -p port" + Style.RESET_ALL)
     def recursion():
       in_put = input(os.getcwd() + ': ')
       if in_put == 'q':
@@ -373,7 +382,8 @@ def home():
     os.system('tor')
     wait()
   elif in_put == '11':
-    print("Use nmap to your will or type 'q' to exit")
+    print(Fore.CYAN + "[*]Enter 'q' to exit")
+    print("[*]Nmap syntax = nmap [options] rhost" + Style.RESET_ALL)
     def recursion():
       in_put = input(os.getcwd() + ': ')
       if in_put == 'q':
@@ -381,14 +391,15 @@ def home():
         home()
       else:
         os.system(in_put)
-        recursion()
+      recursion()
     recursion()
   elif in_put == '12':
     print('[1] netcat')
     print('[2] cryptcat (more secure but requires cryptcat on other end)')
     noc = input(': ')
     if noc == '1':
-      print("use nc to your will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Netcat syntax = nc rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
       def recursion():
         in_put = input(os.getcwd() + ': ')
         if in_put == 'q':
@@ -399,7 +410,8 @@ def home():
           recursion()
       recursion()
     elif noc == '2':
-      print("use cryptcat to your will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Cryptcat syntax = cryptcat rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
       def recursion():
         in_put = input(os.getcwd() + ': ')
         if in_put == 'q':
@@ -416,9 +428,9 @@ def home():
     phish = input(': ')
     if phish == '1':
       try:
-        os.system('python3.7 sonar.py')
+        os.system('python3 sonar.py')
       except:
-        print('sonar.py not found!')
+        print(Fore.RED + '[*]sonar.py not found!' + Style.RESET_ALL)
       wait()
     elif phish == '2':
       wait()
@@ -434,37 +446,37 @@ def home():
     if image == '1':
       try:
         os.system('cp -R ubuntu-18.04-desktop-amd64.iso ~')
-        print('image copied to r00t!')
+        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
       except:
-        print('image not found!')
+        print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '2':
       try:
         os.system('cp -R kali-linux-2019.2-vmware-amd64.7z ~')
-        print('image copied to r00t!')
+        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
       except:
-        print('image not found!')
+        print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '3':
       try:
         os.system('cp -R en_windows_10_x64_dvd.iso ~')
-        print('image copied to r00t!')
+        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
       except:
-        print('image not found!')
+        print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '4':
       try:
         os.system('cp -R en_windows_8_1_x64_dvd_2707217.iso ~')
-        print('image copied to r00t!')
+        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
       except:
-        print('image not found!')
+        print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '5':
       try:
         os.system('cp -R en_windows_7_Ult_64Bit.iso ~')
-        print('image copied to r00t!')
+        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
       except:
-        print('image not found!')
+        print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '6':
       wait()
@@ -475,16 +487,16 @@ def home():
     try:
       os.system('sudo ./packetdump.sh')
       os.system('mv output.pcap ~')
-      print('copied packet capture to r00t!')
+      print(Fore.GREEN + '[+]copied packet capture to r00t!' + Style.RESET_ALL)
     except:
-      print('packet capture not found!')
+      print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '17':
     os.chdir('hg')
     try:
       os.system('sudo ./domain_sticate.sh')
     except:
-      print('Error in file domain_sticate.sh')
+      print(Fore.RED + '[*]Error in file domain_sticate.sh' + Style.RESET_ALL)
     wait()
   elif in_put == '18':
     os.system('irssi')
@@ -503,13 +515,13 @@ def home():
       try:
         os.system('./macchanger.sh')
       except:
-        print('Error in changing mac address!')
+        print(Fore.RED + '[*]Error in changing mac address!' + Style.RESET_ALL)
       wait()
     elif rdefense == '2':
       try:
         os.system('./ssh_randomizer.sh')
       except:
-        print('Error in changing ssh port')
+        print(Fore.RED + '[*]Error in changing ssh port' + Style.RESET_ALL)
       wait()
     elif rdefense == '3':
       try:
@@ -525,42 +537,42 @@ def home():
         os.system('cp /root/.ssh/id_rsa /root')
         print('RSA Keys Generated and Private Key copied to r00t!')
       except:
-        print('Error in generating RSA keys!')
+        print(Fore.RED + '[*]Error in generating RSA keys!' + Style.RESET_ALL)
       wait() 
     elif rdefense == '4':
       try:
         os.system('./proxy_config.sh')
       except:
-        print('Error in running proxy_config.sh!')
+        print(Fore.RED + '[*]Error in running proxy_config.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '5':
       try:
         os.system('./ssh_encr7pt.sh')
       except:
-        print('Error in running ssh_encr7pt.sh!')
+        print(Fore.RED + '[*]Error in running ssh_encr7pt.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '6':
       try:
         os.system('./static_ip.sh')
       except:
-        print('Error in running static_ip.sh!')
+        print(Fore.RED + '[*]Error in running static_ip.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '7':
       wait()
   elif in_put == '20':
     port = input('Enter port number to listen on: ')
     try:
-      print('Listening on port ' + port + '!')
+      print(Fore.GREEN + '[+]Listening on port ' + port + '!' + Style.RESET_ALL)
       os.system('nc -l -p ' + port )
     except:
-      print('Error listening on port!')
+      print(Fore.RED + '[*]Error listening on port!' + Style.RESET_ALL)
     wait()
   elif in_put == '21':
     try:
       os.chdir('OWASP-ZSC')
       os.system('python zsc.py')
     except:
-      print('Error Running OWASP-ZSC!')
+      print(Fore.RED + '[*]Error Running OWASP-ZSC!' + Style.RESET_ALL)
     wait()
   elif in_put == '22':
     print('[1] gdb')
@@ -575,9 +587,10 @@ def home():
     print('[10] steghide')
     print('[11] xxd')
     print('[12] go home')
-    forensic = input(': ')
+    forensic = input(os.getcwd() + ': ')
     if forensic == '1':
-      print("Use gdb at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]gdb syntax = gdb ./file.ext" + Style.RESET_ALL)
       def recursion():
         gdb = input(os.getcwd() + ': ')
         if gdb == 'q':
@@ -588,7 +601,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '2':
-      print("Use radare2 at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Radare2 syntax = r2 file.ext -d (debugger)" + Style.RESET_ALL)
       def recursion():
         r2 = input(os.getcwd() + ': ')
         if r2 == 'q':
@@ -599,7 +613,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '3':
-      print("Use strace at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Strace syntax = strace file.ext" + Style.RESET_ALL)
       def recursion():
         st = input(os.getcwd() + ': ')
         if st == 'q':
@@ -610,7 +625,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '4':
-      print("Use nano at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Nano syntax = nano file.ext" + Style.RESET_ALL)
       def recursion():
         nano = input(os.getcwd() + ': ')
         if nano == 'q':
@@ -621,7 +637,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '5':
-      print("Use sort at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Sort syntax = sort [option] file.ext" + Style.RESET_ALL)
       def recursion():
         sort = input(os.getcwd() + ': ')
         if sort == 'q':
@@ -632,7 +649,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '6':
-      print("Use cat & grep at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]cat & grep syntax = cat file.ext | grep keyword" + Style.RESET_ALL)
       def recursion():
         cg = input(os.getcwd() + ': ')
         if cg == 'q':
@@ -643,7 +661,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '7':
-      print("Use file at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]File syntax = file file.ext" + Style.RESET_ALL)
       def recursion():
         file = input(os.getcwd() + ': ')
         if file == 'q':
@@ -654,12 +673,13 @@ def home():
           recursion()
       recursion()
     elif forensic == '8':
-      file = input('Enter filename and filepath here (/fp/fn): ')
+      file = input(Fore.CYAN + '[*]Enter filename and filepath here (/fp/fn): ' + Style.RESET_ALL)
       os.system('ls -l ' + file)
       wait()
       home()
     elif forensic == '9':
-      print("Use exiftool at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Exiftool syntax = exiftool [options] file.ext" + Style.RESET_ALL)
       def recursion():
         et = input(os.getcwd() + ': ')
         if et == 'q':
@@ -670,7 +690,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '10':
-      print("Use steghide at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]Steghide syntax = steghide embed/extract file.ext" + Style.RESET_ALL)
       def recursion():
         sh = input(os.getcwd() + ': ')
         if sh == 'q':
@@ -681,7 +702,8 @@ def home():
           recursion()
       recursion()
     elif forensic == '11':
-      print("Use xxd at will or type 'q' to exit")
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]xxd syntax = xxd [options] file.ext outfile.txt" + Style.RESET_ALL)
       def recursion():
         xd = input(os.getcwd() + ': ')
         if xd == 'q':
@@ -699,13 +721,13 @@ def home():
       os.system('./bluespoof.sh')
       wait()
     except:
-      print('Error running bluespoof.sh!')
+      print(Fore.RED + '[*]Error running bluespoof.sh!' + Style.RESET_ALL)
   elif in_put == '24':
     try:
       os.system('python3 shodan_search.py')
       wait()
     except:
-      print('Error running shodan_search.py!')
+      print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
   elif in_put == 'R':
     os.chdir(root)
     os.system('more README.md')

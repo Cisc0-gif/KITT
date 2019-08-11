@@ -38,6 +38,10 @@ sudo apt-get install postgresql
 sudo apt-get install kali-linux-full
 sudo apt-get install btscanner
 sudo apt-get install spooftooph
+cd crackers/hashcat
+make
+make install
+cd ../..
 pg_ctlcluster 11 main start
 msfdb init
 pip install bs4
@@ -133,3 +137,6 @@ http 159.65.168.195 80
 socks4 198.50.177.44 44699
 socks5 159.203.166.41 1080
 " > /etc/proxychains.conf
+sudo apt-get update && sudo apt-get upgrade
+sudo apt autoremove
+echo 'Lib installation complete...'
