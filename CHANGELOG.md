@@ -132,3 +132,4 @@
 * removed accidental hydra.restore file
 * fixed syntax error in KITT_INSTALLER.sh
 * renamed sketch.ino to filename.ino in convert.sh
+* added goog-mail.py to hg
