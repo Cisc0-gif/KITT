@@ -15,8 +15,10 @@ my_date = date.today()
 weekday = calendar.day_name[my_date.weekday()]
 
 if sys.platform != 'linux':
-  print('Not a chance pal...')
-  exit()
+  print(Fore.RED + "[*]User OS Doesn't Register as Debian/Linux!" + Style.RESET_ALL)
+  wait()
+else:
+  print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
 
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
@@ -318,7 +320,7 @@ def home():
     elif keylog == '2':
       try:
         os.system('cp -R KidLogger-setupwin26-11-2017 ~')
-        print(Fore.GREEN '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
       except:
         print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()

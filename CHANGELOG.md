@@ -133,3 +133,8 @@
 * fixed syntax error in KITT_INSTALLER.sh
 * renamed sketch.ino to filename.ino in convert.sh
 * added goog-mail.py to hg
+
+### v1.0 8/11/19
+* debugged success message in file copy
+* added success and failure events to os check
+
