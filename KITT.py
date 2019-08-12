@@ -496,7 +496,7 @@ def home():
   elif in_put == '17':
     os.chdir('hg')
     try:
-      os.system('sudo ./domain_sticate.sh')
+      os.system('python3 domain_sticate.py')
     except:
       print(Fore.RED + '[*]Error in file domain_sticate.sh' + Style.RESET_ALL)
     wait()
