@@ -44,7 +44,7 @@ def home():
   print('*[7]  Ruba_digi_spark - Digispark rubberducky tool             *')
   print('*[8]  Xspl0!ts - viruses, exploits, trojans, misc. (WARNING)   *')
   print('*[9]  SSHit - ssh client                                       *')
-  print('*[10] TOR_tilinni - tor connection startup                     *')
+  print('*[10] Ven0m - payload generator                                *')
   print('*[11] nmaPPer - nmap client                                    *')
   print('*[12] NC - nc/cryptcat client                                  *')
   print('*[13] little_phishy - phshing tools                            *')
@@ -381,8 +381,17 @@ def home():
         recursion()
     recursion()
   elif in_put == '10':
-    os.system('tor')
-    wait()
+    print(Fore.CYAN + "[*]Enter 'q' to exit")
+    print("[*]Msfvenom syntax = msfvenom -p payload -e encoder LHOST=localhost_ip LPORT=localhost_port -f format > file.format" + Style.RESET_ALL)
+    def recursion():
+      in_put = input(os.getcwd() + ': ')
+      if in_put == 'q':
+        wait()
+        home()
+      else:
+        os.system(in_put)
+      recursion()
+    recursion()
   elif in_put == '11':
     print(Fore.CYAN + "[*]Enter 'q' to exit")
     print("[*]Nmap syntax = nmap [options] rhost" + Style.RESET_ALL)

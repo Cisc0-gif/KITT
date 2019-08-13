@@ -139,3 +139,6 @@
 * added success and failure events to os check
 * reformatted domain_sticate.sh to python and added lib_install.sh check and shodan search to domain scan
 * added domain_sticate.py to menu
+
+### v1.0 8/12/19
+* swapped tor command for msfvenom shell in KITT.py
