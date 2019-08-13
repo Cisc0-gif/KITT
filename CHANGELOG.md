@@ -142,3 +142,5 @@
 
 ### v1.0 8/12/19
 * swapped tor command for msfvenom shell in KITT.py
+* added os detection message
+* began implementation of runtime log in RUNTIME.log

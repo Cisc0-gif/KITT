@@ -1,5 +1,6 @@
 import os
 import time
+start = time.time()
 import sys
 import pytz
 import time
@@ -9,15 +10,32 @@ import random
 from datetime import date
 from colorama import Fore, Back, Style
 
+def timecheck():
+  global check
+  check = time.time()
+  msg = str(check - start)
+  return msg
+
+def logwrite(msg):
+  with open('RUNTIME.log', 'a+') as f:
+    f.write(msg + '\n')
+    f.close()
+
+logwrite('--[*]KITT Initialized in ' + timecheck() + ' seconds--')
+
 then = datetime.datetime.now(pytz.utc)
 local = then.astimezone(pytz.timezone('America/Los_Angeles'))
 my_date = date.today()
 weekday = calendar.day_name[my_date.weekday()]
 
+print(Fore.CYAN + '[*]Checking OS Version...' + Style.RESET_ALL)
 if sys.platform != 'linux':
+  logwrite("--[*]User OS Doesn't Register as Debian/Linux @ " + timecheck() + "--")
   print(Fore.RED + "[*]User OS Doesn't Register as Debian/Linux!" + Style.RESET_ALL)
   wait()
+  exit()
 else:
+  logwrite("--[+]User OS Registers as Debian/Linux @ " + timecheck() + "--")
   print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
 
 os.system('sudo apt-get update')
