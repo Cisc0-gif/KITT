@@ -1,6 +1,9 @@
 #! /bin/bash
 
+echo '[*]Starting Library Installation...'
+echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
+echo '[*]Installing Linux Packages...'
 sudo apt-get install figlet
 sudo apt-get install metasploit-framework
 sudo apt-get install hydra
@@ -38,12 +41,16 @@ sudo apt-get install postgresql
 sudo apt-get install kali-linux-full
 sudo apt-get install btscanner
 sudo apt-get install spooftooph
+echo '[*]Running make and install for hashcat...'
 cd crackers/hashcat
 make
 make install
 cd ../..
+echo '[*]Starting postgresql main cluster...'
 pg_ctlcluster 11 main start
+echo '[*]Initiating YAML database for metasploit-framework...'
 msfdb init
+echo '[*]Installing python2.7 and 3.7 libraries...'
 pip install bs4
 pip install requests
 pip install psutil
@@ -52,6 +59,70 @@ pip3 install shodan
 pip3 install datetime
 pip3 install pytz
 pip3 install colorama
+echo '[*]Writing Custom IRC ruby script to /usr/share/metasploit-framework/data/exploits/psnuffle...'
+echo "
+class SnifferIRC < BaseProtocolParser
+
+  def register_sigs
+    self.sigs = {
+      :user => /^(NICKs+[^n]+)/si,
+      :pass => /b(IDENTIFYs+[^n]+)/si,
+    }
+  end
+
+  def parse(pkt)
+    return unless pkt.is_tcp?
+    return if (pkt.tcp_sport != 6667 and pkt.tcp_dport != 6667)
+    s = find_session((pkt.tcp_sport == 6667) ? get_session_src(pkt) : get_session_dst(pkt))
+    s[:sname] ||= "irc"
+
+    self.sigs.each_key do |k|
+      matched = nil
+      matches = nil
+
+      if(pkt.payload =~ self.sigs[k])
+        matched = k
+        matches = $1
+      end
+
+      case matched
+
+      when :login_fail
+        if(s[:user] and s[:pass])
+          report_auth_info(s.merge({:active => false}))
+          print_status("Failed IRC Login: #{s[:session]} >> #{s[:user]} / #{s[:pass]}")
+
+          s[:pass] = ""
+          return
+        end
+
+      when :login_pass
+        if(s[:user] and s[:pass])
+          report_auth_info(s)
+          print_status("Successful IRC Login: #{s[:session]} >> #{s[:user]} / #{s[:pass]}")
+          sessions.delete(s[:session])
+          return
+        end
+
+      when :banner
+        if not (s[:info])
+          s[:info] = matches
+          report_service(s)
+        end
+
+      when :bye
+        sessions.delete(s[:session])
+
+      when nil
+      else
+        sessions[s[:session]].merge!({k => matches})
+      end
+
+    end
+  end
+end
+" > /usr/share/metasploit-framework/data/exploits/psnuffle/irc.rb
+echo '[*]Writing dynamic proxychain to proxychain config...'
 echo "
 # proxychains.conf  VER 3.1
 #
@@ -137,6 +208,7 @@ http 159.65.168.195 80
 socks4 198.50.177.44 44699
 socks5 159.203.166.41 1080
 " > /etc/proxychains.conf
+echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
 sudo apt autoremove
-echo 'Lib installation complete...'
+echo '[+]Library Installation Complete...'

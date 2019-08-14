@@ -144,3 +144,8 @@
 * swapped tor command for msfvenom shell in KITT.py
 * added os detection message
 * began implementation of runtime log in RUNTIME.log
+
+### v1.0 8/13/19
+* added upgrade message and continued implementation of runtime log
+* added irc.rb psnuffle module config to lib_install.sh
+* added runtime messages to lib_install.sh

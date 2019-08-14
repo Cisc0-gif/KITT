@@ -38,6 +38,7 @@ else:
   logwrite("--[+]User OS Registers as Debian/Linux @ " + timecheck() + "--")
   print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
 
+print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL)
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
 os.system('sudo apt autoremove')
