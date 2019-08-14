@@ -44,6 +44,7 @@ sudo apt-get install spooftooph
 sudo apt-get install ntfs-3g
 sudo apt-get install cifs.utils
 sudo apt-get install mount
+sudo apt-get install dsniffer
 echo '[*]Running make and install for hashcat...'
 cd crackers/hashcat
 make
