@@ -41,6 +41,9 @@ sudo apt-get install postgresql
 sudo apt-get install kali-linux-full
 sudo apt-get install btscanner
 sudo apt-get install spooftooph
+sudo apt-get install ntfs-3g
+sudo apt-get install cifs.utils
+sudo apt-get install mount
 echo '[*]Running make and install for hashcat...'
 cd crackers/hashcat
 make

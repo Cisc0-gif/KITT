@@ -149,3 +149,6 @@
 * added upgrade message and continued implementation of runtime log
 * added irc.rb psnuffle module config to lib_install.sh
 * added runtime messages to lib_install.sh
+
+### v1.0 8/14/19
+* added SMB drive mounting tools to lib_install.sh
