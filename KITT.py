@@ -248,7 +248,8 @@ def home():
     print('[6] r#con-ng')
     print('[7] fbi_master')
     print('[8] Aut0Sp!oit')
-    print('[9] go home' + Style.RESET_ALL)
+    print('[9] Net-Creds SNiffer')
+    print('[10] go home' + Style.RESET_ALL)
     hg = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
     if hg == '1':
       os.chdir('JoomlaScan')
@@ -321,6 +322,14 @@ def home():
         print(Fore.RED + '[*]Error running AutoSploit!' + Style.RESET_ALL)
       wait()
     elif hg == '9':
+      try:
+        print(Fore.CYAN + '[*]Enter ^C or ^Z to stop packet sniffer' + Style.RESET_ALL)
+        os.system('python net-creds.py')
+        print(Fore.GREEN + '[+]Output directed to credentials.txt!' + Style.RESET_ALL)
+      except:
+        print(Fore.RED + '[*]Packet Sniffer ended prematurely!' + Style.RESET_ALL)
+      wait() 
+    elif hg == '10':
       wait()
   elif in_put == '6':
     os.chdir('keyloggers')

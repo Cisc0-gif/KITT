@@ -153,3 +153,5 @@
 ### v1.0 8/14/19
 * added SMB drive mounting tools to lib_install.sh
 * added dsniffer to lib_install.sh
+* added net-creds.py dependency libraries to lib_install.sh
+* added net-creds.py to hg/ and callable to KITT.py
