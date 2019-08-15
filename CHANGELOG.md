@@ -155,3 +155,5 @@
 * added dsniffer to lib_install.sh
 * added net-creds.py dependency libraries to lib_install.sh
 * added net-creds.py to hg/ and callable to KITT.py
+* added distro warning to README.md
+* continued implementation of runtime log

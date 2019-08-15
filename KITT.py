@@ -89,8 +89,16 @@ def home():
     wait()
     home()
   elif in_put == '1':
-    os.system('service postgresql start')
-    os.system('msfconsole')
+    try:
+      logwrite("--[*]Started Msfconsole @ " + timecheck() + '--')
+      print(Fore.CYAN + '[*]Starting Metasploit-Framework...')
+      os.system('service postgresql start')
+      os.system('msfconsole')
+      print(Fore.GREEN + '[+]Metasploit-Framework Ran Successfully!' + Style.RESET_ALL)
+      logwrite("--[+]Msfconsole ended @ " + timecheck() + '--')
+    except:
+      logwrite("--[*]Error starting postgresql or msfconsole @ " + timecheck() + '--')
+      print(Fore.RED + '[*]Error starting postgresql or msfconsole!' + Style.RESET_ALL)
     wait()
   elif in_put == '2':
     try:
@@ -101,7 +109,9 @@ def home():
       dev_rooter = input('')
       os.system('cp ' + dev_rooter + ' ~')
       print(Fore.GREEN + '[+]dev_rooter ha$ /bin/ cOpied to r00t!' + Style.RESET_ALL)
+      logwrite('--[+]Successfully copied dev rooter to root @ ' + timecheck() + '--')
     except:
+      logwrite("--[*]Error copying dev rooter @ " + timecheck() + '--')
       print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '3':
@@ -111,7 +121,9 @@ def home():
       dev_rooter = input(Fore.CYAN + '[*]Select a rootkit for use: ' + Style.RESET_ALL)
       os.system('cp -R ' + dev_rooter + ' ~')
       print(Fore.GREEN + '[+]r--tkit has /bin/ cOpied to r00t!' + Style.RESET_ALL)
+      logwrite("--[+]Successfully copied rootkit to root @ " + timecheck() + '--')
     except:
+      logwrite("--[*]Error copying rootkit @ " + timecheck() + '--')
       print(Fore.RED + '[*]rootkit not found!' + Style.RESET_ALL)
       print(os.getcwd())
     wait()
@@ -130,6 +142,7 @@ def home():
     crack = input(Fore.CYAN + "[*]So what'll it be?: " + Style.RESET_ALL)
     if crack == '1':
       os.chdir('hashcat')
+      logwrite('--[*]Starting hashcat shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Hashcat syntax = hashcat -a # -m # hash/hashlist.txt wordlist.txt bruteforce mask ?#?#?#?#?#" + Style.RESET_ALL)
       def recursion():
@@ -143,9 +156,11 @@ def home():
       recursion()
     elif crack == '2':
       os.chdir('hashcat')
+      logwrite('--[*]Starting append_num.py @ ' + timecheck() + '--')
       os.system('python3 append_num.py')
       wait()
     elif crack == '3':
+      logwrite('--[*]Starting hydra shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Hydra syntax = hydra -l/-L uname/uname.lst -p/-P pass/pass.lst url type" + Style.RESET_ALL)
       def recursion():
@@ -158,15 +173,18 @@ def home():
         recursion()
       recursion()
     elif crack == '4':
+      logwrite('--[*]Starting burpsuite @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Running Burpsuite..." + Style.RESET_ALL)
       os.system("burpsuite")
       wait()
     elif crack == '5':
+     logwrite('--[*]Reading decoders.txt @ ' + timecheck() + '--')
       with open('decoders.txt', 'r') as f:
         contents = f.read()
       print(contents)
       wait()
     elif crack == '6':
+      logwrite('--[*]Running crunch shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Crunch syntax = crunch min-max -t @,%^(chars to insert) -f charset.lst -i (inverts output) -q readfile.lst -o output.lst" + Style.RESET_ALL)
       def recursion():
@@ -180,6 +198,7 @@ def home():
       recursion()
     elif crack == '7':
       os.chdir('7zip-crack')
+      logwrite('--[*]Running 7zip-crack shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("7zipcrack syntax = ./7zipcrack file.7z wordlist.lst" + Style.RESET_ALL)
       def recursion():
@@ -192,6 +211,7 @@ def home():
         recursion()
       recursion()
     elif crack == '8':
+      logwrite('--[*]Running cewl shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Cewl syntax = cewl -d #(site depth) -m #(min len) -o (offsite) -ua ###(user agent) --with-numbers --meta_file file.txt --email_file file.txt -w output.txt" + Style.RESET_ALL)
       def recursion():
@@ -204,6 +224,7 @@ def home():
         recursion()
       recursion()
     elif crack == '9':
+      logwrite('--[*]Running ROT Bruteforcer @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       def recursion():
         message = input("[*]ROT Cipher Text: " + Style.RESET_ALL).lower().split(' ')
@@ -230,7 +251,7 @@ def home():
             wordlist = f.read().splitlines()
             for i in l:
               if i in wordlist:
-                print(Fore.CYAN + '[*]Decrypted Ciphertext: "' + i + '"' + Style.RESET_ALL)
+                print(Fore.GREEN + '[+]Decrypted Ciphertext: "' + i + '"' + Style.RESET_ALL)
           wait()
           recursion()
 
@@ -253,6 +274,7 @@ def home():
     hg = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
     if hg == '1':
       os.chdir('JoomlaScan')
+      logwrite('--[*]Running Joomlascan shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print('[*]JoomlaScan syntax = python joomlascan.py -u url -t #(threads)' + Style.RESET_ALL)
       def recursion():
@@ -266,6 +288,7 @@ def home():
       recursion()
     elif hg == '2':
       os.chdir('theHarvester')
+      logwrite('--[*]Running theHarvester shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]theHarvester syntax = python3 theHarvester.py -d domain -b source(google,twitter) -l #(limit) -s (start)" + Style.RESET_ALL)
       def recursion():
@@ -280,11 +303,14 @@ def home():
     elif hg == '3':
       try:
         os.system('cp -R FOCA ~')
-        print(Fore.CYAN + '[+]FOCA copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]FOCA copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied FOCA to root @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]FOCA not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying FOCA @ ' + timecheck() + '--')
       wait()
     elif hg =='4':
+      logwrite('--[*]Running goog-mail.py shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print('[*]goog-mail.py syntax = python goog-mail.py -d domain' + Style.RESET_ALL)
       def recursion():
@@ -297,37 +323,61 @@ def home():
         recursion()
       recursion()
     elif hg == '5':
+      logwrite('--[*]Reading dorks.md @ ' + timecheck() + '--')
       try:
         with open('dorks.md', 'r') as f:
           contents = f.read()
         print(contents)
       except:
+        logwrite('--[*]Error reading dorks.md @ ' + timecheck() + '--')
         print(Fore.RED + '[*]dorks not found!' + Style.RESET_ALL)
       wait()
     elif hg == '6':
-      os.system('recon-ng')
+      try:
+        print(Fore.CYAN + '[*]Starting recon-ng...' + Style.RESET_ALL)
+        logwrite('--[*]Starting recon-ng @ ' + timecheck() + '--')
+        os.system('recon-ng')
+        print(Fore.GREEN + '[+]Successfully ended recon-ng!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended recon-ng @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running recon-ng!' + Style.RESET_ALL)
+        logwrite('--[*]Error running recon-ng @ ' + timecheck() + '--')
       wait()
     elif hg == '7':
       try:
         os.chdir('fbi-master')
+        print(Fore.CYAN + '[*]Running fbi.py...' + Style.RESET_ALL)
+        logwrite('--[*]Running fbi.py @ ' + timecheck() + '--')
         os.system('python fbi.py')
+        print(Fore.GREEN + '[+]Successfully ended fbi.py!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended fbi.py @ ' + timecheck() + '--')
       except:
-        print(Fore.RED + '[*]Error in running fbi-master!' + Style.RESET_ALL)
+        print(Fore.RED + '[*]Error in running fbi.py!' + Style.RESET_ALL)
+        logwrite('--[*]Error in running fbi.py @ ' + timecheck()
       wait()
     elif hg == '8':
       try:
         os.chdir('AutoSploit')
+        print(Fore.CYAN + '[*]Running autosploit.py...' + Style.RESET_ALL)
+        logwrite('--[*]Running autosploit.py @ ' + timecheck() + '--')
         os.system('python autosploit.py')
+        print(Fore.GREEN + '[+]Successfully ended autosploit.py!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended autosploit.py @ ' + timecheck() + '--')
       except:
-        print(Fore.RED + '[*]Error running AutoSploit!' + Style.RESET_ALL)
+        print(Fore.RED + '[*]Error running autosploit.py!' + Style.RESET_ALL)
+        logwrite('--[*]Error running autosploit.py @ ' + timecheck() + '--')
       wait()
     elif hg == '9':
+      print(Fore.CYAN + '[*]Running net-creds.py packet sniffer...' + Style.RESET_ALL)
+      logwrite('--[*]Running net-creds.py @ ' + timecheck() + '--')
       try:
         print(Fore.CYAN + '[*]Enter ^C or ^Z to stop packet sniffer' + Style.RESET_ALL)
         os.system('python net-creds.py')
         print(Fore.GREEN + '[+]Output directed to credentials.txt!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended net-creds.py @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Packet Sniffer ended prematurely!' + Style.RESET_ALL)
+        logwrite('--[*]Error running net-creds.py @ ' + timecheck() + '--')
       wait() 
     elif hg == '10':
       wait()
@@ -342,29 +392,43 @@ def home():
       try:
         os.system('cp -R Winupdate ~')
         print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
         print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '2':
       try:
         os.system('cp -R KidLogger-setupwin26-11-2017 ~')
         print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
         print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '3':
       try:
         os.system('cp -R staffcounter_install ~')
         print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
         print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
       wait()
     elif keylog == '4':
       wait()
   elif in_put == '7':
     os.chdir('digis')
-    print(os.getcwd())
-    os.system('sudo ./convert.sh')
+    print(Fore.CYAN + '[*]Running duck2spark converter...' + Style.RESET_ALL)
+    logwrite('--[*]Running duck2spark converter @ ' + timecheck() + '--')
+    print(Fore.CYAN + '[*[Your current directory: ' + Style.RESET_ALL + os.getcwd())
+    try:
+      os.system('sudo ./convert.sh')
+      print(Fore.GREEN + '[+]Successfully converted ducky script to spark!' + Style.RESET_ALL)
+      logwrite('--[+]Successfully converted script @ ' + timecheck() + '--') 
+    except:
+      print(Fore.RED + '[*]Error running duck2spark...' + Style.RESET_ALL)
+      logwrite('--[*]Error runnnig duck2spark @ ' + timecheck() + '--')
     wait()
   elif in_put == '8':
     os.chdir('exploits')
@@ -377,26 +441,33 @@ def home():
       try:
         os.system('cp -R LM_exploit_WIN.sh ~')
         print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
         print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '2':
       try:
         os.system('cp -R unplug.sh ~')
         print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
         print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '3':
       try:
         os.system('cp -R Cisco_E4200_vuln.py ~')
         print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
         print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '4':
       wait()
   elif in_put == '9':
+    logwrite('--[*]Running ssh shell @ ' + timecheck() + '--')
     print(Fore.CYAN + "[*]Enter 'q' to exit")
     print("[*]SSH syntax = ssh -i RSA_KEY uname@ip -p port" + Style.RESET_ALL)
     def recursion():
@@ -409,6 +480,7 @@ def home():
         recursion()
     recursion()
   elif in_put == '10':
+    logwrite('--[*]Running msfvenom shell @ ' + timecheck() + '--')
     print(Fore.CYAN + "[*]Enter 'q' to exit")
     print("[*]Msfvenom syntax = msfvenom -p payload -e encoder LHOST=localhost_ip LPORT=localhost_port -f format > file.format" + Style.RESET_ALL)
     def recursion():
