@@ -1,4 +1,5 @@
 import os
+root = os.getcwd()
 import time
 start = time.time()
 import sys
@@ -17,7 +18,7 @@ def timecheck():
   return msg
 
 def logwrite(msg):
-  with open('RUNTIME.log', 'a+') as f:
+  with open(root + '/RUNTIME.log', 'a+') as f:
     f.write(msg + '\n')
     f.close()
 
@@ -42,7 +43,6 @@ print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL)
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
 os.system('sudo apt autoremove')
-root = os.getcwd()
 
 def wait():
   wait = input('PRESS ENTER TO CONTINUE')
@@ -178,7 +178,7 @@ def home():
       os.system("burpsuite")
       wait()
     elif crack == '5':
-     logwrite('--[*]Reading decoders.txt @ ' + timecheck() + '--')
+      logwrite('--[*]Reading decoders.txt @ ' + timecheck() + '--')
       with open('decoders.txt', 'r') as f:
         contents = f.read()
       print(contents)
@@ -353,7 +353,7 @@ def home():
         logwrite('--[*]Successfully ended fbi.py @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Error in running fbi.py!' + Style.RESET_ALL)
-        logwrite('--[*]Error in running fbi.py @ ' + timecheck()
+        logwrite('--[*]Error in running fbi.py @ ' + timecheck() + '--')
       wait()
     elif hg == '8':
       try:

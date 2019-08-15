@@ -157,3 +157,4 @@
 * added net-creds.py to hg/ and callable to KITT.py
 * added distro warning to README.md
 * continued implementation of runtime log
+* debugged multiple runtime logs occurance
