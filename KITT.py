@@ -22,6 +22,8 @@ def logwrite(msg):
     f.write(msg + '\n')
     f.close()
 
+os.system('sudo chmod 777 RUNTIME.log')
+
 logwrite('--[*]KITT Initialized in ' + timecheck() + ' seconds--')
 
 then = datetime.datetime.now(pytz.utc)

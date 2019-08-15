@@ -158,3 +158,4 @@
 * added distro warning to README.md
 * continued implementation of runtime log
 * debugged multiple runtime logs occurance
+* added rwx perms to RUNTIME.log after being wrote
