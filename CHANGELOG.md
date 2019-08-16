@@ -162,3 +162,5 @@
 
 ### v1.0 8/15/19
 * continued implementation of runtime log at option 18
+* finished implementing runtime log
+* debugged small variable errors in source

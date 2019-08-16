@@ -662,65 +662,104 @@ def home():
     rdefense = input(': ')
     if rdefense == '1':
       try:
+        logwrite('--[*]Running macchanger.sh @ ' + timecheck() + '--')
+        print(Fore.CYAN + '[*]Running macchanger.sh...' + Style.RESET_ALL)
         os.system('./macchanger.sh')
+        print(Fore.GREEN + '[+]Successfully ended macchanger.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended macchanger @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Error in changing mac address!' + Style.RESET_ALL)
+        logwrite('--[*]Error running macchanger.sh @ ' + timecheck() + '--')
       wait()
     elif rdefense == '2':
       try:
+        logwrite('--[*]Running ssh_randomizer.sh @ ' + timecheck() + '--')
+        print(Fore.CYAN + '[*]Running ssh_randomizer.sh...' + Style.RESET_ALL)
         os.system('./ssh_randomizer.sh')
+        print(Fore.GREEN + '[+]Successfully ended ssh_randomizer.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended ssh_randomizer.sh @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Error in changing ssh port' + Style.RESET_ALL)
+        logwrite('--[*]Error running ssh_randomizer.sh @ ' + timecheck() + '--')
       wait()
     elif rdefense == '3':
       try:
+        print(Fore.CYAN + '[*]Beginning RSA Key Generation Process...' + Style.RESET_ALL)
         os.system('sudo service ssh start')
+        print(Fore.GREEN + '[+]ssh daemon started...' + Style.RESET_ALL)
         os.system('mkdir /root/.ssh')
+        print(Fore.GREEN + '[+]key directory generated...' + Style.RESET_ALL)
         uname = input('Enter username for ssh: ')
         port = input('Enter local ssh port: ')
         print('Leave filepath for keys blank for default')
         os.system('ssh-keygen')
+        print(Fore.GREEN + '[+]ssh rsa keys generated...' + Style.RESET_ALL)
         os.system('ssh-copy-id ' + uname + '@localhost -p ' + port)
+        print(Fore.GREEN + '[+]ssh keys copied to ssh server...' + Style.RESET_ALL)
         os.system('ssh ' + uname + '@localhost -p ' + port)
         os.system('exit')
+        print(Fore.GREEN + '[+]ssh connection test successful...' + Style.RESET_ALL)
         os.system('cp /root/.ssh/id_rsa /root')
-        print('RSA Keys Generated and Private Key copied to r00t!')
+        print(Fore.GREEN + '[+]private key copied to root...' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]SSH RSA Key Login Setup Complete!')
+        logwrite('--[+]SSH RSA Key Login Setup Complete @ ' + timecheck() + '--')
       except:
-        print(Fore.RED + '[*]Error in generating RSA keys!' + Style.RESET_ALL)
-      wait() 
+        print(Fore.RED + '[*]Error Running SSH RSA Login Setup!' + Style.RESET_ALL)
+        logwrite('--[*]Error running ssh rsa key login setup @ ' + timecheck() + '--')
+      wait()
     elif rdefense == '4':
       try:
+        print(Fore.CYAN + '[*]Running proxy_config.sh' + Style.RESET_ALL)
         os.system('./proxy_config.sh')
+        print(Fore.GREEN + '[+]Successfully ended proxy_config.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended proxy_config.sh @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Error in running proxy_config.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running proxy_config.sh @ ' + timecheck() + '--')
       wait()
     elif rdefense == '5':
       try:
+        print(Fore.CYAN + '[*]Running ssh_encr7pt.sh...' + Style.RESET_ALL)
         os.system('./ssh_encr7pt.sh')
+        print(Fore.GREEN + '[+]Successfully ended ssh_encr7pt.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended ssh_encr7pt.sh @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error running ssh_encr7pt.sh @ ' + timecheck() + '--')
         print(Fore.RED + '[*]Error in running ssh_encr7pt.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '6':
       try:
+        print(Fore.CYAN + '[*]Running static_ip.sh...' + Style.RESET_ALL)
         os.system('./static_ip.sh')
+        print(Fore.GREEN + '[+]Successfully ended static_ip.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended static_ip.sh @ ' + timecheck() + '--')
       except:
-        print(Fore.RED + '[*]Error in running static_ip.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running static_ip.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running static_ip.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '7':
       wait()
   elif in_put == '20':
     port = input('Enter port number to listen on: ')
     try:
-      print(Fore.GREEN + '[+]Listening on port ' + port + '!' + Style.RESET_ALL)
+      logwrite('--[*]Listening on port ' + port + ' @ ' + timecheck() + '--')
+      print(Fore.CYAN + '[*]Listening on port ' + port + '!' + Style.RESET_ALL)
       os.system('nc -l -p ' + port )
+      print(Fore.GREEN + '[+]Listener Finished!' + Style.RESET_ALL)
+      logwrite('--[+]Listener Finished @ ' + timecheck() + '--')
     except:
-      print(Fore.RED + '[*]Error listening on port!' + Style.RESET_ALL)
+      logwrite('--[*]Error setting up listener on port ' + port + ' @ ' + timecheck() + '--')
+      print(Fore.RED + '[*]Error setting up listener on port ' + port + '!' + Style.RESET_ALL)
     wait()
   elif in_put == '21':
     try:
+      print(Fore.CYAN + '[*]Running OWASP-ZSC...' + Style.RESET_ALL)
       os.chdir('OWASP-ZSC')
       os.system('python zsc.py')
+      print(Fore.GREEN + '[+]Successfully ended OWASP-ZSC!' + Style.RESET_ALL)
+      logwrite('--[+]Successfully ended OWASP-ZSC @ ' + timecheck() + '--')
     except:
+      logwrite('--[*]Error Running OWASP-ZSC @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error Running OWASP-ZSC!' + Style.RESET_ALL)
     wait()
   elif in_put == '22':
@@ -738,6 +777,7 @@ def home():
     print('[12] go home')
     forensic = input(os.getcwd() + ': ')
     if forensic == '1':
+      logwrite('--[*]Running gdb shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]gdb syntax = gdb ./file.ext" + Style.RESET_ALL)
       def recursion():
@@ -750,6 +790,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '2':
+      logwrite('--[*]Running radare2 shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Radare2 syntax = r2 file.ext -d (debugger)" + Style.RESET_ALL)
       def recursion():
@@ -762,6 +803,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '3':
+      logwrite('--[*]Running strace shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Strace syntax = strace file.ext" + Style.RESET_ALL)
       def recursion():
@@ -774,6 +816,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '4':
+      logwrite('--[*]Running nano shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Nano syntax = nano file.ext" + Style.RESET_ALL)
       def recursion():
@@ -786,6 +829,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '5':
+      logwrite('--[*]Running sort shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Sort syntax = sort [option] file.ext" + Style.RESET_ALL)
       def recursion():
@@ -798,6 +842,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '6':
+      logwrite('--[*]Running cat & grep shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]cat & grep syntax = cat file.ext | grep keyword" + Style.RESET_ALL)
       def recursion():
@@ -810,6 +855,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '7':
+      logwrite('--[*]Running file shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]File syntax = file file.ext" + Style.RESET_ALL)
       def recursion():
@@ -824,9 +870,11 @@ def home():
     elif forensic == '8':
       file = input(Fore.CYAN + '[*]Enter filename and filepath here (/fp/fn): ' + Style.RESET_ALL)
       os.system('ls -l ' + file)
+      logwrite('--[*]Ran file ls forensic @ ' + timecheck() + '--')
       wait()
       home()
     elif forensic == '9':
+      logwrite('--[*]Running exiftool shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Exiftool syntax = exiftool [options] file.ext" + Style.RESET_ALL)
       def recursion():
@@ -839,6 +887,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '10':
+      logwrite('--[*]Running stehide shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Steghide syntax = steghide embed/extract file.ext" + Style.RESET_ALL)
       def recursion():
@@ -851,6 +900,7 @@ def home():
           recursion()
       recursion()
     elif forensic == '11':
+      logwrite('--[*]Running xxd shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]xxd syntax = xxd [options] file.ext outfile.txt" + Style.RESET_ALL)
       def recursion():
@@ -867,26 +917,40 @@ def home():
       home()
   elif in_put == '23':
     try:
+      print(Fore.CYAN + '[*]Running bluespoof.sh...' + Style.RESET_ALL)
       os.system('./bluespoof.sh')
-      wait()
+      print(Fore.GREEN + '[+]Successfully ended bluespoof.sh!' + Style.RESET_ALL)
+      logwrite('--[+]Successfully ended bluespoof.sh @ ' + timecheck() + '--')
     except:
+      logwrite('--[*]Error running bluespoof.sh @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running bluespoof.sh!' + Style.RESET_ALL)
+    wait()
   elif in_put == '24':
     try:
+      print(Fore.CYAN + '[*]Running shodan_search.py...' + Style.RESET_ALL)
       os.system('python3 shodan_search.py')
-      wait()
+      print(Fore.GREEN + '[+]Successfully ended shodan_search.py!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully ended shodan_search.py @ ' + timecheck() + '--')
     except:
+      logwrite('--[*]Error running shodan_search.py @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
+    wait()
   elif in_put == 'R':
     os.chdir(root)
+    print(Fore.CYAN + '[*]Reading README.md...' + Style.RESET_ALL)
+    logwrite('--[*]Reading README.md @ ' + timecheck() + '--')
     os.system('more README.md')
     wait()
   elif in_put == 'L':
     os.chdir(root)
+    print(Fore.CYAN + '[*]Reading CHANGELOG.md...' + Style.RESET_ALL)
+    logwrite('--[*]Reading CHANGELOG.md @ ' + timecheck() + Style.RESET_ALL)
     os.system('more CHANGELOG.md')
     wait() 
   elif in_put == 'X':
-    print('Bye Bye')
+    print(Fore.CYAN + '[*]Killing KITT...' + Style.RESET_ALL)
+    print(Fore.RED + '[*]Bye Bye!' + Style.RESET_ALL)
+    logwrite('--[*]Log Closed @ ' + timecheck() + '--')
     exit()
   home()
 
