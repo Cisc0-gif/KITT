@@ -159,3 +159,6 @@
 * continued implementation of runtime log
 * debugged multiple runtime logs occurance
 * added rwx perms to RUNTIME.log after being wrote
+
+### v1.0 8/15/19
+* continued implementation of runtime log at option 18

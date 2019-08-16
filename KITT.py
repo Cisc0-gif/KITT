@@ -495,6 +495,7 @@ def home():
       recursion()
     recursion()
   elif in_put == '11':
+    logwrite('--[*]Running nmap shell @ ' + timecheck() + '--')
     print(Fore.CYAN + "[*]Enter 'q' to exit")
     print("[*]Nmap syntax = nmap [options] rhost" + Style.RESET_ALL)
     def recursion():
@@ -511,6 +512,7 @@ def home():
     print('[2] cryptcat (more secure but requires cryptcat on other end)')
     noc = input(': ')
     if noc == '1':
+      logwrite('--[*]Running netcat shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Netcat syntax = nc rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
       def recursion():
@@ -523,6 +525,7 @@ def home():
           recursion()
       recursion()
     elif noc == '2':
+      logwrite('--[*]Running cryptcat shell @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       print("[*]Cryptcat syntax = cryptcat rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
       def recursion():
@@ -542,8 +545,11 @@ def home():
     if phish == '1':
       try:
         os.system('python3 sonar.py')
+        print(Fore.GREEN + '[+]Ended sonar.py!')
+        logwrite('--[*]Successfully ended sonar.py @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]sonar.py not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error running sonar.py @ ' + timecheck() + '--')
       wait()
     elif phish == '2':
       wait()
@@ -560,59 +566,89 @@ def home():
       try:
         os.system('cp -R ubuntu-18.04-desktop-amd64.iso ~')
         print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying image @ ' + timecheck() + '--')
       wait()
     if image == '2':
       try:
         os.system('cp -R kali-linux-2019.2-vmware-amd64.7z ~')
         print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying image @ ' + timecheck() + '--')
       wait()
     if image == '3':
       try:
         os.system('cp -R en_windows_10_x64_dvd.iso ~')
         print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying image @ ' + timecheck() + '--')
       wait()
     if image == '4':
       try:
         os.system('cp -R en_windows_8_1_x64_dvd_2707217.iso ~')
         print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying image @ ' + timecheck() + '--')
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '5':
       try:
         os.system('cp -R en_windows_7_Ult_64Bit.iso ~')
         print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
       except:
+        logwrite('--[*]Error copying image @ ' + timecheck() + '--')
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
       wait()
     if image == '6':
       wait()
   elif in_put == '15':
-    os.system('sudo ./backup.sh')
+    try:
+      print(Fore.CYAN + '[*]Running backup.sh...' + Style.RESET_ALL)
+      os.system('sudo ./backup.sh')
+      logwrite('--[*]Successfully ended backup.sh @ ' + timecheck() + '--')
+    except:
+      logwrite('--[*]Error running backup.sh @ ' + timecheck() + '--')
+      print(Fore.RED + '[*]Error running backup.sh' + Style.RESET_ALL)
     wait()
   elif in_put == '16':
     try:
+      print(Fore.CYAN + '[*]Running packetdump.sh...' + Style.RESET_ALL)
       os.system('sudo ./packetdump.sh')
       os.system('mv output.pcap ~')
+      logwrite('--[+]Packetdump.sh output directed to root @ ' + timecheck() + '--')
       print(Fore.GREEN + '[+]copied packet capture to r00t!' + Style.RESET_ALL)
     except:
+      logwrite('--[*]Error writing output to root @ ' + timecheck() + '--')
       print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '17':
     os.chdir('hg')
     try:
+      print(Fore.CYAN + '[*]Running domain_sticate.py...' + Style.RESET_ALL)
       os.system('python3 domain_sticate.py')
+      print(Fore.GREEN + '[+]Successfully ended domain_sticate.py' + Style.RESET_ALL)
+      logwrite('--[+]Successfully ended domain_sticate.py @ ' + timecheck() + '--')
     except:
       print(Fore.RED + '[*]Error in file domain_sticate.sh' + Style.RESET_ALL)
+      logwrite('--[*]Error running doamin_sticate.py @ ' + timecheck() + '--')
     wait()
   elif in_put == '18':
-    os.system('irssi')
+    try:
+      print(Fore.CYAN + '[*]Running irssi...' + Style.RESET_ALL)
+      os.system('irssi')
+      print(Fore.GREEN + '[+]Successfully ended irssi' + Style.RESET_ALL)
+      logwrite('--[+]Successfully ended irssi @ ' + Style.RESET_ALL)
+    except:
+      logwrite('--[*]Error running irssi @ ' + timecheck() + '--')
+      print(Fore.RED + '[*]Error running irssi!' + Style.RESET_ALL)
     wait()
   elif in_put == '19':
     os.chdir('sdefense')
