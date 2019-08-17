@@ -167,3 +167,4 @@
 
 ### v1.0 8/16/19
 * added bluelog, redfang, and bluesnarfer to lib_install.sh for bluetooth hacking
+* added btverifier.py to menu and source

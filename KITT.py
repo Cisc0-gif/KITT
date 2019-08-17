@@ -80,11 +80,12 @@ def home():
   print('*[22] Investig@te - forensics tools                            *')
   print('*[23] Spooftooph - bluetooth device spoofer                    *')
   print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
+  print('*[25] BtVerifier - BT RfComm and Active Verification Tool      *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L']
-  for i in range(1,25):
+  for i in range(1,26):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -934,6 +935,16 @@ def home():
     except:
       logwrite('--[*]Error running shodan_search.py @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
+    wait()
+  elif in_put == '25':
+    try:
+      print(Fore.CYAN + '[*]Running btverifier.py...' + Style.RESET_ALL)
+      os.system('python3 btverifier.py')
+      print(Fore.GREEN + '[+]Successfully ended btverifier.py!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully ended btverifier.py @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error running btverifier.py!' + Style.RESET_ALL)
+      logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
     wait()
   elif in_put == 'R':
     os.chdir(root)
