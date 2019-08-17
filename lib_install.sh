@@ -40,6 +40,9 @@ sudo apt-get install python3-pip
 sudo apt-get install postgresql
 sudo apt-get install kali-linux-full
 sudo apt-get install btscanner
+sudo apt-get install bluelog
+sudo apt-get install redfang
+sudo apt-get install bluesnarfer
 sudo apt-get install spooftooph
 sudo apt-get install ntfs-3g
 sudo apt-get install cifs.utils
@@ -59,6 +62,8 @@ pip install bs4
 pip install requests
 pip install psutil
 pip install httplib
+pip install scapy
+pip install wsgiref
 pip3 install shodan
 pip3 install datetime
 pip3 install pytz

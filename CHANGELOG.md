@@ -164,3 +164,6 @@
 * continued implementation of runtime log at option 18
 * finished implementing runtime log
 * debugged small variable errors in source
+
+### v1.0 8/16/19
+* added bluelog, redfang, and bluesnarfer to lib_install.sh for bluetooth hacking
