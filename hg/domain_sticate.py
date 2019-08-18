@@ -18,7 +18,7 @@ def main():
   print(Fore.CYAN + '[*]Output of Ping directed to ping.txt!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Running full nmap scan of domain...' + Style.RESET_ALL)
   try:
-    os.system('nmap -sS -A ' + domain + ' > outputs/nmap.txt')
+    os.system('nmap -sV -A -p 0-65535 ' + domain + ' > outputs/nmap.txt')
     print(Fore.GREEN + '[+]Scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + "[*]Scan incomplete!" + Style.RESET_ALL)

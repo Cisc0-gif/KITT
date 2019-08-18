@@ -168,3 +168,7 @@
 ### v1.0 8/16/19
 * added bluelog, redfang, and bluesnarfer to lib_install.sh for bluetooth hacking
 * added btverifier.py to menu and source
+
+### v1.0 8/17/19
+* extended port scan in domain_sticate.py to max port range
+
