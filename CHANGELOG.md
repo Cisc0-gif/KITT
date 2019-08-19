@@ -172,3 +172,5 @@
 ### v1.0 8/17/19
 * extended port scan in domain_sticate.py to max port range
 
+### v1.0 8/18/19
+* added vigenere bruteforcer to decoders.md

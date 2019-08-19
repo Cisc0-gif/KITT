@@ -1,6 +1,7 @@
 ## Online Decoders
 
 * [Vigenere Cipher](http://rumkin.com/tools/cipher/vigenere.php)
+* [Vigenere Bruteforcer](https://www.guballa.de/vigenere-solver)
 * [Atbash Cipher](http://rumkin.com/tools/cipher/atbash.php)
 * [Online Hash Cracker](https://md5hashing.net/hash/)
 * [Online Hash Cracker](https://crackstation.net/)
