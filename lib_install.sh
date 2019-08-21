@@ -218,6 +218,18 @@ http 159.65.168.195 80
 socks4 198.50.177.44 44699
 socks5 159.203.166.41 1080
 " > /etc/proxychains.conf
+echo '[*]Installing Sherlock Packages...'
+pip3 install beautifulsoup4
+pip3 install bs4
+pip3 install colorama
+pip3 install certifi
+pip3 install lxml
+pip3 install PySocks
+pip3 install requests
+pip3 install requests_futures
+pip3 install soupsieve
+pip3 install stem
+pip3 install torrequest
 echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
 sudo apt autoremove

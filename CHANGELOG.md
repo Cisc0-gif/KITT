@@ -179,3 +179,5 @@
 * added aircrack-ng to lib_install.sh
 * fixed ssh-copy-id id file error
 * fixed root call to ~ for all users
+* added sherlock libs to lib_install.sh
+* added sherlock to KITT

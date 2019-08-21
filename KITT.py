@@ -273,7 +273,8 @@ def home():
     print('[7] fbi_master')
     print('[8] Aut0Sp!oit')
     print('[9] Net-Creds SNiffer')
-    print('[10] go home' + Style.RESET_ALL)
+    print('[10] Sherl0ck')
+    print('[11] go home' + Style.RESET_ALL)
     hg = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
     if hg == '1':
       os.chdir('JoomlaScan')
@@ -383,6 +384,20 @@ def home():
         logwrite('--[*]Error running net-creds.py @ ' + timecheck() + '--')
       wait() 
     elif hg == '10':
+      os.chdir('sherlock')
+      logwrite('--[*]Running sherlock shell @ ' + timecheck() + '--')
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      print("[*]sherlock syntax = python3 sherlock.py -r (ranked search) -v (verbose) --ouput output.txt --print-found (print found sites)" + Style.RESET_ALL)
+      def recursion():
+        in_put = input(os.getcwd() + ': ')
+        if in_put == 'q':
+          wait()
+          home()
+        else:
+          os.system(in_put)
+        recursion()
+      recursion()
+    elif hg == '11':
       wait()
   elif in_put == '6':
     os.chdir('keyloggers')
