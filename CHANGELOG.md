@@ -174,3 +174,8 @@
 
 ### v1.0 8/18/19
 * added vigenere bruteforcer to decoders.md
+
+### v1.0 8/20/19
+* added aircrack-ng to lib_install.sh
+* fixed ssh-copy-id id file error
+* fixed root call to ~ for all users
