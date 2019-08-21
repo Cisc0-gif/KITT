@@ -556,7 +556,8 @@ def home():
   elif in_put == '13':
     os.chdir('phishing')
     print('[1] sonar.py - batch email sender')
-    print('[2] go home')
+    print('[2] blackeye - webpage phishing generator')
+    print('[3] go home')
     phish = input(': ')
     if phish == '1':
       try:
@@ -568,6 +569,16 @@ def home():
         logwrite('--[*]Error running sonar.py @ ' + timecheck() + '--')
       wait()
     elif phish == '2':
+      os.chdir('blackeye')
+      try:
+        os.system('bash blackeye.sh')
+        print(Fore.GREEN + '[+]Ended blackeye.sh!')
+        logwrite('--[*]Successfully ended blackeye.sh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]blackeye.sh not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error running blackeye.sh @ ' + timecheck() + '--')
+      wait()
+    elif phish == '3':
       wait()
   elif in_put == '14':
     os.chdir('images')

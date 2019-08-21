@@ -181,3 +181,4 @@
 * fixed root call to ~ for all users
 * added sherlock libs to lib_install.sh
 * added sherlock to KITT
+* added blackeye to phishing 
