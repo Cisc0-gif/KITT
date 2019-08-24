@@ -28,6 +28,7 @@ sudo apt-get install strace
 sudo apt-get install gdb
 sudo apt-get install radare2
 sudo apt-get install xxd
+sudo apt-get install coreutils
 sudo apt-get install exiftool
 sudo apt-get install steghide
 sudo apt-get install proxychains
@@ -49,6 +50,7 @@ sudo apt-get install cifs.utils
 sudo apt-get install mount
 sudo apt-get install dsniffer
 sudo apt-get install aircrack-ng
+sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
 echo '[*]Running make and install for hashcat...'
 cd crackers/hashcat
 make

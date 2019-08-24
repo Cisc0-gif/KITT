@@ -182,3 +182,9 @@
 * added sherlock libs to lib_install.sh
 * added sherlock to KITT
 * added blackeye to phishing 
+
+### v1.0 8/23/19
+* added coreutils to lib_install.sh
+
+### v1.0 8/24/19
+* added WPA/WPA2 cracking dependencies to lib_install.sh
