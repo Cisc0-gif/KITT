@@ -81,11 +81,12 @@ def home():
   print('*[23] Spooftooph - bluetooth device spoofer                    *')
   print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
   print('*[25] BtVerifier - BT RfComm and Active Verification Tool      *')
+  print('*[26] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L']
-  for i in range(1,26):
+  for i in range(1,27):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -971,6 +972,16 @@ def home():
     except:
       print(Fore.RED + '[*]Error running btverifier.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
+    wait()
+  elif in_put == '26':
+    try:
+      print(Fore.CYAN + '[*]Running network_crack.py...' + Style.RESET_ALL)
+      os.system('python3 network_crack.py')
+      print(Fore.GREEN + '[*]Successfully ended network_crack.py!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully ended network_crack.py @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error running network_crack.py!' + Style.RESET_ALL)
+      logwrite('--[*]Error running network_crack.py @ ' + timecheck() + '--')
     wait()
   elif in_put == 'R':
     os.chdir(root)

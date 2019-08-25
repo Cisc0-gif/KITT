@@ -49,10 +49,19 @@ sudo apt-get install ntfs-3g
 sudo apt-get install cifs.utils
 sudo apt-get install mount
 sudo apt-get install dsniffer
+sudo apt-get install reaver
 sudo apt-get install aircrack-ng
 sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
-echo '[*]Running make and install for hashcat...'
+echo '[*]Running make and install for hashcat, hcxdumptool, and hcxtools...'
 cd crackers/hashcat
+make
+make install
+cd ..
+cd hcxdumptool
+make
+make install
+cd ..
+cd hcxtools
 make
 make install
 cd ../..

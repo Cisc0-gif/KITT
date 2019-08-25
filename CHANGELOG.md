@@ -188,3 +188,8 @@
 
 ### v1.0 8/24/19
 * added WPA/WPA2 cracking dependencies to lib_install.sh
+* added hcxdumptool and hcxtools to crackers and make in lib_install.sh
+
+### v1.0 8/25/19
+* added reaver to lib_install.sh
+* added network_crack.py to KITT.py
