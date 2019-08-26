@@ -193,3 +193,4 @@
 ### v1.0 8/25/19
 * added reaver to lib_install.sh
 * added network_crack.py to KITT.py
+* added wash network scan to network_crack.py
