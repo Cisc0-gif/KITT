@@ -194,3 +194,6 @@
 * added reaver to lib_install.sh
 * added network_crack.py to KITT.py
 * added wash network scan to network_crack.py
+
+### v1.0 8/27/19
+* added schoolloop phishing site to blackeye and edited blackeye menu
