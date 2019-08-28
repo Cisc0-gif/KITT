@@ -197,3 +197,6 @@
 
 ### v1.0 8/27/19
 * added schoolloop phishing site to blackeye and edited blackeye menu
+
+### v1.0 /8/28/19
+* added john the ripper and snort to lib_install.sh

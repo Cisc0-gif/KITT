@@ -52,6 +52,8 @@ sudo apt-get install dsniffer
 sudo apt-get install reaver
 sudo apt-get install aircrack-ng
 sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
+sudo apt-get install john
+sudo apt-get install snort
 echo '[*]Running make and install for hashcat, hcxdumptool, and hcxtools...'
 cd crackers/hashcat
 make
