@@ -21,7 +21,8 @@ def main():
   print('*[3] Crack WEP Network                                   *')
   print('*[4] Crack WPA/WPA2 Network Using PMKID Method           *')
   print('*[5] Crack WPA/WPA2 Network Using PIN (Pixie-Dust) Method*')
-  print('*[6] Exit                                                *')
+  print('*[6] MITM WPA/WPA2 Method                                *')
+  print('*[7] Exit                                                *')
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -71,6 +72,18 @@ def main():
     wait()
     main()
   if in_put == '6':
+    warn = input(Fore.RED + '[*]Fluxion can only run in a graphical interface (no ssh). Are you running in a gui?[y/N]: ' + Style.RESET_ALL)
+    if warn == 'y' or warn == 'Y':
+      os.chdir('fluxion')
+      os.system('sudo ./fluxion.sh')
+      os.chdir('..')
+      wait()
+      main()
+    else:
+      print(Fore.RED + '[*]Run Fluxion in a gui...' + Style.RESET_ALL)
+      wait()
+      main()
+  if in_put == '7':
     wait()
     exit()
 

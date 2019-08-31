@@ -11,12 +11,15 @@ sudo apt-get install burpsuite
 sudo apt-get install tor
 sudo apt-get install nmap
 sudo apt-get install cryptcat
+sudo apt-get install netcat
+sudo apt-get install unicornscan
 sudo apt-get install python
 sudo apt-get install python-pip
 sudo apt-get install maltegoce
 sudo apt-get install recon-ng
 sudo apt-get install cewl
 sudo apt-get install crunch
+sudo apt-get install tshark
 sudo apt-get install tcpdump
 sudo apt-get install irssi
 sudo apt-get install telnet
@@ -54,6 +57,29 @@ sudo apt-get install aircrack-ng
 sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
 sudo apt-get install john
 sudo apt-get install snort
+sudo apt-get install fierce
+sudo apt-get install openvas
+sudo apt-get install nikto
+sudo apt-get install wpscan
+sudo apt-get install mawk
+sudo apt-get install curl
+sudo apt-get install dhcpd
+sudo apt-get install isc-dhcp-server
+sudo apt-get install hostapd
+sudo apt-get install lighttpd
+sudo apt-get install mdk3
+sudo apt-get install php-cgi
+sudo apt-get install pyrit
+sudo apt-get install unzip
+sudo apt-get install xterm
+sudo apt-get install openssl
+sudo apt-get install rfkill
+sudo apt-get install strings
+echo '[*]WARNING: To Run install.sh for fluxion, you must be in a gui (no ssh)'
+read -p 'PRESS ENTER TO CONTINUE' e
+cd fluxion/install
+bash install.sh
+cd ../..
 echo '[*]Running make and install for hashcat, hcxdumptool, and hcxtools...'
 cd crackers/hashcat
 make
