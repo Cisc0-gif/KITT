@@ -208,3 +208,6 @@
 * added fluxion install to lib_install.sh
 * added list of lib_install.sh installation candidates: LIB_REGISTER.md
 * added SSHauth_check.py to sdefense to check IPs accessing local ssh server
+
+### v1.0 /9/1/19
+* added sqlmap to lib_install.sh

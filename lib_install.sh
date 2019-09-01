@@ -42,6 +42,7 @@ sudo apt-get install lm-sensors
 sudo apt-get install python3
 sudo apt-get install python3-pip
 sudo apt-get install postgresql
+sudo apt-get install sqlmap
 sudo apt-get install kali-linux-full
 sudo apt-get install btscanner
 sudo apt-get install bluelog
