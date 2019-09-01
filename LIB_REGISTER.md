@@ -1,102 +1,102 @@
 # Installed Library Regis
 
 ## Bash Libraries
-*figlet
-*metasploit-framework
-*hydra
-*burpsuite
-*tor
-*nmap
-*cryptcat
-*netcat
-*unicornscan
-*python
-*python-pip
-*maltegoce
-*recon-ng
-*cewl
-*crunch
-*tshark
-*tcpdump
-*irssi
-*telnet
-*ftp
-*git
-*apache2
-*ssh
-*strace
-*gdb
-*radare2
-*xxd
-*coreutils
-*exiftool
-*steghide
-*proxychains
-*p7zip
-*macchanger
-*hddtemp
-*lm-sensors
-*python3
-*python3-pip
-*postgresql
-*kali-linux-full
-*btscanner
-*bluelog
-*redfang
-*bluesnarfer
-*spooftooph
-*ntfs-3g
-*cifs.utils
-*mount
-*dsniffer
-*reaver
-*aircrack-ng
-*libcurl4-openssl-dev
-*libpcap0.8-dev
-*zlib1g-dev
-*lbssl-dev
-*john
-*snort
-*fierce
-*openvas
-*nikto
-*wpscan
-*mawk
-*curl
-*dhcpd
-*isc-dhcp-server
-*hostapd
-*lighttpd
-*mdk3
-*php-cgi
-*pyrit
-*unzip
-*xterm
-*openssl
-*rfkill
-*strings
+* figlet
+* metasploit-framework
+* hydra
+* burpsuite
+* tor
+* nmap
+* cryptcat
+* netcat
+* unicornscan
+* python
+* python-pip
+* maltegoce
+* recon-ng
+* cewl
+* crunch
+* tshark
+* tcpdump
+* irssi
+* telnet
+* ftp
+* git
+* apache2
+* ssh
+* strace
+* gdb
+* radare2
+* xxd
+* coreutils
+* exiftool
+* steghide
+* proxychains
+* p7zip
+* macchanger
+* hddtemp
+* lm-sensors
+* python3
+* python3-pip
+* postgresql
+* kali-linux-full
+* btscanner
+* bluelog
+* redfang
+* bluesnarfer
+* spooftooph
+* ntfs-3g
+* cifs.utils
+* mount
+* dsniffer
+* reaver
+* aircrack-ng
+* libcurl4-openssl-dev
+* libpcap0.8-dev
+* zlib1g-dev
+* lbssl-dev
+* john
+* snort
+* fierce
+* openvas
+* nikto
+* wpscan
+* mawk
+* curl
+* dhcpd
+* isc-dhcp-server
+* hostapd
+* lighttpd
+* mdk3
+* php-cgi
+* pyrit
+* unzip
+* xterm
+* openssl
+* rfkill
+* strings 
 
 ## Pip Libraries
 
-*bs4
-*requests
-*psutil
-*httplib
-*scapy
-*wsgiref
+* bs4
+* requests
+* psutil
+* httplib
+* scapy
+* wsgiref 
 
 ## Pip3 Libraries
 
-*shodan
-*datetime
-*pytz
-*colorama
-*beautifulsoup4
-*certifi
-*lxml
-*PySocks
-*requests
-*requests_futures
-*soupsieve
-*stem
-*torrequest
+* shodan
+* datetime
+* pytz
+* colorama
+* beautifulsoup4
+* certifi
+* lxml
+* PySocks
+* requests
+* requests_futures
+* soupsieve
+* stem
+* torrequest 
