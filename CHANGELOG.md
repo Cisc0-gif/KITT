@@ -207,3 +207,4 @@
 * added fluxion to network_crack.py
 * added fluxion install to lib_install.sh
 * added list of lib_install.sh installation candidates: LIB_REGISTER.md
+* added SSHauth_check.py to sdefense to check IPs accessing local ssh server
