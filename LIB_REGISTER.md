@@ -84,6 +84,14 @@
 * httplib
 * scapy
 * wsgiref 
+* pexpect
+* pycrypto
+* pyopenssl
+* pefile
+* impacket
+* qrcode
+* pillow
+* pymssql
 
 ## Pip3 Libraries
 

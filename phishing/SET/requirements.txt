@@ -1,0 +1,10 @@
+pexpect
+pycrypto
+requests
+pyopenssl
+pefile
+impacket
+# Generate QR Codes
+qrcode
+pillow
+pymssql

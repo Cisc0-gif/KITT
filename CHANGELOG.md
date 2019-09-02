@@ -214,3 +214,6 @@
 
 ### v1.0 9/2/19
 * added source configuration to lib_install.sh
+* added SET to phishing
+* added SET libs: pexpect, pycrypto, pyopenssl, pefile, impacket, qrcode, pillow, and pymssql to lib_install.sh
+* updated LIB_REGISTER.md

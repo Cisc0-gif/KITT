@@ -558,7 +558,8 @@ def home():
     os.chdir('phishing')
     print('[1] sonar.py - batch email sender')
     print('[2] blackeye - webpage phishing generator')
-    print('[3] go home')
+    print('[3] SET - Social Engineer Toolkit')
+    print('[4] go home')
     phish = input(': ')
     if phish == '1':
       try:
@@ -580,6 +581,16 @@ def home():
         logwrite('--[*]Error running blackeye.sh @ ' + timecheck() + '--')
       wait()
     elif phish == '3':
+      os.chdir('SET')
+      try:
+        os.system('python setoolkit')
+        print(Fore.GREEN + '[+]Ended SET!')
+        logwrite('--[*]Successfully ended SET @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]SET not found!' + Style.RESET_ALL)
+        logwrite('--[*]Error running SET @ ' + timecheck() + '--')
+      wait()
+    elif phish == '4':
       wait()
   elif in_put == '14':
     os.chdir('images')
@@ -686,7 +697,8 @@ def home():
     print('[4] pr0xy router')
     print('[5] ssh_encr7tion')
     print('[6] st@tic IP')
-    print('[7] go home')
+    print('[7] SSH Auth IP Check')
+    print('[8] go home')
     rdefense = input(': ')
     if rdefense == '1':
       try:
@@ -766,6 +778,16 @@ def home():
         print(Fore.RED + '[*]Error running static_ip.sh!' + Style.RESET_ALL)
       wait()
     elif rdefense == '7':
+      try:
+        print(Fore.CYAN + '[*]Running SSHauth_check.sh...' + Style.RESET_ALL)
+        os.system('python3 SSHauth_check.py')
+        print(Fore.GREEN + '[+]Successfully ended SSHauth_check.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended SSHauth_check.sh @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running SSHauth_check_ip.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running SSHauth_check.sh!' + Style.RESET_ALL)
+      wait()
+    elif rdefense == '8':
       wait()
   elif in_put == '20':
     port = input('Enter port number to listen on: ')

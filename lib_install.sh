@@ -111,6 +111,14 @@ pip install psutil
 pip install httplib
 pip install scapy
 pip install wsgiref
+pip install pexpect
+pip install pycrypto
+pip install pyopenssl
+pip install pefile
+pip install impacket
+pip install qrcode
+pip install pillow
+pip install pymssql
 pip3 install shodan
 pip3 install datetime
 pip3 install pytz
