@@ -198,10 +198,10 @@
 ### v1.0 8/27/19
 * added schoolloop phishing site to blackeye and edited blackeye menu
 
-### v1.0 /8/28/19
+### v1.0 8/28/19
 * added john the ripper and snort to lib_install.sh
 
-### v1.0 /8/31/19
+### v1.0 8/31/19
 * added tshark, netcat, unicornscan, fierce, openvas, nikto, wpscan
 * added fluxion necessary libs to lib_install: mawk, curl, dhcpd, hostapd, lighttpd, mdk3, php-cgi, pyrit, unizip, xterm, openssl, rfkill, strings
 * added fluxion to network_crack.py
@@ -209,5 +209,8 @@
 * added list of lib_install.sh installation candidates: LIB_REGISTER.md
 * added SSHauth_check.py to sdefense to check IPs accessing local ssh server
 
-### v1.0 /9/1/19
+### v1.0 9/1/19
 * added sqlmap to lib_install.sh
+
+### v1.0 9/2/19
+* added source configuration to lib_install.sh

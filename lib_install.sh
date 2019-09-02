@@ -1,6 +1,12 @@
 #! /bin/bash
 
 echo '[*]Starting Library Installation...'
+echo '[*]Configuring Apt Installation Sources...'
+echo "
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+" > /etc/apt/sources.list
+echo '[*]Sources Configured!'
 echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
 echo '[*]Installing Linux Packages...'
