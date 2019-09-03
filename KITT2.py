@@ -678,7 +678,8 @@ def home():
     print('  [6] st@tic IP')
     print('  [7] Fail2ban Configurations')
     print('  [8] DHCP IP Reception')
-    print('  [9] go home')
+    print('  [9] Sysctl_Sanitizer')
+    print('  [10] go home')
     rdefense = input(Fore.CYAN + '[*]Select Security Tool: ' + Style.RESET_ALL)
     if rdefense == '1':
       try:
@@ -778,13 +779,23 @@ def home():
       try:
         print(Fore.CYAN + '[*]Running dh_recv.sh...' + Style.RESET_ALL)
         os.system('./dh_recv.sh')
-        print(Fore.GREEN + '[+]Successfully ran dh_recv.dh!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully ran dh_recv.dh @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]Successfully ran dh_recv.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ran dh_recv.sh @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]Error running dh_recv.sh!' + Style.RESET_ALL)
         logwrite('--[*]Error running dh_recv.sh @ ' + timecheck() + '--')
       wait()
     elif rdefense == '9':
+      try:
+        print(Fore.CYAN + '[*]Running sysctl_sanitize.sh...' + Style.RESET_ALL)
+        os.system('./sysctl_sanitize.sh')
+        print(Fore.GREEN + '[+]Successfully ran sysctl_sanitize.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ran sysctl_sanitize.sh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running sysctl_sanitize.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running sysctl_sanitize.sh @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '10':
       wait()
   elif in_put == '9':
     print('[*]Miscellaneous')

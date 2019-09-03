@@ -398,3 +398,8 @@
 * added sysctl_sanitize.sh to root crontab
 * removed extra time lib import in KITT2.py
 * changed PATH and KITTexe.sh method to KITT2="python3 /opt/KITT/KITT2.py"
+
+### v2.0 12/14/19
+* Merry Christmas!
+* Added sysctl_sanitize.sh to KITT2.py
+* fixed minor extension issues
