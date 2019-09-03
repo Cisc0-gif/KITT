@@ -143,6 +143,7 @@ pip install impacket
 pip install qrcode
 pip install pillow
 pip install pymssql
+pip3 install pwn
 pip3 install shodan
 pip3 install future
 pip3 install datetime
