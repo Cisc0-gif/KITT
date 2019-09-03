@@ -454,8 +454,9 @@ def home():
     print('[*]Network Cracking')
     print('  [1]Network Cracking Tools - aircrack-ng, MiTM, Pixie-Dust, Wash')
     print('  [2]Network Packet Dump')
-    print('  [3]go home')
-    net = input(Fore.CYAN + '[*]Select Netwrk Cracking Tool: ' + Style.RESET_ALL)
+    print('  [3]AP_Spoofer')
+    print('  [4]go home')
+    net = input(Fore.CYAN + '[*]Select Network Cracking Tool: ' + Style.RESET_ALL)
     if net == '1':
       try:
         print(Fore.CYAN + '[*]Running network_crack.py...' + Style.RESET_ALL)
@@ -478,6 +479,18 @@ def home():
         print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
       wait()
     elif net == '3':
+      try:
+        os.chdir('AP_Spoof')
+        hd = input(Fore.CYAN + '[*]Plug in AP Enabled Network Adapter Now...' + Style.RESET_ALL)
+        os.system('./setup.sh')
+        wait()
+        print(Fore.GREEN + '[+]AP_Spoofer setup successfully!' + Style.RESET_ALL)
+        logwrite('--[+]AP_Spoofer setup successfully @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]AP_Spoofer setup failed!' + Style.RESET_ALL)
+        logwrite('--[*]AP_Spoofer setup failed @ ' + timecheck() + '--')
+      wait()
+    elif net == '4':
       wait()
   elif in_put == '6':
     print('[*]IoT Exploitation')

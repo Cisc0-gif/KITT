@@ -356,3 +356,6 @@
 * revamped network_crack.py invalid option method
 * added airgeddon to network_crack.py
 * added airgeddon to repo
+
+### v2.0 12/10/19
+* added AP_Spoofer module to Network Cracking
