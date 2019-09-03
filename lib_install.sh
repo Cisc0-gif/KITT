@@ -26,6 +26,7 @@ echo 'Y' | sudo apt-get install maltegoce
 echo 'Y' | sudo apt-get install recon-ng
 echo 'Y' | sudo apt-get install cewl
 echo 'Y' | sudo apt-get install crunch
+echo 'Y' | sudo apt-get install redis
 echo 'Y' | sudo apt-get install tshark
 echo 'Y' | sudo apt-get install tcpdump
 echo 'Y' | sudo apt-get install irssi
@@ -100,15 +101,18 @@ read -p 'PRESS ENTER TO CONTINUE' e
 cd fluxion/install
 bash install.sh
 cd ../..
-echo '[*]Running make and install for hashcat, hcxdumptool, and hcxtools...'
+echo '[*]Running make and install for hashcat, hcxdumptool, hcxtools, and hashcat-utils...'
+cd airgeddon/hashcat-utils
+make
+cd ../..
 cd crackers/hashcat
 make
 make install
-cd ..
+cd ../
 cd hcxdumptool
 make
 make install
-cd ..
+cd ../
 cd hcxtools
 make
 make install
@@ -123,6 +127,7 @@ pip install -U platformio
 pip install bs4
 pip install requests
 pip install argparse
+pip install termcolor
 pip install dnspython
 pip install psutil
 pip install httplib
@@ -157,6 +162,11 @@ cd ..
 git clone https://github.com/insecurityofthings/jackit.git
 cd jackit
 pip install -r requirements.txt
+cd ..
+echo '[*]Installing WiFi-Pumpkin...'
+cd WiFi-Pumpkin/
+./installer.sh
+pip install --upgrade pyasn1-modules
 cd ..
 echo '[*]Writing fail2ban configurations w/ bantime 5ms, findtime 5ms, and maxretry 3...'
 echo "

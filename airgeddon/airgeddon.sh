@@ -988,7 +988,7 @@ function wash_json_scan() {
 	tee "${tmpdir}wps_json_data.txt"< <(cat < "${tmpdir}wps_fifo") > /dev/null 2>&1 &
 
 	while true; do
-		sleep 5
+		 
 		wash_json_capture_alive=$(ps uax | awk '{print $2}' | grep -E "^${wash_json_pid}$" 2> /dev/null)
 		if [ -z "${wash_json_capture_alive}" ]; then
 			break
@@ -2763,7 +2763,7 @@ function handshake_capture_check() {
 
 	local time_counter=0
 	while true; do
-		sleep 5
+		 
 		if check_bssid_in_captured_file "${tmpdir}${standardhandshake_filename}" "silent"; then
 			break
 		fi
@@ -3364,7 +3364,7 @@ function set_wep_key_script() {
 
 	cat >&8 <<-EOF
 		while true; do
-			sleep 1
+			 
 			if [ -f "${tmpdir}${wepdir}wepkey.txt" ]; then
 				wep_key_found=1
 				break
@@ -3431,7 +3431,7 @@ function set_wep_key_script() {
 			wep_key_cmd+="&& echo -e '\t${yellow_color}${wep_texts[${language},7]}'"
 
 			window_position="${g5_topright_window}"
-			sleep 0.5
+			 
 			manage_output "-hold -bg \"#000000\" -fg \"#FFFFFF\" -geometry \${window_position} -T \"WEP Key Decrypted\"" "clear;\${wep_key_cmd}" "WEP Key Decrypted" "active"
 	EOF
 
@@ -3768,7 +3768,7 @@ function set_wep_script() {
 	cat >&6 <<-'EOF'
 				wep_script_processes+=(${wep_fakeauth_pid})
 				write_wep_processes
-				sleep 2
+				 
 			fi
 
 			if [ ${wep_to_be_launched_only_once} -eq 0 ]; then
@@ -4212,7 +4212,7 @@ pid_control_pursuit_mode() {
 	fi
 
 	while true; do
-		sleep 5
+		 
 		if grep "${bssid}" "${tmpdir}dos_pm-01.csv" > /dev/null 2>&1; then
 			readarray -t DOS_PM_LINES_TO_PARSE < <(cat < "${tmpdir}dos_pm-01.csv" 2> /dev/null)
 
@@ -8624,7 +8624,7 @@ function launch_fake_ap() {
 		global_process_pid=""
 	fi
 
-	sleep 3
+	 
 }
 
 #Create configuration file for dhcpd
@@ -8830,7 +8830,7 @@ function set_std_internet_routing_rules() {
 		"${iptables_cmd}" -A INPUT -p icmp --icmp-type 8 -s ${et_ip_range}/${std_c_mask} -d ${et_ip_router}/${ip_mask} -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 		"${iptables_cmd}" -A INPUT -s ${et_ip_range}/${std_c_mask} -d ${et_ip_router}/${ip_mask} -j DROP
 	fi
-	sleep 2
+	 
 }
 
 #Launch dhcpd server
@@ -8861,7 +8861,7 @@ function launch_dhcp_server() {
 		global_process_pid=""
 	fi
 
-	sleep 2
+	 
 }
 
 #Execute DoS for Evil Twin and Enterprise attacks
@@ -8919,7 +8919,7 @@ function exec_et_deauth() {
 			global_process_pid=""
 		fi
 
-		sleep 1
+		 
 	fi
 }
 
@@ -9205,7 +9205,7 @@ function set_wps_attack_script() {
 				for current_pin in "${script_pins_found[@]}"; do
 					possible_bully_timeout=0
 					if [ ${attack_pin_counter} -ne 1 ]; then
-						sleep 1.5
+						 .5
 					fi
 					bad_attack_this_pin_counter=0
 					if [ "${this_pin_timeout}" -eq 1 ]; then
@@ -9349,7 +9349,7 @@ function set_wps_attack_script() {
 	EOF
 
 	exec 7>&-
-	sleep 1
+	 
 }
 
 #Create here-doc bash script used for control windows on Enterprise attacks
@@ -9606,7 +9606,7 @@ function set_enterprise_control_script() {
 			fi
 
 			echo -ne "\033[K\033[u"
-			sleep 0.3
+			 
 		done
 
 		if [ "${enterprise_heredoc_mode}" = "smooth" ]; then
@@ -9625,7 +9625,7 @@ function set_enterprise_control_script() {
 	EOF
 
 	exec 7>&-
-	sleep 1
+	 
 }
 
 #Create here-doc bash script used for control windows on Evil Twin attacks
@@ -9757,7 +9757,7 @@ function set_et_control_script() {
 				echo "${footer_texts[${language},1]}"
 				} >> "${et_captive_portal_logpath}"
 
-				sleep 2
+				 
 				kill "$(ps -C hostapd --no-headers -o pid | tr -d ' ')" &> /dev/null
 				kill "$(ps -C dhcpd --no-headers -o pid | tr -d ' ')" &> /dev/null
 				kill "$(ps -C aireplay-ng --no-headers -o pid | tr -d ' ')" &> /dev/null
@@ -9887,12 +9887,12 @@ function set_et_control_script() {
 				done
 			fi
 			echo -ne "\033[K\033[u"
-			sleep 0.3
+			 
 		done
 	EOF
 
 	exec 7>&-
-	sleep 1
+	 
 }
 
 #Launch dnsspoof dns black hole for captive portal Evil Twin attack
@@ -9993,7 +9993,7 @@ function set_webserver_config() {
 	echo -e "cgi.assign = ( \".htm\" => \"/bin/bash\" )"
 	} >> "${tmpdir}${webserver_file}"
 
-	sleep 2
+	 
 }
 
 #Create captive portal files. Cgi bash scripts, css and js file
@@ -10196,7 +10196,7 @@ function set_captive_portal_page() {
 	EOF
 
 	exec 4>&-
-	sleep 3
+	 
 }
 
 #Launch lighttpd webserver for captive portal Evil Twin attack
@@ -10576,7 +10576,7 @@ function launch_beef() {
 		et_processes+=($!)
 	fi
 
-	sleep 2
+	 
 }
 
 #Launch bettercap sniffer
@@ -10776,7 +10776,7 @@ function kill_dos_pursuit_mode_processes() {
 	if ! stty sane > /dev/null 2>&1; then
 		reset > /dev/null 2>&1
 	fi
-	sleep 1
+	 
 }
 
 #Set current channel reading it from file
@@ -13835,7 +13835,7 @@ function print_intro() {
 	echo
 	language_strings "${language}" 228 "green"
 	print_animated_flying_saucer
-	sleep 1
+	 
 }
 
 #Generate the frames of the animated ascii art flying saucer
@@ -15211,7 +15211,7 @@ function main() {
 				language_strings "${language}" 228 "green"
 				echo
 				language_strings "${language}" 395 "yellow"
-			sleep 3
+			 
 			fi
 		fi
 
