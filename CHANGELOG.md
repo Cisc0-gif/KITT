@@ -359,3 +359,4 @@
 
 ### v2.0 12/10/19
 * added AP_Spoofer module to Network Cracking
+* added some customization to /AP_Spoof/setup.sh
