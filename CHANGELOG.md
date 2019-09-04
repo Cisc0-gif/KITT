@@ -361,13 +361,16 @@
 * added AP_Spoofer module to Network Cracking
 * added some customization to /AP_Spoof/setup.sh
 
-## v2.0 12/11/19
+### v2.0 12/11/19
 * reworked minor details in README.md
 
-## v2.0 12/13/19
+### v2.0 12/13/19
 * fixed wait() call error in KITT2.py
 * added git pull origin master to update cloned repo
 * added -h to dnsmasq cmd in AP_Spoof/setup.sh to single out specified hostnames in fakehosts.txt
 * added Features to README.md
 * replaced fluxion/ with official version of fluxion
 * added WiFi-Pumpkin as a more advanced method of AP Spoofing to network_crack.py
+
+### v2.0 12/15/19
+* changed airmon-ng stop/start exe time in network_crack to specific options

