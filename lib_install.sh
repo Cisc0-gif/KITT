@@ -10,78 +10,78 @@ echo '[*]Sources Configured!'
 echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
 echo '[*]Installing Linux Packages...'
-sudo apt-get install figlet
-sudo apt-get install metasploit-framework
-sudo apt-get install hydra
-sudo apt-get install burpsuite
-sudo apt-get install tor
-sudo apt-get install nmap
-sudo apt-get install cryptcat
-sudo apt-get install netcat
-sudo apt-get install unicornscan
-sudo apt-get install python
-sudo apt-get install python-pip
-sudo apt-get install maltegoce
-sudo apt-get install recon-ng
-sudo apt-get install cewl
-sudo apt-get install crunch
-sudo apt-get install tshark
-sudo apt-get install tcpdump
-sudo apt-get install irssi
-sudo apt-get install telnet
-sudo apt-get install ftp
-sudo apt-get install git
-sudo apt-get install apache2
-sudo apt-get install ssh
-sudo apt-get install strace
-sudo apt-get install gdb
-sudo apt-get install radare2
-sudo apt-get install xxd
-sudo apt-get install coreutils
-sudo apt-get install exiftool
-sudo apt-get install steghide
-sudo apt-get install proxychains
-sudo apt-get install p7zip
-sudo apt-get install macchanger
-sudo apt-get install hddtemp
-sudo apt-get install lm-sensors
-sudo apt-get install python3
-sudo apt-get install python3-pip
-sudo apt-get install postgresql
-sudo apt-get install sqlmap
-sudo apt-get install kali-linux-full
-sudo apt-get install btscanner
-sudo apt-get install bluelog
-sudo apt-get install redfang
-sudo apt-get install bluesnarfer
-sudo apt-get install spooftooph
-sudo apt-get install ntfs-3g
-sudo apt-get install cifs.utils
-sudo apt-get install mount
-sudo apt-get install dsniffer
-sudo apt-get install reaver
-sudo apt-get install aircrack-ng
-sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
-sudo apt-get install john
-sudo apt-get install snort
-sudo apt-get install fierce
-sudo apt-get install openvas
-sudo apt-get install nikto
-sudo apt-get install wpscan
-sudo apt-get install mawk
-sudo apt-get install curl
-sudo apt-get install dhcpd
-sudo apt-get install isc-dhcp-server
-sudo apt-get install hostapd
-sudo apt-get install lighttpd
-sudo apt-get install mdk3
-sudo apt-get install php-cgi
-sudo apt-get install pyrit
-sudo apt-get install unzip
-sudo apt-get install xterm
-sudo apt-get install openssl
-sudo apt-get install rfkill
-sudo apt-get install strings
+echo 'Y' | sudo apt-get install figlet
+echo 'Y' | sudo apt-get install metasploit-framework
+echo 'Y' | sudo apt-get install hydra
+echo 'Y' | sudo apt-get install burpsuite
+echo 'Y' | sudo apt-get install tor
+echo 'Y' | sudo apt-get install nmap
+echo 'Y' | sudo apt-get install cryptcat
+echo 'Y' | sudo apt-get install netcat
+echo 'Y' | sudo apt-get install unicornscan
+echo 'Y' | sudo apt-get install python
+echo 'Y' | sudo apt-get install python-pip
+echo 'Y' | sudo apt-get install maltegoce
+echo 'Y' | sudo apt-get install recon-ng
+echo 'Y' | sudo apt-get install cewl
+echo 'Y' | sudo apt-get install crunch
+echo 'Y' | sudo apt-get install tshark
+echo 'Y' | sudo apt-get install tcpdump
+echo 'Y' | sudo apt-get install irssi
+echo 'Y' | sudo apt-get install telnet
+echo 'Y' | sudo apt-get install ftp
+echo 'Y' | sudo apt-get install git
+echo 'Y' | sudo apt-get install apache2
+echo 'Y' | sudo apt-get install ssh
+echo 'Y' | sudo apt-get install strace
+echo 'Y' | sudo apt-get install gdb
+echo 'Y' | sudo apt-get install radare2
+echo 'Y' | sudo apt-get install xxd
+echo 'Y' | sudo apt-get install coreutils
+echo 'Y' | sudo apt-get install exiftool
+echo 'Y' | sudo apt-get install steghide
+echo 'Y' | sudo apt-get install proxychains
+echo 'Y' | sudo apt-get install p7zip
+echo 'Y' | sudo apt-get install macchanger
+echo 'Y' | sudo apt-get install hddtemp
+echo 'Y' | sudo apt-get install lm-sensors
+echo 'Y' | sudo apt-get install python3
+echo 'Y' | sudo apt-get install python3-pip
+echo 'Y' | sudo apt-get install postgresql
+echo 'Y' | sudo apt-get install sqlmap
+echo 'Y' | sudo apt-get install kali-linux-full
+echo 'Y' | sudo apt-get install btscanner
+echo 'Y' | sudo apt-get install bluelog
+echo 'Y' | sudo apt-get install redfang
+echo 'Y' | sudo apt-get install bluesnarfer
+echo 'Y' | sudo apt-get install spooftooph
+echo 'Y' | sudo apt-get install ntfs-3g
+echo 'Y' | sudo apt-get install cifs.utils
+echo 'Y' | sudo apt-get install mount
+echo 'Y' | sudo apt-get install dsniffer
+echo 'Y' | sudo apt-get install reaver
+echo 'Y' | sudo apt-get install aircrack-ng
+echo 'Y' | sudo apt-get install libcurl4-openssl-dev libpcap0.8-dev zlib1g-dev libssl-dev
+echo 'Y' | sudo apt-get install john
+echo 'Y' | sudo apt-get install snort
+echo 'Y' | sudo apt-get install fierce
+echo 'Y' | sudo apt-get install openvas
+echo 'Y' | sudo apt-get install nikto
+echo 'Y' | sudo apt-get install wpscan
+echo 'Y' | sudo apt-get install mawk
+echo 'Y' | sudo apt-get install curl
+echo 'Y' | sudo apt-get install dhcpd
+echo 'Y' | sudo apt-get install isc-dhcp-server
+echo 'Y' | sudo apt-get install hostapd
+echo 'Y' | sudo apt-get install lighttpd
+echo 'Y' | sudo apt-get install mdk3
+echo 'Y' | sudo apt-get install php-cgi
+echo 'Y' | sudo apt-get install pyrit
+echo 'Y' | sudo apt-get install unzip
+echo 'Y' | sudo apt-get install xterm
+echo 'Y' | sudo apt-get install openssl
+echo 'Y' | sudo apt-get install rfkill
+echo 'Y' | sudo apt-get install strings
 echo '[*]WARNING: To Run install.sh for fluxion, you must be in a gui (no ssh)'
 read -p 'PRESS ENTER TO CONTINUE' e
 cd fluxion/install
