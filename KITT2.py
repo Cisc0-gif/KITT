@@ -12,6 +12,9 @@ import random
 from datetime import date
 from colorama import Fore, Back, Style
 
+def wait():
+  wait = input('PRESS ENTER TO CONTINUE')
+
 def runtimecheck(): #returns current runtime
   global check
   check = time.time()
@@ -40,13 +43,11 @@ else:
   logwrite("--[+]User OS Registers as Debian/Linux @ " + timecheck() + "--")
   print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
 
-print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL) #updates system libs
+print(Fore.CYAN + '[*]Updating System Libs(CTL^C 3 times to skip)...' + Style.RESET_ALL) #updates system libs
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
 os.system('sudo apt autoremove')
-
-def wait():
-  wait = input('PRESS ENTER TO CONTINUE')
+os.system('git pull origin master')
 
 def home():
   global root
@@ -807,6 +808,9 @@ def home():
       print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
       print(Fore.CYAN + '[*]Removing Deprecated Packages...' + Style.RESET_ALL)
       os.system('sudo apt autoremove')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      print(Fore.CYAN + '[*]Updating Local Git Clone...' + Style.RESET_ALL)
+      os.system('git pull origin master')
       print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
       logwrite('--[*]Successfully Updated Packages @ ' + timecheck() + '--')
     except:

