@@ -14,11 +14,11 @@ from email import encoders
 n = 0
 
 def email_sent(to):
-  fromaddr = 'bablaza41@gmail.com'
-  toaddrs  = to
-  pwd = "Happyface1"
+  fromaddr = 'YOUR EMAIL'
+  toaddrs  = to #EMAIL TO SEND
+  pwd = "ACCOUNT PASSWD"
   msg = MIMEMultipart('alternative')
-  msg['From'] = 'f_disk'
+  msg['From'] = 'FROM'
   msg['To'] = to
   msg['Subject'] = 'To Whom It May Concern: ' + local.strftime("%a, %b %d, %Y")
   body = """
@@ -49,7 +49,7 @@ def countdown():
   sys.setrecursionlimit(1000 + n)
   current_time = str(local.strftime("%I:%M %p"))
   if current_time == '01:00 AM':
-    email_sent('fergo310@yahoo.com')
+    email_sent('TO ADDR')
     n += 1
     time.sleep(45)
     countdown()
