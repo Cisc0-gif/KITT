@@ -374,3 +374,4 @@
 
 ### v2.0 12/15/19
 * changed airmon-ng stop/start exe time in network_crack to specific options
+* fixed git issues
