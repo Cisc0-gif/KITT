@@ -320,3 +320,7 @@
 * added termcolor(pip) and redis(apt) to lib_install.py
 * added redis-server-exploit to KITT and /exploits
 * added passwd_backdoor.sh exploit to escalate
+
+### v1.0 11/24/19
+* added payloads/ w/ P4wnP1 ALOA and php-webshell payloads
+* fixed bugs in KITT.py

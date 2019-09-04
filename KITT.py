@@ -57,7 +57,7 @@ def home():
   print('                      [U]Update')
   print('================================================================')
   print(Fore.RED + '*[1]  Metaspl0!it - metasploit-framework                       *')
-  print('*[2]  dev_r00ters - device rootkits for apk and iphone         *')
+  print('*[2]  dev_rooters - device rootkits for apk and iphone         *')
   print('*[3]  Mouse_JACk - Keyboard Jacker (needs CrazyRadio PA)       *')
   print('*[4]  The Cr@ckin - hash/login crackers                        *')
   print('*[5]  Hunter/Gatherer - OSINT gatherers                        *')
@@ -82,11 +82,12 @@ def home():
   print('*[24] HoneyPot - Honeypot Network Defense Tool                 *')
   print('*[25] HomePWN - IoT Exploitation Framework                     *')
   print('*[26] PhoneInfoga - Phone Number OSINT Tool                    *')
-  print('*[X]  Fuck_0ff                                                 *')
+  print('*[27] P@yloads - Uploadable payloads (PHP, P4wnP1 ALOA, HID)   *')
+  print('*[X]  Close_KITT                                               *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U'] #creates list of letters for options from menu
-  for i in range(1,27): #creates range of numbers as options from menu
+  for i in range(1,28): #creates range of numbers as options from menu
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -108,13 +109,12 @@ def home():
     try:
       os.chdir('rooters')
       os.system('ls')
-      print(Fore.CYAN + '[*]Select a dev rooter for use: ' + Style.RESET_ALL)
-      dev_rooter = input('')
+      dev_rooter = input(Fore.CYAN + '[*]Select a dev_rooter for use: ' + Style.RESET_ALL)
       os.system('cp ' + dev_rooter + ' ~')
-      print(Fore.GREEN + '[+]dev_rooter ha$ /bin/ cOpied to r00t!' + Style.RESET_ALL)
-      logwrite('--[+]Successfully copied dev rooter to root @ ' + timecheck() + '--')
+      print(Fore.GREEN + '[+]dev_rooter copied to home dir!' + Style.RESET_ALL)
+      logwrite('--[+]Successfully copied dev_rooter to home dir @ ' + timecheck() + '--')
     except:
-      logwrite("--[*]Error copying dev rooter @ " + timecheck() + '--')
+      logwrite("--[*]Error copying dev_rooter @ " + timecheck() + '--')
       print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '3':
@@ -221,8 +221,8 @@ def home():
     if hg == '1':
       try:
         os.system('cp -R FOCA ~')
-        print(Fore.GREEN + '[+]FOCA copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied FOCA to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]FOCA copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied FOCA to home dir! @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]FOCA not found!' + Style.RESET_ALL)
         logwrite('--[*]Error copying FOCA @ ' + timecheck() + '--')
@@ -296,7 +296,7 @@ def home():
     if keylog == '1':
       try:
         os.system('cp -R Winupdate ~')
-        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
@@ -305,7 +305,7 @@ def home():
     elif keylog == '2':
       try:
         os.system('cp -R KidLogger-setupwin26-11-2017 ~')
-        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
@@ -314,7 +314,7 @@ def home():
     elif keylog == '3':
       try:
         os.system('cp -R staffcounter_install ~')
-        print(Fore.GREEN + '[+]keylogger copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
@@ -346,7 +346,7 @@ def home():
     if exploit == '1':
       try:
         os.system('cp -R LM_exploit_WIN.sh ~')
-        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
@@ -355,7 +355,7 @@ def home():
     elif exploit == '2':
       try:
         os.system('cp -R unplug.sh ~')
-        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]exploit copied to homr dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
@@ -364,7 +364,7 @@ def home():
     elif exploit == '3':
       try:
         os.system('cp -R Cisco_E4200_vuln.py ~')
-        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
@@ -373,7 +373,7 @@ def home():
     elif exploit == '4':
       try:
         os.system('cp -R redis.py ~')
-        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
         logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
@@ -430,8 +430,8 @@ def home():
     if image == '1':
       try:
         os.system('cp -R ubuntu-18.04-desktop-amd64.iso ~')
-        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]image copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to home dir @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
         logwrite('--[*]Error copying image @ ' + timecheck() + '--')
@@ -439,8 +439,8 @@ def home():
     if image == '2':
       try:
         os.system('cp -R kali-linux-2019.2-vmware-amd64.7z ~')
-        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]image copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to home dir @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
         logwrite('--[*]Error copying image @ ' + timecheck() + '--')
@@ -448,8 +448,8 @@ def home():
     if image == '3':
       try:
         os.system('cp -R en_windows_10_x64_dvd.iso ~')
-        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]image copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to home dir @ ' + timecheck() + '--')
       except:
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
         logwrite('--[*]Error copying image @ ' + timecheck() + '--')
@@ -457,8 +457,8 @@ def home():
     if image == '4':
       try:
         os.system('cp -R en_windows_8_1_x64_dvd_2707217.iso ~')
-        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]image copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to home dir @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying image @ ' + timecheck() + '--')
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
@@ -466,8 +466,8 @@ def home():
     if image == '5':
       try:
         os.system('cp -R en_windows_7_Ult_64Bit.iso ~')
-        print(Fore.GREEN + '[+]image copied to r00t!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully copied image to root @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]image copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied image to home dir @ ' + timecheck() + '--')
       except:
         logwrite('--[*]Error copying image @ ' + timecheck() + '--')
         print(Fore.RED + '[*]image not found!' + Style.RESET_ALL)
@@ -488,10 +488,10 @@ def home():
       print(Fore.CYAN + '[*]Running packetdump.sh...' + Style.RESET_ALL)
       os.system('sudo ./packetdump.sh')
       os.system('mv output.pcap ~')
-      logwrite('--[+]Packetdump.sh output directed to root @ ' + timecheck() + '--')
-      print(Fore.GREEN + '[+]copied packet capture to r00t!' + Style.RESET_ALL)
+      logwrite('--[+]Packetdump.sh output directed to home dir @ ' + timecheck() + '--')
+      print(Fore.GREEN + '[+]copied packet capture to home dir!' + Style.RESET_ALL)
     except:
-      logwrite('--[*]Error writing output to root @ ' + timecheck() + '--')
+      logwrite('--[*]Error writing output to home dir @ ' + timecheck() + '--')
       print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '13':
@@ -567,7 +567,7 @@ def home():
         os.system('exit')
         print(Fore.GREEN + '[+]ssh connection test successful...' + Style.RESET_ALL)
         os.system('cp ~/.ssh/id_rsa ~/')
-        print(Fore.GREEN + '[+]private key copied to root...' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]private key copied to homed dir...' + Style.RESET_ALL)
         print(Fore.GREEN + '[+]SSH RSA Key Login Setup Complete!')
         logwrite('--[+]SSH RSA Key Login Setup Complete @ ' + timecheck() + '--')
       except:
@@ -889,6 +889,38 @@ def home():
     except:
       print(Fore.RED + "[*]Error running PhoneInfoga Scan!" + Style.RESET_ALL)
       logwrite('--[*]Error running PhoneInfoga Scan @ ' + timecheck() + '--')
+      wait()
+  elif in_put == '27':
+    os.chdir('payloads')
+    print('[1] php-webshells')
+    print('[2] P4wnP1 HID scripts')
+    print('[3] Go home')
+    payload = input(Fore.CYAN + '[*]Select a payload dir: ' + Style.RESET_ALL)
+    if payload == '1':
+      try:
+        os.chdir('php-webshells')
+        os.system('ls')
+        pyld = input(Fore.CYAN + '[*]Enter payload name w/ extension (pay.ext): ' + Style.RESET_ALL)
+        os.system('cp -R ' + pyld + ' ~/')
+        print(Fore.GREEN + '[+]Payload copied to home dir!' + Style.RESET_ALL)
+        wait()
+        logwrite('--[+]Copied payload to home dir @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error copying payload to home dir!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying payload to home dir @ ' + timecheck() + '--')
+    elif payload == '2':
+      try:
+        os.chdir('p4wnp1')
+        os.system('ls')
+        pyld = input(Fore.CYAN + '[*]Enter payload name w/ extension (pay.ext): ' + Style.RESET_ALL)
+        os.system('cp -R ' + pyld + ' ~/')
+        print(Fore.GREEN + '[+]Payload copied to home dir!' + Style.RESET_ALL)
+        wait()
+        logwrite('--[+]Copied payload to home dir @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error copying payload to home dir!' + Style.RESET_ALL)
+        logwrite('--[*]Error copying payload to home dir @ ' + timecheck() + '--')
+    elif payload == '3':
       wait()
   elif in_put == 'R':
     os.chdir(root)
