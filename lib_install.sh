@@ -112,6 +112,7 @@ pip install httplib
 pip install scapy
 pip install wsgiref
 pip install pexpect
+pip install http
 pip install pycrypto
 pip install pyopenssl
 pip install pefile
