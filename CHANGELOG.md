@@ -220,3 +220,6 @@
 
 ### v1.0 9/3/19
 * piped 'Y' into Y/n lib install questions
+
+### v1.0 9/4/19
+* added nikto scan to domain_sticate.py in hg/

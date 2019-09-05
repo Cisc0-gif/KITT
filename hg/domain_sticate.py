@@ -46,7 +46,14 @@ def main():
     print(Fore.GREEN + '[+]Cewl wordlist scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]Cewl wordlist scan incomplete!' + Style.RESET_ALL)
-  print(Fore.CYAN + '[*]Output of Cewl directed to domain_wordlist.lst!' + Style.RESET_ALL)
+  print(Fore.CYAN + '[*]Output of Cewl directed to domain_wordlist.lst!')
+  print('[*]Running nikto scan...' + Style.RESET_ALL)
+  try:
+    os.system('nikto -h https://' + domain + ' -output ../nikto.txt')
+    print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
+  except:
+    print(Fore.RED + '[*]Nikto scan incomplete!' + Style.RESET_ALL)
+  print(Fore.CYAN + '[*]Output of nikto directed to nikto.txt' + Style.RESET_ALL)
   os.system('cd ../JoomlaScan')
   print(Fore.CYAN + '[*]Running joomlascan...' + Style.RESET_ALL)
   try:
