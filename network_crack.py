@@ -25,7 +25,8 @@ def main():
   print('*[7] Ettercap (MiTM Attack)                              *')
   print('*[8] Fluxion (MiTM/Router Spoof Attack)                  *')
   print('*[9] Airgeddon (Attack Framework - Graphical)            *')
-  print('*[10] Exit                                               *')
+  print('*[10] WiFi-Pumpkin (Rogue AP - Graphical)                *')
+  print('*[11] Exit                                               *')
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -110,6 +111,14 @@ def main():
       print(Fore.RED + '[*]Error running airgeddon.sh' + Style.RESET_ALL)
     os.chdir('..')
   if in_put == '10':
+    print(Fore.CYAN + '[*]Starting WiFi-Pumpkin...' + Style.RESET_ALL)
+    try:
+      os.system('sudo wifi-pumpkin')
+      print(Fore.GREEN + '[+]Successfully ran WiFi-Pumpkin!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Error running WiFi-Pumpkin' + Style.RESET_ALL)
+    wait()
+  if in_put == '11':
     print(Fore.CYAN + '[*]Shutting down ' + interface + 'mon...' + Style.RESET_ALL)
     os.system('airmon-ng stop ' + interface)
     os.system('airmon-ng stop ' + interface + 'mon')

@@ -370,3 +370,4 @@
 * added -h to dnsmasq cmd in AP_Spoof/setup.sh to single out specified hostnames in fakehosts.txt
 * added Features to README.md
 * replaced fluxion/ with official version of fluxion
+* added WiFi-Pumpkin as a more advanced method of AP Spoofing to network_crack.py
