@@ -363,3 +363,9 @@
 
 ## v2.0 12/11/19
 * reworked minor details in README.md
+
+## v2.0 12/13/19
+* fixed wait() call error in KITT2.py
+* added git pull origin master to update cloned repo
+* added -h to dnsmasq cmd in AP_Spoof/setup.sh to single out specified hostnames in fakehosts.txt
+

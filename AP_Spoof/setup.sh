@@ -29,7 +29,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 sudo iptables -P FORWARD ACCEPT
 sudo iptables --table nat -A POSTROUTING -o wlan0 -j MASQUERADE
 echo "[*]Open 3 windows, 1 for dnsmasq, 2 for hostapd, and 3 if you want to edit fakehosts.conf"
-echo "[*]1.)dnsmasq -C dnsmasq.conf -H fakehosts.conf -d"
+echo "[*]1.)dnsmasq -C dnsmasq.conf -H fakehosts.conf -h -d"
 echo "[*]2.)hostapd ./hostapd.conf"
 echo "[*]3.)./iptables.sh when done to reverse configurations"
 read -p "PRESS ENTER TO CONTINUE" e
