@@ -324,3 +324,6 @@
 ### v1.0 11/24/19
 * added payloads/ w/ P4wnP1 ALOA and php-webshell payloads
 * fixed bugs in KITT.py
+
+### v1.0 11/27/19
+* redesigned p4wnp1 payloads as templates
