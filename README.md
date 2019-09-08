@@ -1,4 +1,4 @@
-# KITT Penetration Testing Framework
+# KITT 2.0 Penetration Testing Framework
 
 The KITT Penetration Testing Framework was developed as an open source solution for pentesters and programmers alike to compile the tools they use with what they know into an open source project.
 With KITT, users are able to easily access a list of commonly used tools to their profession which are all open to configuration in the source code.
@@ -7,6 +7,8 @@ DISCLAIMER: Use of this tool is only to be used legally for education purposes, 
 
 
 ## Getting Started
+
+WARNING: KITT was developed and tested on Kali Linux, I have not added support for any other distro yet but plan to in the near future.
 
 To begin, run ``` ./KITT_INSTALLER.sh ``` to install all necessary libraries and configure PATH usage.
 Simply follow all instructions in the installer.

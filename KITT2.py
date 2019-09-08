@@ -51,7 +51,7 @@ def wait():
 def home():
   global root
   os.chdir(root)
-  os.system("figlet -f slant '   K I T T 1.0'")
+  os.system("figlet -f slant '   K I T T 2.0'")
   print('================================================================')
   print(' [R] README   | ' + time.ctime() + ' |   [L] CHANGELOG')
   print('                      [U]Update')
