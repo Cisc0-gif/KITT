@@ -333,3 +333,4 @@
 * removed certain features that can be done outside KITT
 * updated to KITT2.0
 * fixed unspecified names in backup.sh
+* updated UI w/ colorama and standardized option color scheme
