@@ -1,0 +1,743 @@
+#! python3
+import os
+root = os.getcwd() #sets root as current directory for access to all tools
+import time
+import socket
+import requests
+import sys
+import time
+import calendar
+import datetime
+import random
+from datetime import date
+from colorama import Fore, Back, Style
+
+def runtimecheck(): #returns current runtime
+  global check
+  check = time.time()
+  msg = str(check - start)
+  return msg
+
+def timecheck(): #returns current local time
+  return time.ctime()
+
+def logwrite(msg): #writes input to RUNTIME.log
+  with open(root + '/RUNTIME.log', 'a+') as f:
+    f.write(msg + '\n')
+    f.close()
+
+os.system('sudo chmod 777 RUNTIME.log') #verifies that RUNTIME.log is readable to all
+
+logwrite('--[*]KITT Initialized in ' + timecheck() + ' seconds--')
+
+print(Fore.CYAN + '[*]Checking OS Version...' + Style.RESET_ALL)
+if sys.platform != 'linux': #verifies os is linux and ends program if not
+  logwrite("--[*]User OS Doesn't Register as Debian/Linux @ " + timecheck() + "--")
+  print(Fore.RED + "[*]User OS Doesn't Register as Debian/Linux!" + Style.RESET_ALL)
+  wait()
+  exit()
+else:
+  logwrite("--[+]User OS Registers as Debian/Linux @ " + timecheck() + "--")
+  print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
+
+print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL) #updates system libs
+os.system('sudo apt-get update')
+os.system('sudo apt-get upgrade')
+os.system('sudo apt autoremove')
+
+def wait():
+  wait = input('PRESS ENTER TO CONTINUE')
+
+def home():
+  global root
+  os.chdir(root)
+  os.system("figlet -f slant '   K I T T 1.0'")
+  print('================================================================')
+  print(' [R] README   | ' + time.ctime() + ' |   [L] CHANGELOG')
+  print('                      [U]Update')
+  print('================================================================')
+  print(Fore.RED + '*[1] OSINT - Open Source Intelligence Gathering                *')
+  print('*                                                              *')
+  print('*[2] Exploitation - Metasploit, Payloads, Exploits             *')
+  print('*                                                              *')
+  print('*[3] Enumeration - Win & Lin HTTP Hosted Enumeration Scripts   *')
+  print('*                                                              *')
+  print('*[4] Password Cracking - Bruteforcing and Cracking Tools       *')
+  print('*                                                              *')
+  print('*[5] Network Cracking - MiTM, Packet Tracing, WPA/WPA2 Cracking*')
+  print('*                                                              *')
+  print('*[6] IoT Exploitation - HomePwn, HoneyPot, Bluetooth, etc      *')
+  print('*                                                              *')
+  print('*[7] Hardware Hacking - RubberDuckies, Keyloggers, MouseJack   *')
+  print('*                                                              *')
+  print('*[8] System Security - MAC Spoofing, Proxychains, SSH Encrypt  *')
+  print('*                                                              *')
+  print('*[9] Misc.                                                     *')
+  print('*                                                              *')
+  print('*[X] Exit                                                      *')
+  print(Style.RESET_ALL + '================================================================')
+  in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
+  nums = ['X', 'R', 'L', 'U'] #creates list of letters for options from menu
+  for i in range(1,11): #creates range of numbers as options from menu
+    nums.append(str(i))
+  if in_put not in nums:
+    print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
+    time.sleep(2)
+    home()
+  elif in_put == '1':
+    print(Fore.CYAN + '[*]OSINT' + Style.RESET_ALL)
+    print('  [1] Info Gathering Tools')
+    print('  [2] Domainsticate - Domain Enumeration')
+    print('  [3] Shodan Search')
+    print('  [4] PhoneInfoga')
+    print('  [5] Phishing Tools')
+    print('  [6] go home')
+    osint = input(Fore.CYAN + '[*]Select OSINT Tool: ' + Style.RESET_ALL)
+    if osint == '1':
+      os.chdir('hg')
+      print('Welcome to 2/3 of you life...')
+      print('  [1] FOCA - Windows')
+      print('  [2] g00gle dorks')
+      print('  [3] r#con-ng')
+      print('  [4] fbi_master')
+      print('  [5] Aut0Sp!oit')
+      print('  [6] Net-Creds SNiffer')
+      print('  [7] go home')
+      hg = input(os.getcwd() + ': ')
+      if hg == '1':
+        try:
+          os.system('cp -R FOCA ~')
+          print(Fore.GREEN + '[+]FOCA copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied FOCA to home dir! @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]FOCA not found!' + Style.RESET_ALL)
+          logwrite('--[*]Error copying FOCA @ ' + timecheck() + '--')
+        wait()
+      elif hg == '2':
+        logwrite('--[*]Reading dorks.md @ ' + timecheck() + '--')
+        try:
+          with open('dorks.md', 'r') as f:
+            contents = f.read()
+          print(contents)
+        except:
+          logwrite('--[*]Error reading dorks.md @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]dorks not found!' + Style.RESET_ALL)
+        wait()
+      elif hg == '3':
+        try:
+          print(Fore.CYAN + '[*]Starting recon-ng...' + Style.RESET_ALL)
+          logwrite('--[*]Starting recon-ng @ ' + timecheck() + '--')
+          os.system('recon-ng')
+          print(Fore.GREEN + '[+]Successfully ended recon-ng!' + Style.RESET_ALL)
+          logwrite('--[*]Successfully ended recon-ng @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]Error running recon-ng!' + Style.RESET_ALL)
+          logwrite('--[*]Error running recon-ng @ ' + timecheck() + '--')
+        wait()
+      elif hg == '4':
+        try:
+          os.chdir('fbi-master')
+          print(Fore.CYAN + '[*]Running fbi.py...' + Style.RESET_ALL)
+          logwrite('--[*]Running fbi.py @ ' + timecheck() + '--')
+          os.system('python fbi.py')
+          print(Fore.GREEN + '[+]Successfully ended fbi.py!' + Style.RESET_ALL)
+          logwrite('--[*]Successfully ended fbi.py @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]Error in running fbi.py!' + Style.RESET_ALL)
+          logwrite('--[*]Error in running fbi.py @ ' + timecheck() + '--')
+        wait()
+      elif hg == '5':
+        try:
+          os.chdir('AutoSploit')
+          print(Fore.CYAN + '[*]Running autosploit.py...' + Style.RESET_ALL)
+          logwrite('--[*]Running autosploit.py @ ' + timecheck() + '--')
+          os.system('python autosploit.py')
+          print(Fore.GREEN + '[+]Successfully ended autosploit.py!' + Style.RESET_ALL)
+          logwrite('--[*]Successfully ended autosploit.py @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]Error running autosploit.py!' + Style.RESET_ALL)
+          logwrite('--[*]Error running autosploit.py @ ' + timecheck() + '--')
+        wait()
+      elif hg == '6':
+        print(Fore.CYAN + '[*]Running net-creds.py packet sniffer...' + Style.RESET_ALL)
+        logwrite('--[*]Running net-creds.py @ ' + timecheck() + '--')
+        try:
+          print(Fore.CYAN + '[*]Enter ^C or ^Z to stop packet sniffer' + Style.RESET_ALL)
+          os.system('python net-creds.py')
+          print(Fore.GREEN + '[+]Output directed to credentials.txt!' + Style.RESET_ALL)
+          logwrite('--[*]Successfully ended net-creds.py @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]Packet Sniffer ended prematurely!' + Style.RESET_ALL)
+          logwrite('--[*]Error running net-creds.py @ ' + timecheck() + '--')
+        wait()
+      elif hg == '7':
+        wait()
+    elif osint == '2':
+      os.chdir('hg')
+      try:
+        print(Fore.CYAN + '[*]Running domain_sticate.py...' + Style.RESET_ALL)
+        domain = input('Enter domain here (domain.ext or 0.0.0.0): ')
+        os.system('python3 domain_sticate.py ' + domain)
+        print(Fore.GREEN + '[+]Successfully ended domain_sticate.py' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended domain_sticate.py @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error in file domain_sticate.sh' + Style.RESET_ALL)
+        logwrite('--[*]Error running domain_sticate.py @ ' + timecheck() + '--')
+      wait()
+    elif osint == '3':
+      try:
+        print(Fore.CYAN + '[*]Running shodan_search.py...' + Style.RESET_ALL)
+        os.system('python3 shodan_search.py')
+        print(Fore.GREEN + '[+]Successfully ended shodan_search.py!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended shodan_search.py @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running shodan_search.py @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
+      wait()
+    elif osint == '4':
+      try:
+        os.chdir('PhoneInfoga')
+        n = input(Fore.CYAN + '[*]Enter phone number 1##########: ' + Style.RESET_ALL)
+        os.system('python3 phoneinfoga.py -n ' + str(n))
+        print(Fore.GREEN + '[+]Completed PhoneInfoga Scan!' + Style.RESET_ALL)
+        logwrite('--[+]Completed PhoneInfoga Scan @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + "[*]Error running PhoneInfoga Scan!" + Style.RESET_ALL)
+        logwrite('--[*]Error running PhoneInfoga Scan @ ' + timecheck() + '--')
+      wait()
+    elif osint == '5':
+      os.chdir('phishing')
+      print('  [1] sonar.py - batch email sender')
+      print('  [2] blackeye - webpage phishing generator')
+      print('  [3] SET - Social Engineer Toolkit')
+      print('  [4] go home')
+      phish = input(': ')
+      if phish == '1':
+        try:
+          os.system('python3 sonar.py')
+          print(Fore.GREEN + '[+]Ended sonar.py!')
+          logwrite('--[*]Successfully ended sonar.py @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]sonar.py not found!' + Style.RESET_ALL)
+          logwrite('--[*]Error running sonar.py @ ' + timecheck() + '--')
+        wait()
+      elif phish == '2':
+        os.chdir('blackeye')
+        try:
+          os.system('bash blackeye.sh')
+          print(Fore.GREEN + '[+]Ended blackeye.sh!')
+          logwrite('--[*]Successfully ended blackeye.sh @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]blackeye.sh not found!' + Style.RESET_ALL)
+          logwrite('--[*]Error running blackeye.sh @ ' + timecheck() + '--')
+        wait()
+      elif phish == '3':
+        os.chdir('SET')
+        try:
+          os.system('python setoolkit')
+          print(Fore.GREEN + '[+]Ended SET!')
+          logwrite('--[*]Successfully ended SET @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]SET not found!' + Style.RESET_ALL)
+          logwrite('--[*]Error running SET @ ' + timecheck() + '--')
+        wait()
+      elif phish == '4':
+        wait()
+    elif osint == '6':
+      wait()
+  elif in_put == '2':
+    print(Fore.CYAN + '[*]Exploitation' + Style.RESET_ALL)
+    print('  [1] Metasploit')
+    print('  [2] Non-Metasploit Vulns')
+    print('  [3] OWASP_ZSC - Payload Encoder')
+    print('  [4] Payloads - PHP-webshells, P4wnP1 ALOA')
+    print('  [5] go home')
+    xplt = input(Fore.CYAN + '[*]Select Exploit Tool: ' + Style.RESET_ALL)
+    if xplt == '1':
+      try:
+        logwrite("--[*]Started Msfconsole @ " + timecheck() + '--')
+        print(Fore.CYAN + '[*]Starting Metasploit-Framework...')
+        os.system('service postgresql start')
+        os.system('msfconsole')
+        print(Fore.GREEN + '[+]Metasploit-Framework Ran Successfully!' + Style.RESET_ALL)
+        logwrite("--[+]Msfconsole ended @ " + timecheck() + '--')
+      except:
+        logwrite("--[*]Error starting postgresql or msfconsole @ " + timecheck() + '--')
+        print(Fore.RED + '[*]Error starting postgresql or msfconsole!' + Style.RESET_ALL)
+      wait()
+    elif xplt == '2':
+      os.chdir('exploits')
+      print('[*]Custom Exploits')
+      print('  [1] LM_expl0it_WIN.sh')
+      print('  [2] Unp!ug.sh')
+      print('  [3] Cisco_E4200_vuln.py')
+      print('  [4] Redis-Server-Exploit.py')
+      print('  [5] go home')
+      exploit = input(os.getcwd() + ': ')
+      if exploit == '1':
+        try:
+          os.system('cp -R LM_exploit_WIN.sh ~')
+          print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
+        wait()
+      elif exploit == '2':
+        try:
+          os.system('cp -R unplug.sh ~')
+          print(Fore.GREEN + '[+]exploit copied to homr dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
+        wait()
+      elif exploit == '3':
+        try:
+          os.system('cp -R Cisco_E4200_vuln.py ~')
+          print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
+        wait()
+      elif exploit == '4':
+        try:
+          os.system('cp -R redis.py ~')
+          print(Fore.GREEN + '[+]exploit copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
+        wait()
+      elif exploit == '5':
+        wait()
+  elif in_put == '3':
+    os.chdir('escalate')
+    try:
+      print(Fore.CYAN + '[*]Starting python SimpleHTTPServer on Port 80 to curl payloads...')
+      print(Fore.CYAN + '[*]Enter ^C or ^Z To Stop HTTP Server...')
+      s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+      s.connect(("8.8.8.8", 80))
+      r = requests.get("http://ifconfig.me").text
+      print(Fore.CYAN + '[*]Private IP: ' + Style.RESET_ALL + str(s.getsockname()[0]))
+      print(Fore.CYAN + '[*]Public IP: ' + Style.RESET_ALL + str(r))
+      os.system("python -m SimpleHTTPServer 80")
+      s.close()
+      print(Fore.GREEN + '[+]Successfully ended SimpleHTTPServer!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully ended SimpleHTTPServer @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error running SimpleHTTPServer!' + Style.RESET_ALL)
+      logwrite('--[*]Error running SimpleHTTPServer @ ' + timecheck() + '--')
+    wait()
+  elif in_put == '4':
+    os.chdir('crackers')
+    print(Fore.CYAN + '[*] Passwd Cracking' + Style.RESET_ALL)
+    print('  [1] append_num')
+    print('  [2] burpsuite')
+    print('  [3] dec0ders')
+    print('  [4] R0T_decrypt - :WARNING: Due to extensive wordlist, KITT may crash under this!')
+    print('  [5] go home' + Style.RESET_ALL)
+    crack = input(os.getcwd() + ': ')
+    if crack == '1':
+      logwrite('--[*]Starting append_num.py @ ' + timecheck() + '--')
+      os.system('python3 append_num.py')
+      wait()
+    elif crack == '2':
+      logwrite('--[*]Starting burpsuite @ ' + timecheck() + '--')
+      print(Fore.CYAN + "[*]Running Burpsuite..." + Style.RESET_ALL)
+      os.system("burpsuite")
+      wait()
+    elif crack == '3':
+      logwrite('--[*]Reading decoders.md @ ' + timecheck() + '--')
+      with open('decoders.md', 'r') as f:
+        contents = f.read()
+      print(contents)
+      wait()
+    elif crack == '4':
+      logwrite('--[*]Running ROT Bruteforcer @ ' + timecheck() + '--')
+      print(Fore.CYAN + "[*]Enter 'q' to exit")
+      def recursion():
+        message = input("[*]ROT Cipher Text: " + Style.RESET_ALL).lower().split(' ')
+        if message == 'q':
+          wait()
+          home()
+        else:
+          LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+          l = []
+          for word in list(message):
+            for key in range(len(LETTERS)):
+              translated = ''
+              for symbol in word:
+                if symbol in LETTERS:
+                  num = LETTERS.find(symbol)
+                  num = num - key
+                  if num < 0:
+                    num = num + len(LETTERS)
+                  translated = translated + LETTERS[num]
+                else:
+                  translated = translated + symbol
+              l.append(translated)
+          with open('Edictionary.txt', 'r') as f:
+            wordlist = f.read().splitlines()
+            for i in l:
+              if i in wordlist:
+                print(Fore.GREEN + '[+]Decrypted Ciphertext: "' + i + '"' + Style.RESET_ALL)
+          wait()
+          recursion()
+      recursion()
+    elif crack == '5':
+      wait()
+  elif in_put == '5':
+    print('[*]Network Cracking')
+    print('  [1]Network Cracking Tools - aircrack-ng, MiTM, Pixie-Dust, Wash')
+    print('  [2]Network Packet Dump')
+    print('  [3]go home')
+    net = input(os.getcwd() + ': ')
+    if net == '1':
+      try:
+        print(Fore.CYAN + '[*]Running network_crack.py...' + Style.RESET_ALL)
+        os.system('python3 network_crack.py')
+        print(Fore.GREEN + '[*]Successfully ended network_crack.py!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended network_crack.py @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running network_crack.py!' + Style.RESET_ALL)
+        logwrite('--[*]Error running network_crack.py @ ' + timecheck() + '--')
+      wait()
+    elif net == '2':
+      try:
+        print(Fore.CYAN + '[*]Running packetdump.sh...' + Style.RESET_ALL)
+        os.system('sudo ./packetdump.sh')
+        os.system('mv output.pcap ~')
+        logwrite('--[+]Packetdump.sh output directed to home dir @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]copied packet capture to home dir!' + Style.RESET_ALL)
+      except:
+        logwrite('--[*]Error writing output to home dir @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
+      wait()
+    elif net == '3':
+      wait()
+  elif in_put == '6':
+    print('[*]IoT Exploitation')
+    print('  [1]HomePwn - IoT Exploit Tool')
+    print('  [2]PentBox - HoneyPot Tool')
+    print('  [3]Spooftooph - BT Spoofing')
+    print('  [4]BtVerifier - Rfcomm Channel Verifier')
+    print('  [5]go home')
+    iot = input(os.getcwd() + ': ')
+    if iot == '1':
+      os.chdir('HomePWN')
+      print(Fore.CYAN + '[*]Running HomePWN framework...' + Style.RESET_ALL)
+      try:
+        os.system('python3 homePwn.py')
+        logwrite('--[+]Successfully ended HomePWN @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]Successfully ended HomePWN' + Style.RESET_ALL)
+      except:
+        logwrite('--[*]Error running HomePWN @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running HomePWN!' + Style.RESET_ALL)
+      wait()
+    elif iot == '2':
+      os.chdir('pentbox/pentbox-1.8')
+      print(Fore.CYAN + '[*]Running Pentbox1.8...' + Style.RESET_ALL)
+      try:
+        os.system('./pentbox.rb')
+        logwrite('--[+]Successfully ended Pentbox1.8 @ ' + timecheck() + '--')
+        print(Fore.GREEN + '[+]Successfully ended Pentbox1.8!' + Style.RESET_ALL)
+      except:
+        logwrite('--[*]Error running Pentbox1.8 @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running Pentbox1.8!' + Style.RESET_ALL)
+      wait()
+    elif iot == '3':
+      print(Fore.CYAN + '[*]Running bluespoof.sh...' + Style.RESET_ALL)
+      try:
+        os.system('./bluespoof.sh')
+        print(Fore.GREEN + '[+]Successfully ended bluespoof.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended bluespoof.sh @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running bluespoof.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running bluespoof.sh!' + Style.RESET_ALL)
+      wait()
+    elif iot == '4':
+      print(Fore.CYAN + '[*]Running btverifier.py...' + Style.RESET_ALL)
+      try:
+        os.system('python3 btverifier.py')
+        print(Fore.GREEN + '[+]Successfully ended btverifier.py!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended btverifier.py @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running btverifier.py!' + Style.RESET_ALL)
+        logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
+      wait()
+    elif iot == '5':
+      wait()
+  elif in_put == '7':
+    print('[*]Hardware Hacking')
+    print('  [1]Android Rootkits')
+    print('  [2]MouseJack')
+    print('  [3]Keyloggers')
+    print('  [4]RubberDucky Tools - Digispark')
+    print('  [5]go home')
+    hh = input(os.getcwd() + ': ')
+    if hh == '1':
+      try:
+        os.chdir('rooters')
+        os.system('ls')
+        dev_rooter = input(Fore.CYAN + '[*]Select a dev_rooter for use: ' + Style.RESET_ALL)
+        os.system('cp ' + dev_rooter + ' ~')
+        print(Fore.GREEN + '[+]dev_rooter copied to home dir!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied dev_rooter to home dir @ ' + timecheck() + '--')
+      except:
+        logwrite("--[*]Error copying dev_rooter @ " + timecheck() + '--')
+        print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
+      wait()
+    elif hh == '2':
+      moj = input(Fore.CYAN + "[*]Do you want to initialize a [m]ousejack device or scan with [j]ackit?[m/j]: " + Style.RESET_ALL)
+      if moj == 'M' or moj == 'm':
+        try:
+          print(Fore.CYAN + "[*]Insert CrazyRadio PA device..." + Style.RESET_ALL)
+          wait()
+          os.chdir('mousejack/nrf-research-firmware')
+          os.system('sudo make')
+          os.system('sudo make install')
+          os.system('dmesg')
+          print(Fore.GREEN + "[+]Firmware Uploaded!" + Style.RESET_ALL)
+          logwrite('--[+]Successfully uploaded mousejack firmware to CrazyRadio PA @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + "[*]Failed to upload Firmware!" + Style.RESET_ALL)
+          logwrite('--[*]Failed to upload mouesjack firmware to CrazyRadio PA @ ' + timecheck() + '--')
+        wait()
+      elif moj == 'J' or moj == 'j':
+        try:
+          print(Fore.CYAN + "[*]Insert CrazyRadio PA device w/ mousejack firmware..." + Style.RESET_ALL)
+          wait()
+          os.system('jackit')
+          print(Fore.GREEN + '[+]Scan complete!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully ended jackit scan @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + "[*]Error scanning with jackit" + Style.RESET_ALL)
+          logwrite('--[*]Error scanning with jackit @ ' + timecheck() + '--')
+        wait()
+      else:
+        print(Fore.RED + "[*]Not an option!" + Style.RESET_ALL)
+        time.sleep(2)
+    elif hh == '3':
+      os.chdir('keyloggers')
+      print('  [1] Winupdate')
+      print('  [2] kidlogger(win)')
+      print('  [3] staffcounter(lin)')
+      print('  [4] go home')
+      keylog = input(os.getcwd() + ': ')
+      if keylog == '1':
+        try:
+          os.system('cp -R Winupdate ~')
+          print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
+        wait()
+      elif keylog == '2':
+        try:
+          os.system('cp -R KidLogger-setupwin26-11-2017 ~')
+          print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
+        wait()
+      elif keylog == '3':
+        try:
+          os.system('cp -R staffcounter_install ~')
+          print(Fore.GREEN + '[+]keylogger copied to home dir!' + Style.RESET_ALL)
+          logwrite('--[+]Successfully copied keylogger @ ' + timecheck() + '--')
+        except:
+          logwrite('--[*]Error copying keylogger @ ' + timecheck() + '--')
+          print(Fore.RED + '[*]keylogger not found!' + Style.RESET_ALL)
+        wait()
+      elif keylog == '4':
+        wait()
+    elif hh == '4':
+      os.chdir('digis')
+      print(Fore.CYAN + '[*]Running duck2spark converter...' + Style.RESET_ALL)
+      logwrite('--[*]Running duck2spark converter @ ' + timecheck() + '--')
+      print(Fore.CYAN + '[*[Your current directory: ' + Style.RESET_ALL + os.getcwd())
+      try:
+        os.system('sudo ./convert.sh')
+        print(Fore.GREEN + '[+]Successfully converted ducky script to spark!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully converted script @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running duck2spark...' + Style.RESET_ALL)
+        logwrite('--[*]Error runnnig duck2spark @ ' + timecheck() + '--')
+      wait()
+    elif hh == '5':
+      wait()
+  elif in_put == '8':
+    os.chdir('sdefense')
+    print('[*]System Security')
+    print('  [1] MAC_changer')
+    print('  [2] ssh_p0Rt_r@andomizer')
+    print('  [3] ssh rsa_key generator')
+    print('  [4] pr0xy router')
+    print('  [5] ssh_encr7tion')
+    print('  [6] st@tic IP')
+    print('  [7] Fail2ban Configurations')
+    print('  [8] go home')
+    rdefense = input(os.getcwd() + ': ')
+    if rdefense == '1':
+      try:
+        logwrite('--[*]Running macchanger.sh @ ' + timecheck() + '--')
+        print(Fore.CYAN + '[*]Running macchanger.sh...' + Style.RESET_ALL)
+        os.system('./macchanger.sh')
+        print(Fore.GREEN + '[+]Successfully ended macchanger.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended macchanger @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error in changing mac address!' + Style.RESET_ALL)
+        logwrite('--[*]Error running macchanger.sh @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '2':
+      try:
+        logwrite('--[*]Running ssh_randomizer.sh @ ' + timecheck() + '--')
+        print(Fore.CYAN + '[*]Running ssh_randomizer.sh...' + Style.RESET_ALL)
+        os.system('./ssh_randomizer.sh')
+        print(Fore.GREEN + '[+]Successfully ended ssh_randomizer.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended ssh_randomizer.sh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error in changing ssh port' + Style.RESET_ALL)
+        logwrite('--[*]Error running ssh_randomizer.sh @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '3':
+      try:
+        print(Fore.CYAN + '[*]Beginning RSA Key Generation Process...' + Style.RESET_ALL)
+        os.system('sudo service ssh start')
+        print(Fore.GREEN + '[+]ssh daemon started...' + Style.RESET_ALL)
+        os.system('mkdir ~/.ssh')
+        print(Fore.GREEN + '[+]key directory generated...' + Style.RESET_ALL)
+        uname = input('Enter username for ssh: ')
+        port = input('Enter local ssh port: ')
+        print('Leave filepath for keys blank for default')
+        os.system('ssh-keygen')
+        print(Fore.GREEN + '[+]ssh rsa keys generated...' + Style.RESET_ALL)
+        os.system('ssh-copy-id -i ~/.ssh/id_rsa ' + uname + '@localhost -p ' + port)
+        print(Fore.GREEN + '[+]ssh keys copied to ssh server...' + Style.RESET_ALL)
+        os.system('ssh ' + uname + '@localhost -p ' + port)
+        os.system('exit')
+        print(Fore.GREEN + '[+]ssh connection test successful...' + Style.RESET_ALL)
+        os.system('cp ~/.ssh/id_rsa ~/')
+        print(Fore.GREEN + '[+]private key copied to homed dir...' + Style.RESET_ALL)
+        print(Fore.GREEN + '[+]SSH RSA Key Login Setup Complete!')
+        logwrite('--[+]SSH RSA Key Login Setup Complete @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error Running SSH RSA Login Setup!' + Style.RESET_ALL)
+        logwrite('--[*]Error running ssh rsa key login setup @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '4':
+      try:
+        print(Fore.CYAN + '[*]Running proxy_config.sh' + Style.RESET_ALL)
+        os.system('./proxy_config.sh')
+        print(Fore.GREEN + '[+]Successfully ended proxy_config.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended proxy_config.sh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error in running proxy_config.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running proxy_config.sh @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '5':
+      try:
+        print(Fore.CYAN + '[*]Running ssh_encr7pt.sh...' + Style.RESET_ALL)
+        os.system('./ssh_encr7pt.sh')
+        print(Fore.GREEN + '[+]Successfully ended ssh_encr7pt.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended ssh_encr7pt.sh @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running ssh_encr7pt.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error in running ssh_encr7pt.sh!' + Style.RESET_ALL)
+      wait()
+    elif rdefense == '6':
+      try:
+        print(Fore.CYAN + '[*]Running static_ip.sh...' + Style.RESET_ALL)
+        os.system('./static_ip.sh')
+        print(Fore.GREEN + '[+]Successfully ended static_ip.sh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended static_ip.sh @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running static_ip.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running static_ip.sh!' + Style.RESET_ALL)
+      wait()
+    elif rdefense == '7':
+      try:
+        ipbu = input(Fore.CYAN + '[*]Are you going to [B]an or [U]nban an IP?: ' + Style.RESET_ALL)
+        if ipbu == 'B' or ipbu == 'b':
+          ip = input(Fore.CYAN + '[*]Enter IP: ' + Style.RESET_ALL)
+          os.system('sudo fail2ban-client set sshd banip ' + ip)
+          print(Fore.GREEN + '[+]Banned IP ' + ip + '!' + Style.RESET_ALL)
+          logwrite('--[+]Banned IP ' + ip + ' @ ' + timecheck() + '--')
+        else:
+          ip = input(Fore.CYAN + '[*]Enter IP: ' + Style.RESET_ALL)
+          os.system('sudo fail2ban-client set sshd unbanip ' + ip)
+          print(Fore.GREEN + '[+]Unbanned IP ' + ip + '!' + Style.RESET_ALL)
+          logwrite('--[+]Unbanned IP ' + ip + ' @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error configuring fail2ban @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error configuring fail2ban' + Style.RESET_ALL)
+      wait()
+    elif rdefense == '8':
+      wait()
+  elif in_put == '9':
+    print('[*]Miscellaneous')
+    print('  [1]File Backup')
+    print('  [2]IRCssi')
+    print('  [3]go home')
+    misc = input(os.getcwd() + ': ')
+    if misc == '1':
+      try:
+        print(Fore.CYAN + '[*]Running backup.sh...' + Style.RESET_ALL)
+        os.system('sudo ./backup.sh')
+        logwrite('--[*]Successfully ended backup.sh @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error running backup.sh @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running backup.sh' + Style.RESET_ALL)
+      wait()
+    elif misc == '2':
+      try:
+        print(Fore.CYAN + '[*]Running irssi...' + Style.RESET_ALL)
+        os.system('irssi')
+        print(Fore.GREEN + '[+]Successfully ended irssi' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended irssi @ ' + Style.RESET_ALL)
+      except:
+        logwrite('--[*]Error running irssi @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error running irssi!' + Style.RESET_ALL)
+      wait()
+    elif misc == '3':
+      wait()
+  elif in_put == 'R' or in_put == 'r':
+    os.chdir(root)
+    print(Fore.CYAN + '[*]Reading README.md...' + Style.RESET_ALL)
+    logwrite('--[*]Reading README.md @ ' + timecheck() + '--')
+    os.system('more README.md')
+    wait()
+  elif in_put == 'U' or in_put == 'u':
+    try:
+      print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL)
+      os.system('sudo apt update')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      print(Fore.CYAN + '[*]Upgrading Packages & Dependencies...' + Style.RESET_ALL)
+      os.system('sudo apt upgrade')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      print(Fore.CYAN + '[*]Removing Deprecated Packages...' + Style.RESET_ALL)
+      os.system('sudo apt autoremove')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully Updated Packages @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error Updating Packages...' + Style.RESET_ALL)
+      logwrite('--[*]Error Updating Packages @ ' + timecheck() + '--')
+    wait()
+  elif in_put == 'L' or in_put == 'l':
+    os.chdir(root)
+    print(Fore.CYAN + '[*]Reading CHANGELOG.md...' + Style.RESET_ALL)
+    logwrite('--[*]Reading CHANGELOG.md @ ' + timecheck() + Style.RESET_ALL)
+    os.system('more CHANGELOG.md')
+    wait()
+  elif in_put == 'X' or in_put == 'x':
+    print(Fore.CYAN + '[*]Killing KITT...' + Style.RESET_ALL)
+    print(Fore.RED + '[*]Bye Bye!' + Style.RESET_ALL)
+    logwrite('--[*]Log Closed @ ' + timecheck() + '--')
+    exit()
+  home()
+
+home()

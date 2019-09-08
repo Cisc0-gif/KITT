@@ -327,3 +327,9 @@
 
 ### v1.0 11/27/19
 * redesigned p4wnp1 payloads as templates
+
+### v2.0 11/28/19
+* updatd UI into a more organized system
+* removed certain features that can be done outside KITT
+* updated to KITT2.0
+* fixed unspecified names in backup.sh
