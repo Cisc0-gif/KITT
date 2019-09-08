@@ -224,3 +224,6 @@
 ### v1.0 9/4/19
 * added nikto scan to domain_sticate.py in hg/
 * added http to pip install
+
+### v1.0 9/8/19
+* added masscan to lib_install.sh

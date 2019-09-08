@@ -39,6 +39,7 @@ echo 'Y' | sudo apt-get install radare2
 echo 'Y' | sudo apt-get install xxd
 echo 'Y' | sudo apt-get install coreutils
 echo 'Y' | sudo apt-get install exiftool
+echo 'Y' | sudo apt-get install masscan
 echo 'Y' | sudo apt-get install steghide
 echo 'Y' | sudo apt-get install proxychains
 echo 'Y' | sudo apt-get install p7zip
