@@ -334,3 +334,6 @@
 * updated to KITT2.0
 * fixed unspecified names in backup.sh
 * updated UI w/ colorama and standardized option color scheme
+
+### v2.0 12/1/19
+* updated file error in KITTexe.sh execution to KITT2.py
