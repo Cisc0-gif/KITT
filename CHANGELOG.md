@@ -337,3 +337,4 @@
 
 ### v2.0 12/1/19
 * updated file error in KITTexe.sh execution to KITT2.py
+* added line to payloads/p4wnp1/Reverse_TCP.js
