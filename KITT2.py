@@ -249,8 +249,8 @@ def home():
     print(Fore.CYAN + '[*]Exploitation' + Style.RESET_ALL)
     print('  [1] Metasploit')
     print('  [2] Non-Metasploit Vulns')
-    print('  [3] OWASP_ZSC - Payload Encoder')
-    print('  [4] Payloads - PHP-webshells, P4wnP1 ALOA')
+    print('  [3] Payloads - PHP-webshells, P4wnP1 ALOA')
+    print('  [4] OWASP-ZSC - Payload Encoder')
     print('  [5] go home')
     xplt = input(Fore.CYAN + '[*]Select Exploit Tool: ' + Style.RESET_ALL)
     if xplt == '1':
@@ -312,6 +312,68 @@ def home():
         wait()
       elif exploit == '5':
         wait()
+    elif xplt == '3':
+      os.chdir('payloads')
+      print('  [1]DDoS')
+      print('  [2]P4wnP1')
+      print('  [3]PHP')
+      print('  [4]Exit')
+      pyld = input(os.getcwd() + ': ')
+      if pyld == '1':
+        try:
+          os.chdir('ddos')
+          os.system('ls')
+          file = input(Fore.CYAN + "[*]Enter filename to copy to home dir or 'q' to quit: " + Style.RESET_ALL)
+          if file == 'q' or file == 'Q':
+            wait()
+          else:
+            os.chdir('cp ' + file + ' ~')
+            print(Fore.GREEN + '[+]DDoS payload copied to home dir!' + Style.RESET_ALL)
+            logwrite('--[+]DDoS payload copied to home dir @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]DDoS payload failed to copy to home dir!' + Style.RESET_ALL)
+          logwrite('--[*]DDoS payload failed to copy to home dir @ ' + timecheck() + '--')
+      elif pyld == '2':
+        try:
+          os.chdir('p4wnp1')
+          os.system('ls')
+          file = input(Fore.CYAN + "[*]Enter filename to copy to home dir or 'q' to quit: " + Style.RESET_ALL)
+          if file == 'q' or file == 'Q':
+            wait()
+          else:
+            os.chdir('cp ' + file + ' ~')
+            print(Fore.GREEN + '[+]P4wnP1 payload copied to home dir!' + Style.RESET_ALL)
+            logwrite('--[+]P4wnP1 payload copied to home dir @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]P4wnP1 payload failed to copy to home dir!' + Style.RESET_ALL)
+          logwrite('--[*]P4wnP1 payload failed to copy to home dir @ ' + timecheck() + '--')
+      elif pyld == '3':
+        try:
+          os.chdir('php-webshells')
+          os.system('ls')
+          file = input(Fore.CYAN + '[*]Enter filename to copy to home dir: ' + Style.RESET_ALL)
+          if file == 'q' or file == 'Q':
+            wait()
+          else:
+            os.chdir('cp ' + file + ' ~')
+            print(Fore.GREEN + '[+]PHP payload copied to home dir!' + Style.RESET_ALL)
+            logwrite('--[+]PHP payload copied to home dir @ ' + timecheck() + '--')
+        except:
+          print(Fore.RED + '[*]PHP payload failed to copy to home dir!' + Style.RESET_ALL)
+          logwrite('--[*]PHP payload failed to copy to home dir @ ' + timecheck() + '--')
+      elif pyld == '4':
+        wait()
+    elif xplt == '4':
+      try:
+        os.chdir('OWASP-ZSC')
+        os.system('python3 zsc.py')
+        print(Fore.GREEN + '[+]OWASP-ZSC shutdown successfully!' + Style.RESET_ALL)
+        logwrite('--[+]OWASP-ZSC shutdown successfully @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]OWASP-ZSC failed to start!' + Style.RESET_ALL)
+        logwrite('--[*]OWASP-ZSC failed to start @ ' + timecheck() + '--')
+    elif xplt == '5':
+      wait()
   elif in_put == '3':
     os.chdir('escalate')
     try:

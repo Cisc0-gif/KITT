@@ -339,3 +339,7 @@
 * updated file error in KITTexe.sh execution to KITT2.py
 * added line to payloads/p4wnp1/Reverse_TCP.js
 * added mimikatz to escalate
+
+### v2.0 12/2/19
+* fixed major functionality bugs in Exploits
+* added ddos/ to payloads
