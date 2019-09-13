@@ -230,3 +230,7 @@
 * added SSH server check to beginning of SSHauth_check.py
 * added Drupalgeddon2 to hg/
 * added Drupalgeddon2 shell attempt to domain_sticate.py
+
+### v1.0 9/12/19
+* extended range in append_num.py from 100 to 1000000
+* added ncrack, arp-scan, and medusa to lib_install.sh

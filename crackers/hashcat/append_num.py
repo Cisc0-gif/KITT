@@ -29,7 +29,7 @@ def home():
           with open('num_output' + str(n) + '.txt', 'a+') as n:
             for w in contents:
               n.write(str(w) + '\n')
-              for i in range(0,100):
+              for i in range(0,1000000):
                 n.write(str(w) + str(i) + '\n')
         os.system('mv num_output' + str(n) + '.txt Hashlists')
         print('num_output' + str(n) + '.txt generated and moved to Hashlists!')

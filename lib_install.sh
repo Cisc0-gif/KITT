@@ -36,6 +36,9 @@ echo 'Y' | sudo apt-get install ssh
 echo 'Y' | sudo apt-get install strace
 echo 'Y' | sudo apt-get install gdb
 echo 'Y' | sudo apt-get install radare2
+echo 'Y' | sudo apt-get install arp-scan
+echo 'Y' | sudo apt-get install ncrack
+echo 'Y' | sudo apt-get install medusa
 echo 'Y' | sudo apt-get install xxd
 echo 'Y' | sudo apt-get install coreutils
 echo 'Y' | sudo apt-get install exiftool
