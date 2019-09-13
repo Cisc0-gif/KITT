@@ -37,12 +37,15 @@ echo 'Y' | sudo apt-get install strace
 echo 'Y' | sudo apt-get install gdb
 echo 'Y' | sudo apt-get install radare2
 echo 'Y' | sudo apt-get install arp-scan
+echo 'Y' | sudo apt-get install dirbuster
+echo 'Y' | sudo apt-get install wfuzz
 echo 'Y' | sudo apt-get install ncrack
 echo 'Y' | sudo apt-get install medusa
 echo 'Y' | sudo apt-get install xxd
 echo 'Y' | sudo apt-get install coreutils
 echo 'Y' | sudo apt-get install exiftool
 echo 'Y' | sudo apt-get install masscan
+echo 'Y' | sudo apt-get install dirb
 echo 'Y' | sudo apt-get install steghide
 echo 'Y' | sudo apt-get install proxychains
 echo 'Y' | sudo apt-get install p7zip

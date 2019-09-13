@@ -234,3 +234,7 @@
 ### v1.0 9/12/19
 * extended range in append_num.py from 100 to 1000000
 * added ncrack, arp-scan, and medusa to lib_install.sh
+
+### v1.0 9/13/19
+* added sqlmap and dirb to domain_sticate.py
+* added dirb, dirbuster, and wfuzz to lib_install.sh

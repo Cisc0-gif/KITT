@@ -33,13 +33,15 @@ def main():
   os.system('cd theHarvester')
   print(Fore.RED +'[*]:WARNING: Once you run this, google will read your pings as a DDoS attack and block your IP temporarily!' + Style.RESET_ALL)
   wait()
-  print(Fore.CYAN + "[*]Running harvester scan..." + Style.RESET_ALL)
-  try:
-    os.system('python3.7 theHarvester.py -d ' + domain + ' -l 200 -b google -s -g -p -f ../outputs/output.html > ../outputs/harvest.txt')
-    print(Fore.GREEN + '[+]Harvester scan complete!')
-  except:
-    print(Fore.RED + '[*]Harvester scan incomplete!')
-  print(Fore.CYAN + '[*]Output of theHarvester directed to harvest.txt!' + Style.RESET_ALL)
+  harv = input(Fore.CYAN + "[*]Do you want to run a harvester scan?[y/N]: " + Style.RESET_ALL)
+  if harv == 'y' or harv == 'Y':
+    print(Fore.CYAN + "[*]Running harvester scan..." + Style.RESET_ALL)
+    try:
+      os.system('python3.7 theHarvester.py -d ' + domain + ' -l 200 -b google -s -g -p -f ../outputs/output.html > ../outputs/harvest.txt')
+      print(Fore.GREEN + '[+]Harvester scan complete!')
+    except:
+      print(Fore.RED + '[*]Harvester scan incomplete!')
+    print(Fore.CYAN + '[*]Output of theHarvester directed to harvest.txt!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Running cewl wordlist scan...' + Style.RESET_ALL)
   try:
     os.system('cewl -w ../outputs/domain_wordlist.lst -d 7 -m 5 https://www.' + domain)
@@ -96,6 +98,22 @@ def main():
     except:
       print(Fore.RED + '[*]Drupalgeddon2 attemp failed!' + Style.RESET_ALL)
   os.chdir('..')
+  print(Fore.CYAN + '[*]Running sqlmap scan on domain...' + Style.RESET_ALL)
+  try:
+    os.system('sqlmap -u ' + domain  + ' > sqlmap.txt')
+    print(Fore.GREEN + '[+]Sqlmap scan complete!' + Style.RESET_ALL)
+  except:
+    print(Fore.RED + '[*]Sqlmap scan incomplete!' + Style.RESET_ALL)
+  print(Fore.CYAN + '[*]Running dirb scan on domain...' + Style.RESET_ALL)
+  try:
+    http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
+    if http == 'P':
+      os.system('dirb http://' + domain  + ' > dirb.txt')
+    else:
+      os.system('dirb https://' + domain + ' > dirb.txt')
+    print(Fore.GREEN + '[+]dirb scan complete!' + Style.RESET_ALL)
+  except:
+    print(Fore.RED + '[*]dirb scan incomplete!' + Style.RESET_ALL)
   print('=========================================================================')
   print(Fore.GREEN + '[+]Domainstication Complete!' + Style.RESET_ALL)
   wait()
