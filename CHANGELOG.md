@@ -343,3 +343,6 @@
 ### v2.0 12/2/19
 * fixed major functionality bugs in Exploits
 * added ddos/ to payloads
+
+### v2.0 12/4/19
+* added Net_Share.js and fixed minor bugs in File_Thief and Reverse_TCP
