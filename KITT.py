@@ -3,7 +3,6 @@ root = os.getcwd()
 import time
 start = time.time()
 import sys
-import pytz
 import time
 import calendar
 import datetime
@@ -25,11 +24,6 @@ def logwrite(msg):
 os.system('sudo chmod 777 RUNTIME.log')
 
 logwrite('--[*]KITT Initialized in ' + timecheck() + ' seconds--')
-
-then = datetime.datetime.now(pytz.utc)
-local = then.astimezone(pytz.timezone('America/Los_Angeles'))
-my_date = date.today()
-weekday = calendar.day_name[my_date.weekday()]
 
 print(Fore.CYAN + '[*]Checking OS Version...' + Style.RESET_ALL)
 if sys.platform != 'linux':
@@ -54,7 +48,7 @@ def home():
   os.chdir(root)
   os.system("figlet -f slant '   K I T T 1.0'")
   print('================================================================')
-  print(' [R] README   | ' + local.strftime("%a, %b %d, %Y") + ' - ' + local.strftime("%I:%M %p") + ' |   [L] CHANGELOG')
+  print(' [R] README   | ' + time.ctime() + ' |   [L] CHANGELOG')
   print('================================================================')
   print(Fore.RED + '*[1]  Metaspl0!it - metasploit-framework                       *')
   print('*[2]  dev_r00ters - device rootkits for apk and iphone         *')

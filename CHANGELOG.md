@@ -238,3 +238,4 @@
 ### v1.0 9/13/19
 * added sqlmap and dirb to domain_sticate.py
 * added dirb, dirbuster, and wfuzz to lib_install.sh
+* removed pytz from KITT.py and replaced it with time.ctime() method
