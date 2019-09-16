@@ -8,6 +8,8 @@ def wait():
 def main():
   os.system("figlet -f slant 'domain_sticate'")
   print('=========================================================================')
+  print(Fore.CYAN + '[*]Creating output directory...' + Style.RESET_ALL)
+  os.system('mkdir outputs')
   domain = input(Fore.CYAN + '[*]Enter domain to investigate(domain.ext): ' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Pinging domain...' + Style.RESET_ALL)
   try:

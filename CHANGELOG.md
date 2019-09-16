@@ -246,3 +246,4 @@
 * added CyberChef to crackers/decoders.md
 * fixed output directory in domain_sticate.py to outputs
 * removed bloat space from hg/outputs
+* added outputs directory creation to domain_sticate.py
