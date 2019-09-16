@@ -114,6 +114,8 @@ msfdb init
 echo '[*]Installing python2.7 and 3.7 libraries...'
 pip install bs4
 pip install requests
+pip install argparse
+pip install dnspython
 pip install psutil
 pip install httplib
 pip install scapy

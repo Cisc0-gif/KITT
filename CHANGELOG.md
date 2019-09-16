@@ -239,3 +239,8 @@
 * added sqlmap and dirb to domain_sticate.py
 * added dirb, dirbuster, and wfuzz to lib_install.sh
 * removed pytz from KITT.py and replaced it with time.ctime() method
+
+### v1.0 9/15/19
+* added argparse and dnspython to lib_install.sh
+* added Sublist3r to domain_sticate.py
+* added CyberChef to crackers/decoders.md

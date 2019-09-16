@@ -61,6 +61,14 @@ def main():
   except:
     print(Fore.RED + '[*]Nikto scan incomplete!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Output of nikto directed to nikto.txt' + Style.RESET_ALL)
+  print('[*]Running sublist3r scan...' + Style.RESET_ALL)
+  try:
+    os.chdir('Sublist3r')
+    os.system('python sublist3r.py -d ' + domain + ' > ../sublist3r.txt')
+    print(Fore.GREEN + '[+]sublist3r scan complete!' + Style.RESET_ALL)
+  except:
+    print(Fore.RED + '[*]sublist3r scan incomplete!' + Style.RESET_ALL)
+  print(Fore.CYAN + '[*]Output of sublist3r directed to sublist3r.txt' + Style.RESET_ALL)
   os.system('cd ../JoomlaScan')
   print(Fore.CYAN + '[*]Running joomlascan...' + Style.RESET_ALL)
   try:
