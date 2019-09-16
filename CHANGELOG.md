@@ -245,3 +245,4 @@
 * added Sublist3r to domain_sticate.py
 * added CyberChef to crackers/decoders.md
 * fixed output directory in domain_sticate.py to outputs
+* removed bloat space from hg/outputs
