@@ -53,10 +53,10 @@ def main():
   try:
     http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
     if http == 'P':
-      os.system('nikto -h http://' + domain + ' -output ../nikto.txt')
+      os.system('nikto -h http://' + domain + ' -output ../outputs/nikto.txt')
       print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
     else:
-      os.system('nikto -h https://' + domain + ' -output ../nikto.txt')
+      os.system('nikto -h https://' + domain + ' -output ../outputs/nikto.txt')
       print(Fore.GREEN + '[+]nikto scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]Nikto scan incomplete!' + Style.RESET_ALL)
@@ -64,7 +64,7 @@ def main():
   print('[*]Running sublist3r scan...' + Style.RESET_ALL)
   try:
     os.chdir('Sublist3r')
-    os.system('python sublist3r.py -d ' + domain + ' > ../sublist3r.txt')
+    os.system('python sublist3r.py -d ' + domain + ' > ../outputs/sublist3r.txt')
     print(Fore.GREEN + '[+]sublist3r scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]sublist3r scan incomplete!' + Style.RESET_ALL)
@@ -87,7 +87,7 @@ def main():
   print(Fore.CYAN + '[*]Output of goog-mail scan directed to domain_emails.txt!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Running shodan search on domain...' + Style.RESET_ALL)
   try:
-    os.system('shodan search --fields ip_str,port,org,hostnames ' + domain  + ' > shodan.txt')
+    os.system('shodan search --fields ip_str,port,org,hostnames ' + domain  + ' > outputs/shodan.txt')
     print(Fore.GREEN + '[+]Shodan search complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]Shodan search incomplete!' + Style.RESET_ALL)
@@ -98,17 +98,17 @@ def main():
       os.chdir('Drupalgeddon2')
       http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
       if http == 'P':
-        os.system('ruby drupalgeddon2.rb http://' + domain + ' > drupal.txt')
+        os.system('ruby drupalgeddon2.rb http://' + domain + ' > outputs/drupal.txt')
         print(Fore.GREEN + '[+]Drupalgeddon2 attempt complete!' + Style.RESET_ALL)
       else:
-        os.system('ruby drupalgeddon2.rb https://' + domain + ' > drupal.txt')
+        os.system('ruby drupalgeddon2.rb https://' + domain + ' > outputs/drupal.txt')
         print(Fore.GREEN + '[+]Drupalgeddon2 attempt complete!' + Style.RESET_ALL)
     except:
       print(Fore.RED + '[*]Drupalgeddon2 attemp failed!' + Style.RESET_ALL)
   os.chdir('..')
   print(Fore.CYAN + '[*]Running sqlmap scan on domain...' + Style.RESET_ALL)
   try:
-    os.system('sqlmap -u ' + domain  + ' > sqlmap.txt')
+    os.system('sqlmap -u ' + domain  + ' > outputs/sqlmap.txt')
     print(Fore.GREEN + '[+]Sqlmap scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]Sqlmap scan incomplete!' + Style.RESET_ALL)
@@ -116,9 +116,9 @@ def main():
   try:
     http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
     if http == 'P':
-      os.system('dirb http://' + domain  + ' > dirb.txt')
+      os.system('dirb http://' + domain  + ' > outputs/dirb.txt')
     else:
-      os.system('dirb https://' + domain + ' > dirb.txt')
+      os.system('dirb https://' + domain + ' > outputs/dirb.txt')
     print(Fore.GREEN + '[+]dirb scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]dirb scan incomplete!' + Style.RESET_ALL)

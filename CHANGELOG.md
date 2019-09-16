@@ -244,3 +244,4 @@
 * added argparse and dnspython to lib_install.sh
 * added Sublist3r to domain_sticate.py
 * added CyberChef to crackers/decoders.md
+* fixed output directory in domain_sticate.py to outputs
