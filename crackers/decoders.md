@@ -14,3 +14,4 @@
 * [JS Char Code Converter](http://jdstiles.com/java/cct.html)
 * [UUEncode Decocer](https://www.dcode.fr/uu-encoding)
 * [SHA-1 Converter and Reverser](https://sha1.gromweb.com/)
+* [Multiple Encryption Tool](https://gchq.github.io/CyberChef/)
