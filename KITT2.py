@@ -77,7 +77,7 @@ def home():
   print(Fore.WHITE + '*' + Style.RESET_ALL + Fore.YELLOW + '[X] Exit' + '                                                      ' + Fore.WHITE + '*' + Style.RESET_ALL)
   print('================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
-  nums = ['X', 'R', 'L', 'U'] #creates list of letters for options from menu
+  nums = ['X', 'R', 'L', 'U', 'x', 'r', 'l', 'u'] #creates list of letters for options from menu
   for i in range(1,11): #creates range of numbers as options from menu
     nums.append(str(i))
   if in_put not in nums:
@@ -537,7 +537,8 @@ def home():
     print('  [2]MouseJack')
     print('  [3]Keyloggers')
     print('  [4]RubberDucky Tools - Digispark')
-    print('  [5]go home')
+    print('  [5]GPIO_CTL - RPI GPIO controller')
+    print('  [6]go home')
     hh = input(Fore.CYAN + '[*]Select Hardware Hacking Tool: ' + Style.RESET_ALL)
     if hh == '1':
       try:
@@ -631,6 +632,16 @@ def home():
         logwrite('--[*]Error runnnig duck2spark @ ' + timecheck() + '--')
       wait()
     elif hh == '5':
+      print(Fore.CYAN + '[*]Running GPIO_CTL.py...' + Style.RESET_ALL)
+      logwrite('--[*]Running GPIO_CTL.py @ ' + timecheck() + '--')
+      try:
+        os.system('python3 GPIO_CTL.py')
+        print(Fore.GREEN + '[+]Successfully ended GPIO_CTL.py!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended GPIO_CTL.py @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running GPIO_CTL.py' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended GPIO_CTL.py @ ' + timecheck() + '--')
+    elif hh == '6':
       wait()
   elif in_put == '8':
     os.chdir('sdefense')

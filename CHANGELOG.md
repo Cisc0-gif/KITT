@@ -346,3 +346,7 @@
 
 ### v2.0 12/4/19
 * added Net_Share.js and fixed minor bugs in File_Thief and Reverse_TCP
+
+### v2.0 12/7/19
+* added GPIO_CTL.py to hardware hacking
+* fixed lowercase letter option use in menu error
