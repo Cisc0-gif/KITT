@@ -247,3 +247,6 @@
 * fixed output directory in domain_sticate.py to outputs
 * removed bloat space from hg/outputs
 * added outputs directory creation to domain_sticate.py
+
+### v1.0 9/17/19
+* added update feature to menu in KITT.py

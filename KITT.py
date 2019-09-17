@@ -49,6 +49,7 @@ def home():
   os.system("figlet -f slant '   K I T T 1.0'")
   print('================================================================')
   print(' [R] README   | ' + time.ctime() + ' |   [L] CHANGELOG')
+  print('                      [U]Update')
   print('================================================================')
   print(Fore.RED + '*[1]  Metaspl0!it - metasploit-framework                       *')
   print('*[2]  dev_r00ters - device rootkits for apk and iphone         *')
@@ -79,7 +80,7 @@ def home():
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
-  nums = ['X', 'R', 'L']
+  nums = ['X', 'R', 'L', 'U']
   for i in range(1,27):
     nums.append(str(i))
   if in_put not in nums:
@@ -1004,6 +1005,22 @@ def home():
     print(Fore.CYAN + '[*]Reading README.md...' + Style.RESET_ALL)
     logwrite('--[*]Reading README.md @ ' + timecheck() + '--')
     os.system('more README.md')
+    wait()
+  elif in_put == 'U':
+    try:
+      print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL)
+      os.system('sudo apt update')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      print(Fore.CYAN + '[*]Upgrading Packages & Dependencies...' + Style.RESET_ALL)
+      os.system('sudo apt upgrade')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      print(Fore.CYAN + '[*]Removing Deprecated Packages...' + Style.RESET_ALL)
+      os.system('sudo apt autoremove')
+      print(Fore.GREEN + '[+]Done!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully Updated Packages @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error Updating Packages...' + Style.RESET_ALL)
+      logwrite('--[*]Error Updating Packages @ ' + timecheck() + '--')
     wait()
   elif in_put == 'L':
     os.chdir(root)
