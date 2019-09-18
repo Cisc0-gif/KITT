@@ -1,0 +1,15 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Text files and source code
+*.txt text
+*.sh text
+*.md text
+*.db text
+
+# Executable binaries/packages
+*.deb binary
+*.xz binary
+
+# Binary image formats
+*.png binary
