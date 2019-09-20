@@ -250,3 +250,6 @@
 
 ### v1.0 9/17/19
 * added update feature to menu in KITT.py
+
+### v1.0 9/19/19
+* added Privesc feature to KITT.py with SimpleHTTPServer to host and Private and Public IP check

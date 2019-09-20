@@ -2,6 +2,8 @@ import os
 root = os.getcwd()
 import time
 start = time.time()
+import socket
+import requests
 import sys
 import time
 import calendar
@@ -77,11 +79,12 @@ def home():
   print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
   print('*[25] BtVerifier - BT RfComm and Active Verification Tool      *')
   print('*[26] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
+  print('*[27] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U']
-  for i in range(1,27):
+  for i in range(1,28):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -999,6 +1002,24 @@ def home():
     except:
       print(Fore.RED + '[*]Error running network_crack.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running network_crack.py @ ' + timecheck() + '--')
+    wait()
+  elif in_put == '27':
+    os.chdir('escalate')
+    try:
+      print(Fore.CYAN + '[*]Starting python SimpleHTTPServer on Port 80 to curl payloads...')
+      print(Fore.CYAN + '[*]Enter ^C or ^Z To Stop HTTP Server...')
+      s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+      s.connect(("8.8.8.8", 80))
+      r = requests.get("http://ifconfig.me").text
+      print(Fore.CYAN + '[*]Private IP: ' + Style.RESET_ALL + str(s.getsockname()[0]))
+      print(Fore.CYAN + '[*]Public IP: ' + Style.RESET_ALL + str(r))
+      os.system("python -m SimpleHTTPServer 80")
+      s.close()
+      print(Fore.GREEN + '[+]Successfully ended SimpleHTTPServer!' + Style.RESET_ALL)
+      logwrite('--[*]Successfully ended SimpleHTTPServer @ ' + timecheck() + '--')
+    except:
+      print(Fore.RED + '[*]Error running SimpleHTTPServer!' + Style.RESET_ALL)
+      logwrite('--[*]Error running SimpleHTTPServer @ ' + timecheck() + '--')
     wait()
   elif in_put == 'R':
     os.chdir(root)
