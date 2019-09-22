@@ -253,3 +253,12 @@
 
 ### v1.0 9/19/19
 * added Privesc feature to KITT.py with SimpleHTTPServer to host and Private and Public IP check
+
+### v1.0 9/22/19
+* removed most shell tools from KITT.py selections
+* compiled all domain_sticate.py outputs to output/report.txt
+* removed options 9,10,11, and 12 from KITT.py
+* added append_num.py outside of hashcat
+* updated hashcat
+* added gevent to lib_install.sh
+*

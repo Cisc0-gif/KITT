@@ -61,30 +61,26 @@ def home():
   print('*[6]  Key!0ggers - keyloggers                                  *')
   print('*[7]  Ruba_digi_spark - Digispark rubberducky tool             *')
   print('*[8]  Xspl0!ts - viruses, exploits, trojans, misc. (WARNING)   *')
-  print('*[9]  SSHit - ssh client                                       *')
-  print('*[10] Ven0m - payload generator                                *')
-  print('*[11] nmaPPer - nmap client                                    *')
-  print('*[12] NC - nc/cryptcat client                                  *')
-  print('*[13] little_phishy - phshing tools                            *')
-  print('*[14] i_m_a_g_e_s - VMware images                              *')
-  print('*[15] b@cker_upper - file backup tool                          *')
-  print('*[16] packetdump - packet capture tool                         *')
-  print('*[17] domainsticate - doamin recon tool                        *')
-  print('*[18] IRCssi - IRC client                                      *')
-  print('*[19] self-DeFENSE - track wipers                              *')
-  print('*[20] port jack - port listener                                *')
-  print('*[21] OWASP-ZSC - payload encoder                              *')
-  print('*[22] Investig@te - forensics tools                            *')
-  print('*[23] Spooftooph - bluetooth device spoofer                    *')
-  print('*[24] ShodanSearch - Shodan Lookup Tool                        *')
-  print('*[25] BtVerifier - BT RfComm and Active Verification Tool      *')
-  print('*[26] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
-  print('*[27] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
+  print('*[9] little_phishy - phshing tools                            *')
+  print('*[10] i_m_a_g_e_s - VMware images                              *')
+  print('*[11] b@cker_upper - file backup tool                          *')
+  print('*[12] packetdump - packet capture tool                         *')
+  print('*[13] domainsticate - doamin recon tool                        *')
+  print('*[14] IRCssi - IRC client                                      *')
+  print('*[15] self-DeFENSE - track wipers                              *')
+  print('*[16] port jack - port listener                                *')
+  print('*[17] OWASP-ZSC - payload encoder                              *')
+  print('*[18] Investig@te - forensics tools                            *')
+  print('*[19] Spooftooph - bluetooth device spoofer                    *')
+  print('*[20] ShodanSearch - Shodan Lookup Tool                        *')
+  print('*[21] BtVerifier - BT RfComm and Active Verification Tool      *')
+  print('*[22] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
+  print('*[23] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U']
-  for i in range(1,28):
+  for i in range(1,24):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -131,101 +127,28 @@ def home():
     wait()
   elif in_put == '4':
     os.chdir('crackers')
-    print('[1] hashcat')
-    print('[2] append_num')
-    print('[3] hydr@')
-    print('[4] burpsuite')
-    print('[5] dec0ders')
-    print('[6] crunch')
-    print('[7] 7zCracker')
-    print('[8] cewl')
-    print('[9] R0T_decrypt - :WARNING: Due to extensive wordlist, KITT may crash under this!')
-    print('[10] go home' + Style.RESET_ALL)
+    print('[1] append_num')
+    print('[2] burpsuite')
+    print('[3] dec0ders')
+    print('[4] R0T_decrypt - :WARNING: Due to extensive wordlist, KITT may crash under this!')
+    print('[5] go home' + Style.RESET_ALL)
     crack = input(Fore.CYAN + "[*]So what'll it be?: " + Style.RESET_ALL)
     if crack == '1':
-      os.chdir('hashcat')
-      logwrite('--[*]Starting hashcat shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Hashcat syntax = hashcat -a # -m # hash/hashlist.txt wordlist.txt bruteforce mask ?#?#?#?#?#" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif crack == '2':
-      os.chdir('hashcat')
       logwrite('--[*]Starting append_num.py @ ' + timecheck() + '--')
       os.system('python3 append_num.py')
       wait()
-    elif crack == '3':
-      logwrite('--[*]Starting hydra shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Hydra syntax = hydra -l/-L uname/uname.lst -p/-P pass/pass.lst url type" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif crack == '4':
+    elif crack == '2':
       logwrite('--[*]Starting burpsuite @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Running Burpsuite..." + Style.RESET_ALL)
       os.system("burpsuite")
       wait()
-    elif crack == '5':
+    elif crack == '3':
       logwrite('--[*]Reading decoders.txt @ ' + timecheck() + '--')
       with open('decoders.txt', 'r') as f:
         contents = f.read()
       print(contents)
       wait()
-    elif crack == '6':
-      logwrite('--[*]Running crunch shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Crunch syntax = crunch min-max -t @,%^(chars to insert) -f charset.lst -i (inverts output) -q readfile.lst -o output.lst" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif crack == '7':
-      os.chdir('7zip-crack')
-      logwrite('--[*]Running 7zip-crack shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("7zipcrack syntax = ./7zipcrack file.7z wordlist.lst" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif crack == '8':
-      logwrite('--[*]Running cewl shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Cewl syntax = cewl -d #(site depth) -m #(min len) -o (offsite) -ua ###(user agent) --with-numbers --meta_file file.txt --email_file file.txt -w output.txt" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ' + Style.RESET_ALL)
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif crack == '9':
+    elif crack == '4':
       logwrite('--[*]Running ROT Bruteforcer @ ' + timecheck() + '--')
       print(Fore.CYAN + "[*]Enter 'q' to exit")
       def recursion():
@@ -258,52 +181,20 @@ def home():
           recursion()
 
       recursion()
-    elif crack == '10':
+    elif crack == '5':
       wait()
   elif in_put == '5':
     os.chdir('hg')
     print(Fore.RED + 'Welcome to 2/3 of you life...')
-    print('[1] JoomlaScan')
-    print('[2] theHarvester')
-    print('[3] FOCA - Windows')
-    print('[4] google email index')
-    print('[5] g00gle dorks')
-    print('[6] r#con-ng')
-    print('[7] fbi_master')
-    print('[8] Aut0Sp!oit')
-    print('[9] Net-Creds SNiffer')
-    print('[10] Sherl0ck')
-    print('[11] go home' + Style.RESET_ALL)
+    print('[1] FOCA - Windows')
+    print('[2] g00gle dorks')
+    print('[3] r#con-ng')
+    print('[4] fbi_master')
+    print('[5] Aut0Sp!oit')
+    print('[6] Net-Creds SNiffer')
+    print('[7] go home' + Style.RESET_ALL)
     hg = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
     if hg == '1':
-      os.chdir('JoomlaScan')
-      logwrite('--[*]Running Joomlascan shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print('[*]JoomlaScan syntax = python joomlascan.py -u url -t #(threads)' + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif hg == '2':
-      os.chdir('theHarvester')
-      logwrite('--[*]Running theHarvester shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]theHarvester syntax = python3 theHarvester.py -d domain -b source(google,twitter) -l #(limit) -s (start)" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif hg == '3':
       try:
         os.system('cp -R FOCA ~')
         print(Fore.GREEN + '[+]FOCA copied to r00t!' + Style.RESET_ALL)
@@ -312,20 +203,7 @@ def home():
         print(Fore.RED + '[*]FOCA not found!' + Style.RESET_ALL)
         logwrite('--[*]Error copying FOCA @ ' + timecheck() + '--')
       wait()
-    elif hg =='4':
-      logwrite('--[*]Running goog-mail.py shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print('[*]goog-mail.py syntax = python goog-mail.py -d domain' + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif hg == '5':
+    elif hg == '2':
       logwrite('--[*]Reading dorks.md @ ' + timecheck() + '--')
       try:
         with open('dorks.md', 'r') as f:
@@ -335,7 +213,7 @@ def home():
         logwrite('--[*]Error reading dorks.md @ ' + timecheck() + '--')
         print(Fore.RED + '[*]dorks not found!' + Style.RESET_ALL)
       wait()
-    elif hg == '6':
+    elif hg == '3':
       try:
         print(Fore.CYAN + '[*]Starting recon-ng...' + Style.RESET_ALL)
         logwrite('--[*]Starting recon-ng @ ' + timecheck() + '--')
@@ -346,7 +224,7 @@ def home():
         print(Fore.RED + '[*]Error running recon-ng!' + Style.RESET_ALL)
         logwrite('--[*]Error running recon-ng @ ' + timecheck() + '--')
       wait()
-    elif hg == '7':
+    elif hg == '4':
       try:
         os.chdir('fbi-master')
         print(Fore.CYAN + '[*]Running fbi.py...' + Style.RESET_ALL)
@@ -358,7 +236,7 @@ def home():
         print(Fore.RED + '[*]Error in running fbi.py!' + Style.RESET_ALL)
         logwrite('--[*]Error in running fbi.py @ ' + timecheck() + '--')
       wait()
-    elif hg == '8':
+    elif hg == '5':
       try:
         os.chdir('AutoSploit')
         print(Fore.CYAN + '[*]Running autosploit.py...' + Style.RESET_ALL)
@@ -370,7 +248,7 @@ def home():
         print(Fore.RED + '[*]Error running autosploit.py!' + Style.RESET_ALL)
         logwrite('--[*]Error running autosploit.py @ ' + timecheck() + '--')
       wait()
-    elif hg == '9':
+    elif hg == '6':
       print(Fore.CYAN + '[*]Running net-creds.py packet sniffer...' + Style.RESET_ALL)
       logwrite('--[*]Running net-creds.py @ ' + timecheck() + '--')
       try:
@@ -382,21 +260,7 @@ def home():
         print(Fore.RED + '[*]Packet Sniffer ended prematurely!' + Style.RESET_ALL)
         logwrite('--[*]Error running net-creds.py @ ' + timecheck() + '--')
       wait() 
-    elif hg == '10':
-      os.chdir('sherlock')
-      logwrite('--[*]Running sherlock shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]sherlock syntax = python3 sherlock.py -r (ranked search) -v (verbose) --ouput output.txt --print-found (print found sites)" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-        recursion()
-      recursion()
-    elif hg == '11':
+    elif hg == '7':
       wait()
   elif in_put == '6':
     os.chdir('keyloggers')
@@ -484,75 +348,6 @@ def home():
     elif exploit == '4':
       wait()
   elif in_put == '9':
-    logwrite('--[*]Running ssh shell @ ' + timecheck() + '--')
-    print(Fore.CYAN + "[*]Enter 'q' to exit")
-    print("[*]SSH syntax = ssh -i RSA_KEY uname@ip -p port" + Style.RESET_ALL)
-    def recursion():
-      in_put = input(os.getcwd() + ': ')
-      if in_put == 'q':
-        wait()
-        home()
-      else:
-        os.system(in_put)
-        recursion()
-    recursion()
-  elif in_put == '10':
-    logwrite('--[*]Running msfvenom shell @ ' + timecheck() + '--')
-    print(Fore.CYAN + "[*]Enter 'q' to exit")
-    print("[*]Msfvenom syntax = msfvenom -p payload -e encoder LHOST=localhost_ip LPORT=localhost_port -f format > file.format" + Style.RESET_ALL)
-    def recursion():
-      in_put = input(os.getcwd() + ': ')
-      if in_put == 'q':
-        wait()
-        home()
-      else:
-        os.system(in_put)
-      recursion()
-    recursion()
-  elif in_put == '11':
-    logwrite('--[*]Running nmap shell @ ' + timecheck() + '--')
-    print(Fore.CYAN + "[*]Enter 'q' to exit")
-    print("[*]Nmap syntax = nmap [options] rhost" + Style.RESET_ALL)
-    def recursion():
-      in_put = input(os.getcwd() + ': ')
-      if in_put == 'q':
-        wait()
-        home()
-      else:
-        os.system(in_put)
-      recursion()
-    recursion()
-  elif in_put == '12':
-    print('[1] netcat')
-    print('[2] cryptcat (more secure but requires cryptcat on other end)')
-    noc = input(': ')
-    if noc == '1':
-      logwrite('--[*]Running netcat shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Netcat syntax = nc rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-          recursion()
-      recursion()
-    elif noc == '2':
-      logwrite('--[*]Running cryptcat shell @ ' + timecheck() + '--')
-      print(Fore.CYAN + "[*]Enter 'q' to exit")
-      print("[*]Cryptcat syntax = cryptcat rhost -l (listener) -v (verbose) -p (port to connect to or listen on)" + Style.RESET_ALL)
-      def recursion():
-        in_put = input(os.getcwd() + ': ')
-        if in_put == 'q':
-          wait()
-          home()
-        else:
-          os.system(in_put)
-          recursion()
-      recursion()
-  elif in_put == '13':
     os.chdir('phishing')
     print('[1] sonar.py - batch email sender')
     print('[2] blackeye - webpage phishing generator')
@@ -590,7 +385,7 @@ def home():
       wait()
     elif phish == '4':
       wait()
-  elif in_put == '14':
+  elif in_put == '10':
     os.chdir('images')
     print('[1] Ubuntu_18.04 ')
     print('[2] Kali_amd64')
@@ -646,7 +441,7 @@ def home():
       wait()
     if image == '6':
       wait()
-  elif in_put == '15':
+  elif in_put == '11':
     try:
       print(Fore.CYAN + '[*]Running backup.sh...' + Style.RESET_ALL)
       os.system('sudo ./backup.sh')
@@ -655,7 +450,7 @@ def home():
       logwrite('--[*]Error running backup.sh @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running backup.sh' + Style.RESET_ALL)
     wait()
-  elif in_put == '16':
+  elif in_put == '12':
     try:
       print(Fore.CYAN + '[*]Running packetdump.sh...' + Style.RESET_ALL)
       os.system('sudo ./packetdump.sh')
@@ -666,7 +461,7 @@ def home():
       logwrite('--[*]Error writing output to root @ ' + timecheck() + '--')
       print(Fore.RED + '[*]packet capture not found!' + Style.RESET_ALL)
     wait()
-  elif in_put == '17':
+  elif in_put == '13':
     os.chdir('hg')
     try:
       print(Fore.CYAN + '[*]Running domain_sticate.py...' + Style.RESET_ALL)
@@ -677,7 +472,7 @@ def home():
       print(Fore.RED + '[*]Error in file domain_sticate.sh' + Style.RESET_ALL)
       logwrite('--[*]Error running doamin_sticate.py @ ' + timecheck() + '--')
     wait()
-  elif in_put == '18':
+  elif in_put == '14':
     try:
       print(Fore.CYAN + '[*]Running irssi...' + Style.RESET_ALL)
       os.system('irssi')
@@ -687,7 +482,7 @@ def home():
       logwrite('--[*]Error running irssi @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running irssi!' + Style.RESET_ALL)
     wait()
-  elif in_put == '19':
+  elif in_put == '15':
     os.chdir('sdefense')
     print('[1] MAC_changer')
     print('[2] ssh_p0Rt_r@andomizer')
@@ -787,7 +582,7 @@ def home():
       wait()
     elif rdefense == '8':
       wait()
-  elif in_put == '20':
+  elif in_put == '17':
     port = input('Enter port number to listen on: ')
     try:
       logwrite('--[*]Listening on port ' + port + ' @ ' + timecheck() + '--')
@@ -799,7 +594,7 @@ def home():
       logwrite('--[*]Error setting up listener on port ' + port + ' @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error setting up listener on port ' + port + '!' + Style.RESET_ALL)
     wait()
-  elif in_put == '21':
+  elif in_put == '18':
     try:
       print(Fore.CYAN + '[*]Running OWASP-ZSC...' + Style.RESET_ALL)
       os.chdir('OWASP-ZSC')
@@ -810,7 +605,7 @@ def home():
       logwrite('--[*]Error Running OWASP-ZSC @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error Running OWASP-ZSC!' + Style.RESET_ALL)
     wait()
-  elif in_put == '22':
+  elif in_put == '19':
     print('[1] gdb')
     print('[2] radare2')
     print('[3] strace')
@@ -963,7 +758,7 @@ def home():
     elif forensic == '12':
       wait()
       home()
-  elif in_put == '23':
+  elif in_put == '20':
     try:
       print(Fore.CYAN + '[*]Running bluespoof.sh...' + Style.RESET_ALL)
       os.system('./bluespoof.sh')
@@ -973,7 +768,7 @@ def home():
       logwrite('--[*]Error running bluespoof.sh @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running bluespoof.sh!' + Style.RESET_ALL)
     wait()
-  elif in_put == '24':
+  elif in_put == '21':
     try:
       print(Fore.CYAN + '[*]Running shodan_search.py...' + Style.RESET_ALL)
       os.system('python3 shodan_search.py')
@@ -983,7 +778,7 @@ def home():
       logwrite('--[*]Error running shodan_search.py @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
     wait()
-  elif in_put == '25':
+  elif in_put == '22':
     try:
       print(Fore.CYAN + '[*]Running btverifier.py...' + Style.RESET_ALL)
       os.system('python3 btverifier.py')
@@ -993,7 +788,7 @@ def home():
       print(Fore.RED + '[*]Error running btverifier.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
     wait()
-  elif in_put == '26':
+  elif in_put == '23':
     try:
       print(Fore.CYAN + '[*]Running network_crack.py...' + Style.RESET_ALL)
       os.system('python3 network_crack.py')
@@ -1003,7 +798,7 @@ def home():
       print(Fore.RED + '[*]Error running network_crack.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running network_crack.py @ ' + timecheck() + '--')
     wait()
-  elif in_put == '27':
+  elif in_put == '24':
     os.chdir('escalate')
     try:
       print(Fore.CYAN + '[*]Starting python SimpleHTTPServer on Port 80 to curl payloads...')

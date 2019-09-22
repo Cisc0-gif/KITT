@@ -133,6 +133,7 @@ pip3 install shodan
 pip3 install datetime
 pip3 install pytz
 pip3 install colorama
+
 echo '[*]Writing Custom IRC ruby script to /usr/share/metasploit-framework/data/exploits/psnuffle...'
 echo "
 class SnifferIRC < BaseProtocolParser
@@ -294,6 +295,17 @@ pip3 install requests_futures
 pip3 install soupsieve
 pip3 install stem
 pip3 install torrequest
+echo '[*]Installing theHarvester Packages...'
+pip3 install censys
+pip3 install dnspython
+pip3 install flake8
+pip3 install grequests
+pip3 install gevent
+pip3 install mypy
+pip3 install plotly
+pip3 install pytest
+pip3 install PyYaml
+pip3 install texttable
 echo '[*]Updating and Upgrading Packages...'
 sudo apt-get update && sudo apt-get upgrade
 sudo apt autoremove
