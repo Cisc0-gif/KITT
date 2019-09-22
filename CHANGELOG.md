@@ -261,4 +261,4 @@
 * added append_num.py outside of hashcat
 * updated hashcat
 * added gevent to lib_install.sh
-*
+* added XSStrike to domain_sticate.py
