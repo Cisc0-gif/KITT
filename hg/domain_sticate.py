@@ -101,9 +101,9 @@ def main():
     print(Fore.RED + '[*]Shodan search incomplete!' + Style.RESET_ALL)
   print(Fore.CYAN + '[*]Output of shodan scan directed to report.txt!' + Style.RESET_ALL)
   drupal = input(Fore.CYAN + '[*]Do you want to run DrupalGeddon2 to attempt a shell?[y/N]: ' + Style.RESET_ALL)
+  os.chdir('Drupalgeddon2')
   if drupal == 'y' or drupal == 'Y':
     try:
-      os.chdir('Drupalgeddon2')
       http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
       if http == 'P':
         os.system('ruby drupalgeddon2.rb http://' + domain + ' >> report.txt')
