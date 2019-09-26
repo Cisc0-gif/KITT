@@ -21,7 +21,7 @@ def main():
   print('*[3] Crack WEP Network                                   *')
   print('*[4] Crack WPA/WPA2 Network Using PMKID Method           *')
   print('*[5] Crack WPA/WPA2 Network Using PIN (Pixie-Dust) Method*')
-  print('*[6] MITM WPA/WPA2 Method                                *')
+  print('*[6] Wifite2 (Automated Network Cracker)                 *')
   print('*[7] Exit                                                *')
   print('==========================================================')
   in_put = input(': ')
@@ -72,17 +72,15 @@ def main():
     wait()
     main()
   if in_put == '6':
-    warn = input(Fore.RED + '[*]Fluxion can only run in a graphical interface (no ssh). Are you running in a gui?[y/N]: ' + Style.RESET_ALL)
-    if warn == 'y' or warn == 'Y':
-      os.chdir('fluxion')
-      os.system('sudo ./fluxion.sh')
-      os.chdir('..')
-      wait()
-      main()
-    else:
-      print(Fore.RED + '[*]Run Fluxion in a gui...' + Style.RESET_ALL)
-      wait()
-      main()
+    print(Fore.CYAN + '[*]Starting Wifite2...' + Style.RESET_ALL)
+    try:
+      os.chdir('wifite2')
+      os.system('python3 Wifite.py')
+      print(Fore.GREEN + '[+]Successfully ran wifite.py!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Error running wifite.py' + Style.RESET_ALL)
+    os.chdir('..')
+    main()
   if in_put == '7':
     wait()
     exit()

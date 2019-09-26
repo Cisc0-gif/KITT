@@ -262,3 +262,6 @@
 * updated hashcat
 * added gevent to lib_install.sh
 * added XSStrike to domain_sticate.py
+
+### v1.0 9/26/19
+* added Wifite2 to network_crack.py
