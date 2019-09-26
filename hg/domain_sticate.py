@@ -45,7 +45,7 @@ def main():
   if harv == 'y' or harv == 'Y':
     print(Fore.CYAN + "[*]Running harvester scan..." + Style.RESET_ALL)
     try:
-      os.system('python3 theHarvester.py -d ' + domain + ' -l 200 -b google -s -g -p -f ../harvester.html > ../harvest.txt')
+      os.system('python3.7 theHarvester.py -d ' + domain + ' -l 200 -b google -s -g -p -f ../harvester.html > ../harvest.txt')
       print(Fore.GREEN + '[+]Harvester scan complete!')
     except:
       print(Fore.RED + '[*]Harvester scan incomplete!')
@@ -159,6 +159,17 @@ def main():
     print(Fore.GREEN + '[+]XSStrike scan complete!' + Style.RESET_ALL)
   except:
     print(Fore.RED + '[*]XSStrike scan incomplete!' + Style.RESET_ALL)
+  print(Fore.CYAN + '[*]Running vBulletin 5 - 5.5.4 scan on domain...' + Style.RESET_ALL)
+  try:
+    os.chdir('vBulletinScan')
+    http = input(Fore.CYAN + '[*]HTT(P) or HTTP(S)?: ' + Style.RESET_ALL)
+    if http == 'P':
+      os.system('python exploit.py http://' + domain  + ' >> report.txt')
+    else:
+      os.system('python exploit.py https://' + domain + ' >> report.txt')
+    print(Fore.GREEN + '[+]vBulletin scan complete!' + Style.RESET_ALL)
+  except:
+    print(Fore.RED + '[*]vBulletin scan incomplete!' + Style.RESET_ALL)
   print('=========================================================================')
   print(Fore.GREEN + '[+]Domainstication Complete!' + Style.RESET_ALL)
   wait()

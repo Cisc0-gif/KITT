@@ -265,3 +265,4 @@
 
 ### v1.0 9/26/19
 * added Wifite2 to network_crack.py
+* added vBulletin 5-5.5.4 Scan to domain_sticate.py and vBulletinScan
