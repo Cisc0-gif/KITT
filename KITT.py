@@ -582,7 +582,7 @@ def home():
       wait()
     elif rdefense == '8':
       wait()
-  elif in_put == '17':
+  elif in_put == '16':
     port = input('Enter port number to listen on: ')
     try:
       logwrite('--[*]Listening on port ' + port + ' @ ' + timecheck() + '--')
@@ -594,7 +594,7 @@ def home():
       logwrite('--[*]Error setting up listener on port ' + port + ' @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error setting up listener on port ' + port + '!' + Style.RESET_ALL)
     wait()
-  elif in_put == '18':
+  elif in_put == '17':
     try:
       print(Fore.CYAN + '[*]Running OWASP-ZSC...' + Style.RESET_ALL)
       os.chdir('OWASP-ZSC')
@@ -605,7 +605,7 @@ def home():
       logwrite('--[*]Error Running OWASP-ZSC @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error Running OWASP-ZSC!' + Style.RESET_ALL)
     wait()
-  elif in_put == '19':
+  elif in_put == '18':
     print('[1] gdb')
     print('[2] radare2')
     print('[3] strace')
@@ -758,7 +758,7 @@ def home():
     elif forensic == '12':
       wait()
       home()
-  elif in_put == '20':
+  elif in_put == '19':
     try:
       print(Fore.CYAN + '[*]Running bluespoof.sh...' + Style.RESET_ALL)
       os.system('./bluespoof.sh')
@@ -768,7 +768,7 @@ def home():
       logwrite('--[*]Error running bluespoof.sh @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running bluespoof.sh!' + Style.RESET_ALL)
     wait()
-  elif in_put == '21':
+  elif in_put == '20':
     try:
       print(Fore.CYAN + '[*]Running shodan_search.py...' + Style.RESET_ALL)
       os.system('python3 shodan_search.py')
@@ -778,7 +778,7 @@ def home():
       logwrite('--[*]Error running shodan_search.py @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running shodan_search.py!' + Style.RESET_ALL)
     wait()
-  elif in_put == '22':
+  elif in_put == '21':
     try:
       print(Fore.CYAN + '[*]Running btverifier.py...' + Style.RESET_ALL)
       os.system('python3 btverifier.py')
@@ -788,7 +788,7 @@ def home():
       print(Fore.RED + '[*]Error running btverifier.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
     wait()
-  elif in_put == '23':
+  elif in_put == '22':
     try:
       print(Fore.CYAN + '[*]Running network_crack.py...' + Style.RESET_ALL)
       os.system('python3 network_crack.py')
@@ -798,7 +798,7 @@ def home():
       print(Fore.RED + '[*]Error running network_crack.py!' + Style.RESET_ALL)
       logwrite('--[*]Error running network_crack.py @ ' + timecheck() + '--')
     wait()
-  elif in_put == '24':
+  elif in_put == '23':
     os.chdir('escalate')
     try:
       print(Fore.CYAN + '[*]Starting python SimpleHTTPServer on Port 80 to curl payloads...')

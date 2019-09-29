@@ -109,7 +109,6 @@ def main():
     os.chdir('..')
     main()
   if in_put == '9':
-    wait()
     exit()
 
 main()

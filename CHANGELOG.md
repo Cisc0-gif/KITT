@@ -271,3 +271,4 @@
 * added fluxion to network_crack.py - for real this time
 * added ettercap to network_crack.py and lib_install.sh
 * added necessary libs for running ettercap
+* fixed numerical error in choices list in KITT.py
