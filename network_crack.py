@@ -22,7 +22,9 @@ def main():
   print('*[4] Crack WPA/WPA2 Network Using PMKID Method           *')
   print('*[5] Crack WPA/WPA2 Network Using PIN (Pixie-Dust) Method*')
   print('*[6] Wifite2 (Automated Network Cracker)                 *')
-  print('*[7] Exit                                                *')
+  print('*[7] Ettercap (MiTM Attack)                              *')
+  print('*[8] Fluxion (MiTM/Router Spoof Attack)                  *')
+  print('*[9] Exit                                                *')
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -82,6 +84,31 @@ def main():
     os.chdir('..')
     main()
   if in_put == '7':
+    got = input(Fore.CYAN + '[*]Do you want to run ettercap in Graphical or Text mode?[G/T]: ' + Style.RESET_ALL)
+    try:
+      if got == 'G':
+        print(Fore.CYAN + '[*]Running ettercap in graphical mode...' + Style.RESET_ALL)
+        os.system('sudo ettercap -G')
+        print(Fore.GREEN + '[+]Successfully ended ettercap in graphical mode!' + Style.RESET_ALL)
+      else:
+        print(Fore.CYAN + '[*]Running ettercap in text mode...' + Style.RESET_ALL)
+        os.system('sudo ettercap -T')
+        print(Fore.GREEN + '[+]Successfully ended ettercap in text mode!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Error running ettercap!' + Style.RESET_ALL)
+    wait()
+    main()
+  if in_put == '8':
+    print(Fore.CYAN + '[*]Starting Fluxion...' + Style.RESET_ALL)
+    try:
+      os.chdir('fluxion')
+      os.system('./fluxion.sh')
+      print(Fore.GREEN + '[+]Successfully ran fluxion.sh!' + Style.RESET_ALL)
+    except:
+      print(Fore.RED + '[*]Error running fluxion.sh' + Style.RESET_ALL)
+    os.chdir('..')
+    main()
+  if in_put == '9':
     wait()
     exit()
 
