@@ -102,7 +102,6 @@ def home():
   elif in_put == '2':
     try:
       os.chdir('rooters')
-      wait()
       os.system('ls')
       print(Fore.CYAN + '[*]Select a dev rooter for use: ' + Style.RESET_ALL)
       dev_rooter = input('')
@@ -114,7 +113,7 @@ def home():
       print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '3':
-    os.chdir('rootkittens')
+    os.chdir('rootkits')
     try:
       os.system('ls')
       dev_rooter = input(Fore.CYAN + '[*]Select a rootkit for use: ' + Style.RESET_ALL)

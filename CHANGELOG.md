@@ -276,3 +276,4 @@
 ### v1.0 10/4/19
 * added pentbox1.8 honeypot tool to KITT.py
 * added HiddenSMSTracker apk to rooters
+* fixed directory error with rootkits
