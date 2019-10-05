@@ -61,7 +61,7 @@ def home():
   print('*[6]  Key!0ggers - keyloggers                                  *')
   print('*[7]  Ruba_digi_spark - Digispark rubberducky tool             *')
   print('*[8]  Xspl0!ts - viruses, exploits, trojans, misc. (WARNING)   *')
-  print('*[9] little_phishy - phshing tools                            *')
+  print('*[9]  little_phishy - phshing tools                            *')
   print('*[10] i_m_a_g_e_s - VMware images                              *')
   print('*[11] b@cker_upper - file backup tool                          *')
   print('*[12] packetdump - packet capture tool                         *')
@@ -76,11 +76,12 @@ def home():
   print('*[21] BtVerifier - BT RfComm and Active Verification Tool      *')
   print('*[22] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
   print('*[23] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
+  print('*[24] HoneyPot - Honeypot Network Defense Tool                 *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U']
-  for i in range(1,24):
+  for i in range(1,25):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -815,6 +816,17 @@ def home():
     except:
       print(Fore.RED + '[*]Error running SimpleHTTPServer!' + Style.RESET_ALL)
       logwrite('--[*]Error running SimpleHTTPServer @ ' + timecheck() + '--')
+    wait()
+  elif in_put == '24':
+    os.chdir('pentbox/pentbox-1.8')
+    try:
+      print(Fore.CYAN + '[*]Running Pentbox1.8...' + Style.RESET_ALL)
+      os.system('./pentbox.rb')
+      logwrite('--[+]Successfully ended Pentbox1.8 @ ' + timecheck() + '--')
+      print(Fore.GREEN + '[+]Successfully ended Pentbox1.8!' + Style.RESET_ALL)
+    except:
+      logwrite('--[*]Error running Pentbox1.8 @ ' + timecheck() + '--')
+      print(Fore.RED + '[*]Error running Pentbox1.8!' + Style.RESET_ALL)
     wait()
   elif in_put == 'R':
     os.chdir(root)

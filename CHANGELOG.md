@@ -272,3 +272,6 @@
 * added ettercap to network_crack.py and lib_install.sh
 * added necessary libs for running ettercap
 * fixed numerical error in choices list in KITT.py
+
+### v1.0 10/4/19
+* added pentbox1.8 honeypot tool to KITT.py
