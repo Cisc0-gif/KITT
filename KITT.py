@@ -490,7 +490,7 @@ def home():
     print('[4] pr0xy router')
     print('[5] ssh_encr7tion')
     print('[6] st@tic IP')
-    print('[7] SSH Auth IP Check')
+    print('[7] Fail2ban Configurations')
     print('[8] go home')
     rdefense = input(': ')
     if rdefense == '1':
@@ -572,13 +572,20 @@ def home():
       wait()
     elif rdefense == '7':
       try:
-        print(Fore.CYAN + '[*]Running SSHauth_check.sh...' + Style.RESET_ALL)
-        os.system('python3 SSHauth_check.py')
-        print(Fore.GREEN + '[+]Successfully ended SSHauth_check.sh!' + Style.RESET_ALL)
-        logwrite('--[+]Successfully ended SSHauth_check.sh @ ' + timecheck() + '--')
+        ipbu = input(Fore.CYAN + '[*]Are you going to [B]an or [U]nban an IP?: ' + Style.RESET_ALL)
+        if ipbu == 'B' or ipbu == 'b':
+          ip = input(Fore.CYAN + '[*]Enter IP: ' + Style.RESET_ALL)
+          os.system('sudo fail2ban-client set sshd banip ' + ip)
+          print(Fore.GREEN + '[+]Banned IP ' + ip + '!' + Style.RESET_ALL)
+          logwrite('--[+]Banned IP ' + ip + ' @ ' + timecheck() + '--')
+        else:
+          ip = input(Fore.CYAN + '[*]Enter IP: ' + Style.RESET_ALL)
+          os.system('sudo fail2ban-client set sshd unbanip ' + ip)
+          print(Fore.GREEN + '[+]Unbanned IP ' + ip + '!' + Style.RESET_ALL)
+          logwrite('--[+]Unbanned IP ' + ip + ' @ ' + timecheck() + '--')
       except:
-        logwrite('--[*]Error running SSHauth_check_ip.sh @ ' + timecheck() + '--')
-        print(Fore.RED + '[*]Error running SSHauth_check.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error configuring fail2ban @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]Error configuring fail2ban' + Style.RESET_ALL)
       wait()
     elif rdefense == '8':
       wait()

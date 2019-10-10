@@ -277,3 +277,8 @@
 * added pentbox1.8 honeypot tool to KITT.py
 * added HiddenSMSTracker apk to rooters
 * fixed directory error with rootkits
+
+### v1.0 10/9/19
+* added fail2ban to lib_install.sh and added jail.local configuration
+* removed SSHauth_checker.py
+* added fail2ban to KITT.py
