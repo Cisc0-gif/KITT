@@ -282,3 +282,6 @@
 * added fail2ban to lib_install.sh and added jail.local configuration
 * removed SSHauth_checker.py
 * added fail2ban to KITT.py
+
+### v1.0 10/14/19
+* added php to lib_install.py

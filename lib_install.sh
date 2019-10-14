@@ -20,6 +20,7 @@ echo 'Y' | sudo apt-get install cryptcat
 echo 'Y' | sudo apt-get install netcat
 echo 'Y' | sudo apt-get install unicornscan
 echo 'Y' | sudo apt-get install python
+echo 'Y' | sudo apt-get install php
 echo 'Y' | sudo apt-get install python-pip
 echo 'Y' | sudo apt-get install maltegoce
 echo 'Y' | sudo apt-get install recon-ng
