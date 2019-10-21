@@ -18,6 +18,8 @@ echo "
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
+Protocol 2
+
 Port 43594
 #AddressFamily any
 #ListenAddress 0.0.0.0
@@ -39,7 +41,7 @@ Port 43594
 #LoginGraceTime 2m
 PermitRootLogin no
 #StrictModes yes
-#MaxAuthTries 6
+MaxAuthTries 10
 #MaxSessions 10
 
 #PubkeyAuthentication yes
@@ -94,7 +96,7 @@ UsePAM yes
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
 #GatewayPorts no
-X11Forwarding yes
+X11Forwarding no
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PermitTTY yes
@@ -103,7 +105,7 @@ PrintMotd no
 #TCPKeepAlive yes
 #PermitUserEnvironment no
 #Compression delayed
-#ClientAliveInterval 0
+ClientAliveInterval 300
 #ClientAliveCountMax 3
 #UseDNS no
 #PidFile /var/run/sshd.pid
