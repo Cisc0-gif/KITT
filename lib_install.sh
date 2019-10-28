@@ -1132,6 +1132,10 @@ pip3 install requests_futures
 pip3 install soupsieve
 pip3 install stem
 pip3 install torrequest
+echo '[*]Installing HomePWN libs...'
+cd HomePWN/
+bash install.sh
+cd ..
 echo '[*]Installing theHarvester Packages...'
 pip3 install censys
 pip3 install dnspython

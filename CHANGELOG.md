@@ -288,3 +288,6 @@
 
 ### v1.0 10/20/19
 * added SSH protocol 2 enforcement, disabled X11 forwarding, set idle timeout, and limited password attempts to ssh_encr7pt.sh
+
+### v1.0 10/27/19
+* added HomePWN to KITT

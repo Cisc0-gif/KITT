@@ -77,11 +77,12 @@ def home():
   print('*[22] Network_Cr@ck - WEP/WPA/WPA2 Network Cracker             *')
   print('*[23] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
   print('*[24] HoneyPot - Honeypot Network Defense Tool                 *')
+  print('*[25] HomePWN - IoT Exploitation Framework                     *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U']
-  for i in range(1,25):
+  for i in range(1,26):
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -834,6 +835,16 @@ def home():
       logwrite('--[*]Error running Pentbox1.8 @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running Pentbox1.8!' + Style.RESET_ALL)
     wait()
+  elif in_put == '25':
+    os.chdir('HomePWN')
+    try:
+      print(Fore.CYAN + '[*]Running HomePWN framework...' + Style.RESET_ALL)
+      os.system('python3 homePwn.py')
+      logwrite('--[+]Successfully ended HomePWN @ ' + timecheck() + '--')
+      print(Fore.GREEN + '[+]Successfully ended HomePWN' + Style.RESET_ALL)
+    except:
+      logwrite('--[*]Error running HomePWN @ ' + timecheck() + '--')
+      print(Fore.RED + '[*]Error running HomePWN!' + Style.RESET_ALL)
   elif in_put == 'R':
     os.chdir(root)
     print(Fore.CYAN + '[*]Reading README.md...' + Style.RESET_ALL)
