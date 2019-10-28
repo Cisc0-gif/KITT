@@ -12,11 +12,14 @@ import random
 from datetime import date
 from colorama import Fore, Back, Style
 
-def timecheck():
+def runtimecheck():
   global check
   check = time.time()
   msg = str(check - start)
   return msg
+
+def timecheck():
+  return time.ctime()
 
 def logwrite(msg):
   with open(root + '/RUNTIME.log', 'a+') as f:

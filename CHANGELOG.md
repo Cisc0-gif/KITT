@@ -291,3 +291,4 @@
 
 ### v1.0 10/27/19
 * added HomePWN to KITT
+* changed timecheck() output to time.ctime()
