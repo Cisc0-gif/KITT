@@ -292,3 +292,9 @@
 ### v1.0 10/27/19
 * added HomePWN to KITT
 * changed timecheck() output to time.ctime()
+
+### v1.0 11/1/19
+* began documentation for KITT.py
+
+### v1.0 11/3/19
+* added Ubuntu USB Boot SAM hack method to escalate
