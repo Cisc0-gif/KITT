@@ -137,16 +137,16 @@ pip install qrcode
 pip install pillow
 pip install pymssql
 pip3 install shodan
+pip3 install future
 pip3 install datetime
 pip3 install pytz
 pip3 install colorama
-echo '[*]Installing and Initializing PhoneInfoga...'
-git clone https://github.com/sundowndev/PhoneInfoga
-cd PhoneInfoga
-pip3 install future
-python3 -m pip install -r requirements.txt
-cp config.example.py config.py
-cd ../
+pip3 install phonenumbers
+pip3 install requests
+pip3 install selenium
+pip3 install beautifulsoup4
+pip3 install html5lib
+pip3 install config
 echo '[*]Installing and Initializing mousejack...'
 git clone https://github.com/BastilleResearch/mousejack.git
 cd mousejack
