@@ -298,3 +298,9 @@
 
 ### v1.0 11/3/19
 * added Ubuntu USB Boot SAM hack method to escalate
+
+### v1.0 11/6/19
+* removed rootkits
+* replaced rootkits with mousejack and jackit
+* added mousejack and jackit firmware upload tools to lib_install.sh
+* added mousejack and jackit git configuration to lib_install.sh

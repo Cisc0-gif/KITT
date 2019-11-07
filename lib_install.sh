@@ -117,6 +117,8 @@ pg_ctlcluster 11 main start
 echo '[*]Initiating YAML database for metasploit-framework...'
 msfdb init
 echo '[*]Installing python2.7 and 3.7 libraries...'
+pip install -U -I pyusb
+pip install -U platformio
 pip install bs4
 pip install requests
 pip install argparse
@@ -138,6 +140,16 @@ pip3 install shodan
 pip3 install datetime
 pip3 install pytz
 pip3 install colorama
+echo '[*]Initializing mousejack...'
+git clone https://github.com/BastilleResearch/mousejack.git
+cd mousejack
+git submodule init
+git submoudle update
+cd ..
+git clone https://github.com/insecurityofthings/jackit.git
+cd jackit
+pip install -r requirements.txt
+cd ..
 echo '[*]Writing fail2ban configurations w/ bantime 5ms, findtime 5ms, and maxretry 3...'
 echo "
 #

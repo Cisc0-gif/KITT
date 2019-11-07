@@ -1,7 +1,7 @@
+#! python3
 import os
-root = os.getcwd()
+root = os.getcwd() #sets root as current directory for access to all tools
 import time
-start = time.time()
 import socket
 import requests
 import sys
@@ -12,26 +12,26 @@ import random
 from datetime import date
 from colorama import Fore, Back, Style
 
-def runtimecheck():
+def runtimecheck(): #returns current runtime
   global check
   check = time.time()
   msg = str(check - start)
   return msg
 
-def timecheck():
+def timecheck(): #returns current local time
   return time.ctime()
 
-def logwrite(msg):
+def logwrite(msg): #writes input to RUNTIME.log
   with open(root + '/RUNTIME.log', 'a+') as f:
     f.write(msg + '\n')
     f.close()
 
-os.system('sudo chmod 777 RUNTIME.log')
+os.system('sudo chmod 777 RUNTIME.log') #verifies that RUNTIME.log is readable to all
 
 logwrite('--[*]KITT Initialized in ' + timecheck() + ' seconds--')
 
-print(Fore.CYAN + '[*]Checking OS Version...' + Style.RESET_ALL)
-if sys.platform != 'linux':
+print(Fore.CYAN + '[*]Checking OS Version...' + Style.RESET_ALL) 
+if sys.platform != 'linux': #verifies os is linux and ends program if not
   logwrite("--[*]User OS Doesn't Register as Debian/Linux @ " + timecheck() + "--")
   print(Fore.RED + "[*]User OS Doesn't Register as Debian/Linux!" + Style.RESET_ALL)
   wait()
@@ -40,7 +40,7 @@ else:
   logwrite("--[+]User OS Registers as Debian/Linux @ " + timecheck() + "--")
   print(Fore.GREEN + '[+]User OS Registers as Debian/Linux!' + Style.RESET_ALL)
 
-print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL)
+print(Fore.CYAN + '[*]Updating System Libs...' + Style.RESET_ALL) #updates system libs
 os.system('sudo apt-get update')
 os.system('sudo apt-get upgrade')
 os.system('sudo apt autoremove')
@@ -58,7 +58,7 @@ def home():
   print('================================================================')
   print(Fore.RED + '*[1]  Metaspl0!it - metasploit-framework                       *')
   print('*[2]  dev_r00ters - device rootkits for apk and iphone         *')
-  print('*[3]  Rootkit_tens - remote rookits for injection              *')
+  print('*[3]  Mouse_JACk - Keyboard Jacker (needs CrazyRadio PA)       *')
   print('*[4]  The Cr@ckin - hash/login crackers                        *')
   print('*[5]  Hunter/Gatherer - OSINT gatherers                        *')
   print('*[6]  Key!0ggers - keyloggers                                  *')
@@ -84,8 +84,8 @@ def home():
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
-  nums = ['X', 'R', 'L', 'U']
-  for i in range(1,26):
+  nums = ['X', 'R', 'L', 'U'] #creates list of letters for options from menu
+  for i in range(1,26): #creates range of numbers as options from menu
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -117,18 +117,37 @@ def home():
       print(Fore.RED + '[*]dev_rooter not found!' + Style.RESET_ALL)
     wait()
   elif in_put == '3':
-    os.chdir('rootkits')
-    try:
-      os.system('ls')
-      dev_rooter = input(Fore.CYAN + '[*]Select a rootkit for use: ' + Style.RESET_ALL)
-      os.system('cp -R ' + dev_rooter + ' ~')
-      print(Fore.GREEN + '[+]r--tkit has /bin/ cOpied to r00t!' + Style.RESET_ALL)
-      logwrite("--[+]Successfully copied rootkit to root @ " + timecheck() + '--')
-    except:
-      logwrite("--[*]Error copying rootkit @ " + timecheck() + '--')
-      print(Fore.RED + '[*]rootkit not found!' + Style.RESET_ALL)
-      print(os.getcwd())
-    wait()
+    moj = input(Fore.CYAN + "[*]Do you want to initialize with [m]ousejack or scan with [j]ackit?[m/j]: " + Style.RESET_ALL)
+    if moj == 'M' or moj == 'm':
+      try:
+        print(Fore.CYAN + "[*]Insert CrazyRadio PA device..." + Style.RESET_ALL)
+        wait()
+        os.chdir('mousejack/nrf-research-firmware')
+        os.system('make')
+        os.system('make install')
+        os.system('dmesg')
+        print(Fore.GREEN + "[+]Firmware Uploaded!" + Style.RESET_ALL)
+        logwrite('--[+]Successfully uploaded mousejack firmware to CrazyRadio PA @ ' + timecheck() + '--')
+        wait()
+      except:
+        print(Fore.RED + "[*]Failed to upload Firmware!" + Style.RESET_ALL)
+        logwrite('--[*]Failed to upload mouesjack firmware to CrazyRadio PA @ ' + timecheck() + '--')
+        wait()
+    elif moj == 'J' or moj == 'j':
+      try:
+        print(Fore.CYAN + "[*]Insert CrazyRadio PA device w/ mousejack firmware..." + Style.RESET_ALL)
+        wait()
+        os.system('jackit')
+        print(Fore.GREEN + '[+]Scan complete!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ended jackit scan @ ' + timecheck() + '--')
+        wait()
+      except:
+        print(Fore.RED + "[*]Error scanning with jackit" + Style.RESET_ALL)
+        logwrite('--[*]Error scanning with jackit @ ' + timecheck() + '--')
+        wait()
+    else:
+      print(Fore.RED + "[*]Not an option!" + Style.RESET_ALL)
+      time.sleep(2)
   elif in_put == '4':
     os.chdir('crackers')
     print('[1] append_num')
