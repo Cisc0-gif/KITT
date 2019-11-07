@@ -81,11 +81,12 @@ def home():
   print('*[23] Enumeration - Lin & Win Enumeration and Privesc Tools    *')
   print('*[24] HoneyPot - Honeypot Network Defense Tool                 *')
   print('*[25] HomePWN - IoT Exploitation Framework                     *')
+  print('*[26] PhoneInfoga - Phone Number OSINT Tool                    *')
   print('*[X]  Fuck_0ff                                                 *')
   print(Style.RESET_ALL + '================================================================')
   in_put = input(Fore.CYAN + os.getcwd() + ': ' + Style.RESET_ALL)
   nums = ['X', 'R', 'L', 'U'] #creates list of letters for options from menu
-  for i in range(1,26): #creates range of numbers as options from menu
+  for i in range(1,27): #creates range of numbers as options from menu
     nums.append(str(i))
   if in_put not in nums:
     print(Fore.RED + '[*]Invalid Option' + Style.RESET_ALL)
@@ -867,6 +868,18 @@ def home():
     except:
       logwrite('--[*]Error running HomePWN @ ' + timecheck() + '--')
       print(Fore.RED + '[*]Error running HomePWN!' + Style.RESET_ALL)
+  elif in_put == '26':
+    try:
+      os.chdir('PhoneInfoga')
+      n = input(Fore.CYAN + '[*]Enter phone number 1##########: ' + Style.RESET_ALL)
+      os.system('python3 phoneinfoga.py -n ' + str(n))
+      print(Fore.GREEN + '[+]Completed PhoneInfoga Scan!' + Style.RESET_ALL)
+      logwrite('--[+]Completed PhoneInfoga Scan @ ' + timecheck() + '--')
+      wait()
+    except:
+      print(Fore.RED + "[*]Error running PhoneInfoga Scan!" + Style.RESET_ALL)
+      logwrite('--[*]Error running PhoneInfoga Scan @ ' + timecheck() + '--')
+      wait()
   elif in_put == 'R':
     os.chdir(root)
     print(Fore.CYAN + '[*]Reading README.md...' + Style.RESET_ALL)

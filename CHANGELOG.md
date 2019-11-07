@@ -304,3 +304,4 @@
 * replaced rootkits with mousejack and jackit
 * added mousejack and jackit firmware upload tools to lib_install.sh
 * added mousejack and jackit git configuration to lib_install.sh
+* added PhoneInfoga to KITT.py and necessary libs to lib_install.sh
