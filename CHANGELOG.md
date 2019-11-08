@@ -305,3 +305,6 @@
 * added mousejack and jackit firmware upload tools to lib_install.sh
 * added mousejack and jackit git configuration to lib_install.sh
 * added PhoneInfoga to KITT.py and necessary libs to lib_install.sh
+
+### v1.0 11/8/19
+* added sudo support to make and make install for mousejack firmware upload
