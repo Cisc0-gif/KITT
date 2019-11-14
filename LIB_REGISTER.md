@@ -78,13 +78,18 @@
 
 ## Pip Libraries
 
+* pyusb
+* platformio
 * bs4
 * requests
+* argparse
+* dnspython
 * psutil
 * httplib
 * scapy
-* wsgiref 
+* wsgiref
 * pexpect
+* http
 * pycrypto
 * pyopenssl
 * pefile
@@ -107,4 +112,7 @@
 * requests_futures
 * soupsieve
 * stem
-* torrequest 
+* torrequest
+* config
+* phonenumbers
+* html5lib
