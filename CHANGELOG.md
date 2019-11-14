@@ -308,3 +308,6 @@
 
 ### v1.0 11/8/19
 * added sudo support to make and make install for mousejack firmware upload
+
+### v1.0 11/13/19
+* fixed domainsticate execution without domain input 

@@ -489,7 +489,8 @@ def home():
     os.chdir('hg')
     try:
       print(Fore.CYAN + '[*]Running domain_sticate.py...' + Style.RESET_ALL)
-      os.system('python3 domain_sticate.py')
+      domain = input('Enter domain here (domain.ext or 0.0.0.0): ')
+      os.system('python3 domain_sticate.py ' + domain)
       print(Fore.GREEN + '[+]Successfully ended domain_sticate.py' + Style.RESET_ALL)
       logwrite('--[+]Successfully ended domain_sticate.py @ ' + timecheck() + '--')
     except:
