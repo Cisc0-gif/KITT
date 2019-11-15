@@ -311,3 +311,6 @@
 
 ### v1.0 11/13/19
 * fixed domainsticate execution without domain input 
+
+### v1.0 11/14/19
+* added linux and mysql escalation scripts from PrivEsc git repo to escalate
