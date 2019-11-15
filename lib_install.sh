@@ -35,6 +35,7 @@ echo 'Y' | sudo apt-get install git
 echo 'Y' | sudo apt-get install fail2ban
 echo 'Y' | sudo apt-get install apache2
 echo 'Y' | sudo apt-get install ssh
+echo 'Y' | sudo apt-get install weevely
 echo 'Y' | sudo apt-get install strace
 echo 'Y' | sudo apt-get install gdb
 echo 'Y' | sudo apt-get install radare2
