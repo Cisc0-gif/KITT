@@ -319,4 +319,4 @@
 ### v1.0 11/20/19
 * added termcolor(pip) and redis(apt) to lib_install.py
 * added redis-server-exploit to KITT and /exploits
-
+* added passwd_backdoor.sh exploit to escalate
