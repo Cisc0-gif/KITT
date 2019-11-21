@@ -340,7 +340,8 @@ def home():
     print('[1] LM_expl0it_WIN.sh')
     print('[2] Unp!ug.sh')
     print('[3] Cisco_E4200_vuln.py')
-    print('[4] go home')
+    print('[4] Redis-Server-Exploit.py')
+    print('[5] go home')
     exploit = input(os.getcwd() + ': ')
     if exploit == '1':
       try:
@@ -370,6 +371,14 @@ def home():
         print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
       wait()
     elif exploit == '4':
+      try:
+        os.system('cp -R redis.py ~')
+        print(Fore.GREEN + '[+]exploit copied to r00t!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully copied exploit @ ' + timecheck() + '--')
+      except:
+        logwrite('--[*]Error copying exploit @ ' + timecheck() + '--')
+        print(Fore.RED + '[*]exploit not found!' + Style.RESET_ALL)
+    elif exploit == '5':
       wait()
   elif in_put == '9':
     os.chdir('phishing')

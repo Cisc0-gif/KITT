@@ -315,3 +315,8 @@
 ### v1.0 11/14/19
 * added linux and mysql escalation scripts from PrivEsc git repo to escalate
 * added weevely to lib_install.sh
+
+### v1.0 11/20/19
+* added termcolor(pip) and redis(apt) to lib_install.py
+* added redis-server-exploit to KITT and /exploits
+
