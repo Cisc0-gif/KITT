@@ -9,14 +9,14 @@ def wait():
   wait = input('PRESS ENTER TO CONTINUE')
 
 def main():
-  print('       _   __     __      ______     ______       __')
+  print(Fore.GREEN + Style.BRIGHT + '       _   __     __      ______     ______       __')
   print('      / | / /__  / /_    / ____/____/ ____ \_____/ /__')
   print('     /  |/ / _ \/ __/   / /   / ___/ / __ `/ ___/ //_/')
   print('    / /|  /  __/ /_    / /___/ /  / / /_/ / /__/ ,<')
   print('   /_/ |_/\___/\__/____\____/_/   \ \__,_/\___/_/|_|')
-  print('                 /_____/           \____/')
+  print('                 /_____/           \____/' + Style.RESET_ALL)
   print('==========================================================')
-  print('*[1] Scan Local Networks (Airodump-ng)                   *')
+  print(Fore.GREEN + Style.BRIGHT + '*[1] Scan Local Networks (Airodump-ng)                   *')
   print('*[2] Scan Local Networks (Wash)                          *')
   print('*[3] Crack WEP Network                                   *')
   print('*[4] Crack WPA/WPA2 Network Using PMKID Method           *')
@@ -26,7 +26,8 @@ def main():
   print('*[8] Fluxion (MiTM/Router Spoof Attack)                  *')
   print('*[9] Airgeddon (Attack Framework - Graphical)            *')
   print('*[10] WiFi-Pumpkin (Rogue AP - Graphical)                *')
-  print('*[11] Exit                                               *')
+  print('*[11] WPA/WPA2 Handshake Cracking (Hashcat BF, WL, & RB) *')
+  print('*[12] Exit                                               *' + Style.RESET_ALL)
   print('==========================================================')
   in_put = input(': ')
   if in_put == '1':
@@ -129,6 +130,55 @@ def main():
       print(Fore.RED + '[*]Error running WiFi-Pumpkin' + Style.RESET_ALL)
     wait()
   if in_put == '11':
+    print(Fore.GREEN + Style.BRIGHT + '                                   ______       __')
+    print('   _________ _____      __________/ ____ \_____/ /__')
+    print('  / ___/ __ `/ __ \    / ___/ ___/ / __ `/ ___/ //_/')
+    print(' / /__/ /_/ / /_/ /   / /__/ /  / / /_/ / /__/ ,<')
+    print(' \___/\__,_/ .___/____\___/_/   \ \__,_/\___/_/|_|')
+    print('          /_/   /_____/          \____/' + Style.RESET_ALL)
+    print('=========================================================')
+    print(Fore.GREEN + Style.BRIGHT + '*[1] Dictionary Attack                                    *')
+    print('*[2] Bruteforce Attack                                    *')
+    print('*[3] Rulebased Attack                                     *')
+    print('*[4] Exit                                                 *'+ Style.RESET_ALL)
+    print('========================================================================')
+    atk = input(': ')
+    if atk == '1':
+      check = input(Fore.CYAN + '[*]Did you convert the capture file to hccapx using cap2hccapx.bin in hashcat-utils?[y/N]: ' + Style.RESET_ALL)
+      if check == 'y' or check == 'Y':
+        hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
+        wordlist = input(Fore.CYAN + '[*]Enter path to wordlist file(.dict/.txt/.wordlist): ' + Style.RESET_ALL)
+        print(Fore.CYAN + '[*]Beginning dictionary attack...' + Style.RESET_ALL)
+        os.system('hashcat -m 2500 -a 0 ' + hash + ' ' + wordlist)
+        print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
+      else:
+        print(Fore.RED + '[*]Convert cap file to .hccapx using cap2hccapx.bin in hashcat-utils!' + Style.RESET_ALL)
+      wait()
+    elif atk == '2':
+      check = input(Fore.CYAN + '[*]Did you convert the capture file to hccapx using cap2hccapx.bin in hashcat-utils?[y/N]: ' + Style.RESET_ALL)
+      if check == 'y' or check == 'Y':
+        hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
+        print(Fore.CYAN + '[*]Beginning bruteforce attack...' + Style.RESET_ALL)
+        os.system('hashcat -m 2500 -a 3 ' + hash + ' ?a?a?a?a?a?a?a?a?a?a --increment --increment-min=2 --increment-max=10')
+        print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
+      else:
+        print(Fore.RED + '[*]Convert cap file to .hccapx using cap2hccapx.bin in hashcat-utils!' + Style.RESET_ALL)
+      wait()
+    elif atk == '3':
+      check = input(Fore.CYAN + '[*]Did you convert the capture file to hccapx using cap2hccapx.bin in hashcat-utils?[y/N]: ' + Style.RESET_ALL)
+      if check == 'y' or check == 'Y':
+        hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
+        wordlist = input(Fore.CYAN + '[*]Enter path to wordlist file(.dict/.txt/.wordlist): ' + Style.RESET_ALL)
+        rule = input(Fore.CYAN + '[*]Enter path to rule table(.rule/.rules): ' + Style.RESET_ALL)
+        print(Fore.CYAN + '[*]Beginning rule-based attack...' + Style.RESET_ALL)
+        os.system('hashcat -m 2500 -a 0 ' + hash + ' ' + wordlist + ' -r ' + rule)
+        print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
+      else:
+        print(Fore.RED + '[*]Convert cap file to .hccapx using cap2hccapx.bin in hashcat-utils!' + Style.RESET_ALL)
+      wait()
+    elif atk == '4':
+      wait()
+  if in_put == '12':
     print(Fore.CYAN + '[*]Shutting down ' + interface + 'mon...' + Style.RESET_ALL)
     os.system('airmon-ng stop ' + interface)
     os.system('airmon-ng stop ' + interface + 'mon')
