@@ -96,6 +96,7 @@ echo 'Y' | sudo apt-get install xterm
 echo 'Y' | sudo apt-get install openssl
 echo 'Y' | sudo apt-get install rfkill
 echo 'Y' | sudo apt-get install strings
+gem install zsteg
 echo '[*]WARNING: To Run install.sh for fluxion, you must be in a gui (no ssh)'
 read -p 'PRESS ENTER TO CONTINUE' e
 cd fluxion/install
