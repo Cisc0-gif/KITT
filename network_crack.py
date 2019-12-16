@@ -148,7 +148,7 @@ def main():
       if check == 'y' or check == 'Y':
         hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
         wordlist = input(Fore.CYAN + '[*]Enter path to wordlist file(.dict/.txt/.wordlist): ' + Style.RESET_ALL)
-        print(Fore.CYAN + '[*]Beginning dictionary attack...' + Style.RESET_ALL)
+        print(Fore.CYAN + '[*]Beginning dictionary attack(if running on machine w/ OpenCL Drivers append -O --force -w 3 to utilize GPUs)...' + Style.RESET_ALL)
         os.system('hashcat -m 2500 -a 0 ' + hash + ' ' + wordlist)
         print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
       else:
@@ -158,8 +158,8 @@ def main():
       check = input(Fore.CYAN + '[*]Did you convert the capture file to hccapx using cap2hccapx.bin in hashcat-utils?[y/N]: ' + Style.RESET_ALL)
       if check == 'y' or check == 'Y':
         hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
-        print(Fore.CYAN + '[*]Beginning bruteforce attack...' + Style.RESET_ALL)
-        os.system('hashcat -m 2500 -a 3 ' + hash + ' ?a?a?a?a?a?a?a?a?a?a --increment --increment-min=2 --increment-max=10')
+        print(Fore.CYAN + '[*]Beginning bruteforce attack(if running on machine w/ OpenCL Drivers append -O --force -w 3 to utilize GPUs)...' + Style.RESET_ALL)
+        os.system('hashcat -m 2500 -a 3 -i ' + hash + ' ?a?a?a?a?a?a?a?a?a?a --increment --increment-min=2 --increment-max=10')
         print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
       else:
         print(Fore.RED + '[*]Convert cap file to .hccapx using cap2hccapx.bin in hashcat-utils!' + Style.RESET_ALL)
@@ -170,7 +170,7 @@ def main():
         hash = input(Fore.CYAN + '[*]Enter path to Capture file (.hccapx): ' + Style.RESET_ALL)
         wordlist = input(Fore.CYAN + '[*]Enter path to wordlist file(.dict/.txt/.wordlist): ' + Style.RESET_ALL)
         rule = input(Fore.CYAN + '[*]Enter path to rule table(.rule/.rules): ' + Style.RESET_ALL)
-        print(Fore.CYAN + '[*]Beginning rule-based attack...' + Style.RESET_ALL)
+        print(Fore.CYAN + '[*]Beginning rule-based attack(if running on machine w/ OpenCL Drivers append -O --force -w 3 to utilize GPUs)...' + Style.RESET_ALL)
         os.system('hashcat -m 2500 -a 0 ' + hash + ' ' + wordlist + ' -r ' + rule)
         print(Fore.GREEN + '[+]Process finished!' + Style.RESET_ALL)
       else:

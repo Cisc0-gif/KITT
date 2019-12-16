@@ -380,3 +380,4 @@
 ### v2.0 12/16/19
 * updated net-creds and added libs to lib_install.sh
 * added cap_crack to network_crack.py for WPA/WPA2 handshake cracking
+* fixed increment usage in network_crack.py and added optimization suggestions
