@@ -376,3 +376,6 @@
 * changed airmon-ng stop/start exe time in network_crack to specific options
 * fixed git issues
 * removed sleep calls in airgeddon and add hashcat-utils make to lib_install in airgeddon/
+
+### v2.0 12/16/19
+* updated net-creds and added libs to lib_install.sh

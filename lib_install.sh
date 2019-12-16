@@ -131,8 +131,8 @@ pip install termcolor
 pip install dnspython
 pip install psutil
 pip install httplib
-pip install scapy
-pip install wsgiref
+pip install scapy==2.3.1
+pip install wsgiref==0.1.2
 pip install pexpect
 pip install http
 pip install pycrypto
