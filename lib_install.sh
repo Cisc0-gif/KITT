@@ -99,9 +99,9 @@ echo 'Y' | sudo apt-get install strings
 gem install zsteg
 echo '[*]WARNING: To Run install.sh for fluxion, you must be in a gui (no ssh)'
 read -p 'PRESS ENTER TO CONTINUE' e
-cd fluxion/install
-bash install.sh
-cd ../..
+cd fluxion/
+./fluxion.sh
+cd ../
 echo '[*]Running make and install for hashcat, hcxdumptool, hcxtools, and hashcat-utils...'
 cd airgeddon/hashcat-utils
 make
@@ -160,16 +160,16 @@ git clone https://github.com/BastilleResearch/mousejack.git
 cd mousejack
 git submodule init
 git submoudle update
-cd ..
+cd ../
 git clone https://github.com/insecurityofthings/jackit.git
 cd jackit
 pip install -r requirements.txt
-cd ..
+cd ../
 echo '[*]Installing WiFi-Pumpkin...'
 cd WiFi-Pumpkin/
 ./installer.sh
 pip install --upgrade pyasn1-modules
-cd ..
+cd ../
 echo '[*]Writing fail2ban configurations w/ bantime 5ms, findtime 5ms, and maxretry 3...'
 echo "
 #
@@ -1063,8 +1063,7 @@ backend = %(syslog_backend)s
 # Zoneminder HTTP/HTTPS web interface auth
 # Logs auth failures to apache2 error log
 port    = http,https
-logpath = %(apache_error_log)s
-" > /etc/fail2ban/jail.local
+logpath = %(apache_error_log)s"  > /etc/fail2ban/jail.local
 sudo service fail2ban restart
 echo '[*]Writing dynamic proxychain to proxychain config...'
 echo "
@@ -1150,8 +1149,7 @@ https 171.5.102.251 8080
 http  54.180.123.253 8080
 http 159.65.168.195 80
 socks4 198.50.177.44 44699
-socks5 159.203.166.41 1080
-" > /etc/proxychains.conf
+socks5 159.203.166.41 1080" > /etc/proxychains.conf
 echo '[*]Installing Sherlock Packages...'
 pip3 install beautifulsoup4
 pip3 install bs4

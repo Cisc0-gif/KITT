@@ -388,3 +388,4 @@
 
 ### v2.0 12/22/19
 * fixed hashcat-utils error
+* fixed multiple errors in lib_install.sh execution
