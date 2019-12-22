@@ -385,3 +385,6 @@
 
 ### v2.0 12/20/19
 * added pip3 install pwn to lib_install.sh
+
+### v2.0 12/22/19
+* fixed hashcat-utils error
