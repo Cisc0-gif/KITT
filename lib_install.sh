@@ -172,6 +172,12 @@ cd WiFi-Pumpkin/
 ./installer.sh
 pip install --upgrade pyasn1-modules
 cd ../
+echo '[*]Installing w3af...'
+git clone https://github.com/andresriancho/w3af
+cd w3af/
+python w3af_console
+bash /tmp/w3af_dependency_install.sh
+cd ../
 echo '[*]Writing fail2ban configurations w/ bantime 5ms, findtime 5ms, and maxretry 3...'
 echo "#
 # WARNING: heavily refactored in 0.9.0 release.  Please review and
@@ -1151,6 +1157,9 @@ http  54.180.123.253 8080
 http 159.65.168.195 80
 socks4 198.50.177.44 44699
 socks5 159.203.166.41 1080" > /etc/proxychains.conf
+echo '[*]Writing sysctl_sanitize.sh to root crontab...'
+echo "@reboot bash /opt/KITT/sdefense/sysctl_sanitize.sh" >> /var/spool/cron/crontabs/root
+echo "*/59 * * * * bash /opt/KITT/sdefense/sysctl_sanitize.sh" >> /var/spool/cron/crontabs/root
 echo '[*]Installing Sherlock Packages...'
 pip3 install beautifulsoup4
 pip3 install bs4

@@ -391,3 +391,8 @@
 * fixed multiple errors in lib_install.sh execution
 * added dishred.sh to escalate/ dh_recv.sh to sdefense and logrotate to lib_install.sh
 * added bluez to lib_install.sh and BlueScan.sh to KITT2.py
+
+### v2.0 12/23/19
+* added sysctl_sanitize.sh to sdefense
+* added w3af to lib_install.sh
+* added sysctl_sanitize.sh to root crontab
