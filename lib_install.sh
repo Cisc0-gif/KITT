@@ -60,6 +60,7 @@ echo 'Y' | sudo apt-get install python3
 echo 'Y' | sudo apt-get install python3-pip
 echo 'Y' | sudo apt-get install postgresql
 echo 'Y' | sudo apt-get install sqlmap
+echo 'Y' | sudo apt-get install logrotate
 echo 'Y' | sudo apt-get install kali-linux-full
 echo 'Y' | sudo apt-get install btscanner
 echo 'Y' | sudo apt-get install bluelog
@@ -171,8 +172,7 @@ cd WiFi-Pumpkin/
 pip install --upgrade pyasn1-modules
 cd ../
 echo '[*]Writing fail2ban configurations w/ bantime 5ms, findtime 5ms, and maxretry 3...'
-echo "
-#
+echo "#
 # WARNING: heavily refactored in 0.9.0 release.  Please review and
 #          customize settings for your setup.
 #

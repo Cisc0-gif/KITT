@@ -667,7 +667,8 @@ def home():
     print('  [5] ssh_encr7tion')
     print('  [6] st@tic IP')
     print('  [7] Fail2ban Configurations')
-    print('  [8] go home')
+    print('  [8] DHCP IP Reception')
+    print('  [9] go home')
     rdefense = input(Fore.CYAN + '[*]Select Security Tool: ' + Style.RESET_ALL)
     if rdefense == '1':
       try:
@@ -764,6 +765,16 @@ def home():
         print(Fore.RED + '[*]Error configuring fail2ban' + Style.RESET_ALL)
       wait()
     elif rdefense == '8':
+      try:
+        print(Fore.CYAN + '[*]Running dh_recv.sh...' + Style.RESET_ALL)
+        os.system('./dh_recv.sh')
+        print(Fore.GREEN + '[+]Successfully ran dh_recv.dh!' + Style.RESET_ALL)
+        logwrite('--[+]Successfully ran dh_recv.dh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running dh_recv.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running dh_recv.sh @ ' + timecheck() + '--')
+      wait()
+    elif rdefense == '9':
       wait()
   elif in_put == '9':
     print('[*]Miscellaneous')

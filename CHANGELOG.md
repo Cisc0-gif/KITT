@@ -389,3 +389,4 @@
 ### v2.0 12/22/19
 * fixed hashcat-utils error
 * fixed multiple errors in lib_install.sh execution
+* added dishred.sh to escalate/ dh_recv.sh to sdefense and logrotate to lib_install.sh
