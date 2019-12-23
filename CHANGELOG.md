@@ -390,3 +390,4 @@
 * fixed hashcat-utils error
 * fixed multiple errors in lib_install.sh execution
 * added dishred.sh to escalate/ dh_recv.sh to sdefense and logrotate to lib_install.sh
+* added bluez to lib_install.sh and BlueScan.sh to KITT2.py

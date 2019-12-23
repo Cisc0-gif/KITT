@@ -63,6 +63,7 @@ echo 'Y' | sudo apt-get install sqlmap
 echo 'Y' | sudo apt-get install logrotate
 echo 'Y' | sudo apt-get install kali-linux-full
 echo 'Y' | sudo apt-get install btscanner
+echo 'Y' | sudo apt-get install bluez
 echo 'Y' | sudo apt-get install bluelog
 echo 'Y' | sudo apt-get install redfang
 echo 'Y' | sudo apt-get install bluesnarfer

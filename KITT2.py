@@ -499,7 +499,8 @@ def home():
     print('  [2]PentBox - HoneyPot Tool')
     print('  [3]Spooftooph - BT Spoofing')
     print('  [4]BtVerifier - Rfcomm Channel Verifier')
-    print('  [5]go home')
+    print('  [5]BlueScan - BT Class and MAC Scanner')
+    print('  [6]go home')
     iot = input(Fore.CYAN + '[*]Select IoT Exploit Tool: ' + Style.RESET_ALL)
     if iot == '1':
       os.chdir('HomePWN')
@@ -544,6 +545,16 @@ def home():
         logwrite('--[*]Error running btverifier.py @ ' + timecheck() + '--')
       wait()
     elif iot == '5':
+      print(Fore.CYAN + '[*]Running BlueScan.sh...' + Style.RESET_ALL)
+      try:
+        os.system('./BlueScan.sh')
+        print(Fore.GREEN + '[+]Successfully ended BlueScan.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Successfully ended BlueScan.sh @ ' + timecheck() + '--')
+      except:
+        print(Fore.RED + '[*]Error running BlueScan.sh!' + Style.RESET_ALL)
+        logwrite('--[*]Error running BlueScan.sh @ ' + timecheck() + '--')
+      wait()
+    elif iot == '6':
       wait()
   elif in_put == '7':
     print('[*]Hardware Hacking')
