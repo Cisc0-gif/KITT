@@ -8,11 +8,12 @@ mkdir /opt
 cd ..
 mv KITT /opt
 echo "[+]Done!"
-echo "[*]Writing KITT directory to PATH..."
-export PATH=$PATH:/opt/KITT
+#echo "[*]Writing KITT directory to PATH..." #old method
+#export PATH=$PATH:/opt/KITT
+#echo "[*]Appending KITT directory to .bashrc" #old method
+#echo "export PATH=$PATH:/opt/KITT" >> /root/.bashrc
+echo "[*]Writing KITT2.py to alias..."
+alias KITT2="python3 /opt/KITT/KITT2.py"
 echo "[+]Done!"
-echo "[*]Appending KITT directory to .bashrc"
-echo "export PATH=$PATH:/opt/KITT" >> /root/.bashrc
-echo "[+]Done!"
-echo 'Execute "KITTexe.sh" to run KITT'
+echo 'Type "KITT2" to run KITT Framework'
 

@@ -397,3 +397,4 @@
 * added w3af to lib_install.sh
 * added sysctl_sanitize.sh to root crontab
 * removed extra time lib import in KITT2.py
+* changed PATH and KITTexe.sh method to KITT2="python3 /opt/KITT/KITT2.py"
