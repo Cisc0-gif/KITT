@@ -396,3 +396,4 @@
 * added sysctl_sanitize.sh to sdefense
 * added w3af to lib_install.sh
 * added sysctl_sanitize.sh to root crontab
+* removed extra time lib import in KITT2.py

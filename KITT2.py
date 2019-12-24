@@ -1,7 +1,6 @@
 #! python3
 import os
 root = os.getcwd() #sets root as current directory for access to all tools
-import time
 import socket
 import requests
 import sys
