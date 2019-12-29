@@ -399,7 +399,10 @@
 * removed extra time lib import in KITT2.py
 * changed PATH and KITTexe.sh method to KITT2="python3 /opt/KITT/KITT2.py"
 
-### v2.0 12/14/19
+### v2.0 12/24/19
 * Merry Christmas!
 * Added sysctl_sanitize.sh to KITT2.py
 * fixed minor extension issues
+
+### v2.0 12/29/19
+* fixed bad interpreter in shebang of KITT2.py

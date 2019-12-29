@@ -1,4 +1,4 @@
-#! python3
+#! /usr/bin/env python3
 import os
 root = os.getcwd() #sets root as current directory for access to all tools
 import socket
