@@ -406,3 +406,6 @@
 
 ### v2.0 12/29/19
 * fixed bad interpreter in shebang of KITT2.py
+
+### v2.0 12/30/19
+* fixed errors with KITT_INSTALLER.sh setup
