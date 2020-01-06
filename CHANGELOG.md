@@ -409,3 +409,6 @@
 
 ### v2.0 12/30/19
 * fixed errors with KITT_INSTALLER.sh setup
+
+### v2.0 1/5/20
+* redesigned lib_install.sh and migrated to lib_install.py and added requirements for python
