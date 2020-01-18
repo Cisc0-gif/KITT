@@ -1,3 +1,0 @@
-#!/bin/sh
-export LD_LIBRARY_PATH=/usr/share/staffcounter/lib/
-/usr/share/staffcounter/bin/staffcounter "$1"

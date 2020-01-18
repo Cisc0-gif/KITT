@@ -1,1 +1,0 @@
-class AutoSploitAPIConnectionError(Exception): pass

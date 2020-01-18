@@ -1,3 +1,0 @@
-# This file contains label of property for MetaDataExtractor
-TEST=For testing. Do not remove
-MARKER_NOTE_NAME=Kodak Makernote
