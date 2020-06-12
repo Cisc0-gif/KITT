@@ -7,9 +7,6 @@ WARNING: This project is no longer being updated and some installation features 
 
 If you prefer a CLI tool to a GUI tool KITT Lite, a lighter and more advanced tool for the command line, can be found [here](<https://github.com/Cisc0-gif/KITT-Lite.git>)
 
-DISCLAIMER: This tool is for educational purposes only. I am not responsible for the misuse of others of this tool in any way, shape or form.
-
-
 ## Features
 
 ### OSINT
@@ -101,6 +98,9 @@ If you do not want to install KITT to alias then simply run ``` python3 lib_inst
 
 To begin the framework, type ``` KITT2 ``` and execute in terminal. 
 
+## Legal Disclaimer
+
+Usage of KITT-Lite and/or the tools installed with KITT-Lite for attacking targets without prior mutual consent is illegal. It's the end user's responsibility to obey all applicable local, state, and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program.
 
 ## Built With
 
